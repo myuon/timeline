@@ -4,10 +4,12 @@ import { z } from "zod";
 import { schemaForType } from "./helper/zod";
 import fetch from "node-fetch";
 
+const domain = `https://example.com`;
+
 export const newRouter = (options?: IRouterOptions) => {
   const router = new Router(options);
 
-  router.get("/federation/:userName", async (ctx) => {
+  router.get("/ap/federation/:userName", async (ctx) => {
     const userName = ctx.params.userName;
     const [, domain] = userName.split("@");
     const resp = await fetch(
@@ -41,6 +43,28 @@ export const newRouter = (options?: IRouterOptions) => {
 
     ctx.body = await actorResp.json();
   });
+  router.get("/me", async (ctx) => {
+    const auth = ctx.state.auth;
+
+    ctx.body = {
+      "@context": "https://www.w3.org/ns/activitystreams",
+      type: "Person",
+      id: `${domain}/users/${auth.uid}`,
+      following: `${domain}/users/${auth.uid}/following`,
+      followers: `${domain}/users/${auth.uid}/followers`,
+      inbox: `${domain}/users/${auth.uid}/inbox`,
+      outbox: `${domain}/users/${auth.uid}/outbox`,
+      preferredUsername: auth.name,
+      name: auth.name,
+      summary: auth.name,
+      icon: {
+        type: "Image",
+        mediaType: "image/png",
+        url: auth.photoURL,
+      },
+    };
+  });
+
   router.get("/hello", async (ctx) => {
     ctx.body = "Hello World!";
   });
