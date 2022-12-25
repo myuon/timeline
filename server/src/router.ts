@@ -9,6 +9,30 @@ const domain = `https://example.com`;
 export const newRouter = (options?: IRouterOptions) => {
   const router = new Router(options);
 
+  router.get("/ap/.well-known/host-meta", async (ctx) => {
+    ctx.body = `<?xml version="1.0" encoding="UTF-8"?>
+<XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0">
+  <Link rel="lrdd" template="${domain}/.well-known/webfinger?resource={uri}"/>
+</XRD>`;
+  });
+  router.get("/ap/.well-known/webfinger", async (ctx) => {
+    const resource = ctx.query.resource;
+    if (!resource) {
+      ctx.throw(400, "Invalid resource");
+      return;
+    }
+
+    ctx.body = {
+      subject: `acct:${resource}`,
+      links: [
+        {
+          rel: "self",
+          type: "application/activity+json",
+          href: `${domain}/ap/users/${resource}`,
+        },
+      ],
+    };
+  });
   router.get("/ap/federation/:userName", async (ctx) => {
     const userName = ctx.params.userName;
     const [, domain] = userName.split("@");
