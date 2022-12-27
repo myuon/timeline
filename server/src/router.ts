@@ -1,5 +1,7 @@
 import Router, { IRouterOptions } from "koa-router";
 import fetch from "node-fetch";
+import fs from "fs";
+import path from "path";
 
 const domain = `https://tl.ramda.io`;
 
@@ -36,7 +38,10 @@ export const newRouter = (options?: IRouterOptions) => {
 
     ctx.headers["Content-Type"] = "application/activity+json";
     ctx.body = {
-      "@context": "https://www.w3.org/ns/activitystreams",
+      "@context": [
+        "https://www.w3.org/ns/activitystreams",
+        "https://w3id.org/security/v1",
+      ],
       type: "Person",
       id: `${domain}/users/${userName}`,
       following: `${domain}/users/${userName}/following`,
@@ -52,9 +57,17 @@ export const newRouter = (options?: IRouterOptions) => {
         url: "https://pbs.twimg.com/profile_images/1398634166523097090/QhosMWKS_400x400.jpg",
       },
       url: `${domain}/users/${userName}`,
+      publicKey: {
+        id: `${domain}/users/${userName}#main-key`,
+        owner: `${domain}/users/${userName}`,
+        publicKeyPem: fs.readFileSync(
+          path.join(__dirname, "../../.secrets/public.pem"),
+          "utf-8"
+        ),
+      },
     };
   });
-  router.get("/users/outbox", async (ctx) => {
+  router.get("/users/myuon/outbox", async (ctx) => {
     const userName = "myuon";
 
     ctx.headers["Content-Type"] = "application/activity+json";
