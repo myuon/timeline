@@ -49,6 +49,7 @@ export const newRouter = (options?: IRouterOptions) => {
         mediaType: "image/png",
         url: "https://pbs.twimg.com/profile_images/1398634166523097090/QhosMWKS_400x400.jpg",
       },
+      url: `${domain}/users/${userName}`,
     };
   });
   router.get("/federation/:userName", async (ctx) => {
