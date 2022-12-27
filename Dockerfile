@@ -16,4 +16,4 @@ COPY --from=builder --chown=nonroot:nonroot /app/dist ./dist
 COPY --from=deps --chown=nonroot:nonroot /app/node_modules ./node_modules
 USER nonroot
 
-CMD ["dist/index.js"]
+CMD ["dist/server/index.js"]
