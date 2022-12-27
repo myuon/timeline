@@ -54,6 +54,18 @@ export const newRouter = (options?: IRouterOptions) => {
       url: `${domain}/users/${userName}`,
     };
   });
+  router.get("/users/outbox", async (ctx) => {
+    const userName = "myuon";
+
+    ctx.headers["Content-Type"] = "application/activity+json";
+    ctx.body = {
+      "@context": "https://www.w3.org/ns/activitystreams",
+      type: "OrderedCollection",
+      id: `${domain}/users/${userName}/outbox`,
+      totalItems: 0,
+      first: `${domain}/users/${userName}/outbox?page=true`,
+    };
+  });
   router.get("/federation/:userName", async (ctx) => {
     const userName = ctx.params.userName;
     const [, domain] = userName.split("@");
