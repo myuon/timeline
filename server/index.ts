@@ -8,6 +8,7 @@ import { DataSource } from "typeorm";
 import adminKey from "../.secrets/adminKey.json";
 import * as admin from "firebase-admin";
 import { authJwt } from "./src/middleware/auth";
+import proxy from "koa-proxies";
 
 const dataSource = new DataSource({
   type: "sqlite",
@@ -25,16 +26,26 @@ const auth = admin.auth();
 const app = new Koa();
 
 app.use(logger());
-app.use(
-  serveStaticProd({
-    path: path.resolve(__dirname, "..", "web"),
-    excludePrefix: "/api",
-    fallbackForSpa: true,
-  })
-);
+if (process.env.NODE_ENV !== "production") {
+  app.use(
+    proxy("/web", {
+      target: "http://localhost:5173",
+      changeOrigin: true,
+    })
+  );
+}
+app.use(async (ctx, next) => {
+  if (ctx.request.path.startsWith("/web")) {
+    serveStaticProd({
+      path: path.resolve(__dirname, ".."),
+    })(ctx, next);
+  } else {
+    await next();
+  }
+});
 
 const router = newRouter({
-  prefix: "/api",
+  prefix: "",
 });
 app.use(authJwt(auth));
 app.use(router.routes());

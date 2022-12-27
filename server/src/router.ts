@@ -9,13 +9,13 @@ const domain = `https://example.com`;
 export const newRouter = (options?: IRouterOptions) => {
   const router = new Router(options);
 
-  router.get("/ap/.well-known/host-meta", async (ctx) => {
+  router.get("/.well-known/host-meta", async (ctx) => {
     ctx.body = `<?xml version="1.0" encoding="UTF-8"?>
 <XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0">
   <Link rel="lrdd" template="${domain}/.well-known/webfinger?resource={uri}"/>
 </XRD>`;
   });
-  router.get("/ap/.well-known/webfinger", async (ctx) => {
+  router.get("/.well-known/webfinger", async (ctx) => {
     const resource = ctx.query.resource;
     if (!resource) {
       ctx.throw(400, "Invalid resource");
@@ -33,7 +33,7 @@ export const newRouter = (options?: IRouterOptions) => {
       ],
     };
   });
-  router.get("/ap/federation/:userName", async (ctx) => {
+  router.get("/federation/:userName", async (ctx) => {
     const userName = ctx.params.userName;
     const [, domain] = userName.split("@");
     const resp = await fetch(
@@ -87,28 +87,6 @@ export const newRouter = (options?: IRouterOptions) => {
         url: auth.photoURL,
       },
     };
-  });
-
-  router.get("/hello", async (ctx) => {
-    ctx.body = "Hello World!";
-  });
-  router.post("/echo", koaBody(), async (ctx) => {
-    interface EchoInput {
-      message: string;
-    }
-
-    const schema = schemaForType<EchoInput>()(
-      z.object({
-        message: z.string(),
-      })
-    );
-    const result = schema.safeParse(ctx.request.body);
-    if (!result.success) {
-      ctx.throw(400, result.error);
-      return;
-    }
-
-    ctx.body = result.data.message;
   });
 
   return router;
