@@ -19,6 +19,7 @@ export const newRouter = (options?: IRouterOptions) => {
       return;
     }
 
+    ctx.headers["Content-Type"] = "application/activity+json";
     ctx.body = {
       subject: resource,
       links: [
@@ -33,6 +34,7 @@ export const newRouter = (options?: IRouterOptions) => {
   router.get("/users/myuon.json", async (ctx) => {
     const userName = "myuon";
 
+    ctx.headers["Content-Type"] = "application/activity+json";
     ctx.body = {
       "@context": "https://www.w3.org/ns/activitystreams",
       type: "Person",
