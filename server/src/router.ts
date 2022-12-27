@@ -1,7 +1,4 @@
-import koaBody from "koa-body";
 import Router, { IRouterOptions } from "koa-router";
-import { z } from "zod";
-import { schemaForType } from "./helper/zod";
 import fetch from "node-fetch";
 
 const domain = `https://tl.ramda.io`;
@@ -23,7 +20,7 @@ export const newRouter = (options?: IRouterOptions) => {
     }
 
     ctx.body = {
-      subject: `acct:${resource}`,
+      subject: resource,
       links: [
         {
           rel: "self",
