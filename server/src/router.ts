@@ -30,6 +30,27 @@ export const newRouter = (options?: IRouterOptions) => {
       ],
     };
   });
+  router.get("/users/myuon.json", async (ctx) => {
+    const userName = "myuon";
+
+    ctx.body = {
+      "@context": "https://www.w3.org/ns/activitystreams",
+      type: "Person",
+      id: `${domain}/users/${userName}`,
+      following: `${domain}/users/${userName}/following`,
+      followers: `${domain}/users/${userName}/followers`,
+      inbox: `${domain}/users/${userName}/inbox`,
+      outbox: `${domain}/users/${userName}/outbox`,
+      preferredUsername: userName,
+      name: userName,
+      summary: userName,
+      icon: {
+        type: "Image",
+        mediaType: "image/png",
+        url: "https://pbs.twimg.com/profile_images/1398634166523097090/QhosMWKS_400x400.jpg",
+      },
+    };
+  });
   router.get("/federation/:userName", async (ctx) => {
     const userName = ctx.params.userName;
     const [, domain] = userName.split("@");
@@ -82,27 +103,6 @@ export const newRouter = (options?: IRouterOptions) => {
         type: "Image",
         mediaType: "image/png",
         url: auth.photoURL,
-      },
-    };
-  });
-  router.get("/users/myuon", async (ctx) => {
-    const userName = "myuon";
-
-    ctx.body = {
-      "@context": "https://www.w3.org/ns/activitystreams",
-      type: "Person",
-      id: `${domain}/users/${userName}`,
-      following: `${domain}/users/${userName}/following`,
-      followers: `${domain}/users/${userName}/followers`,
-      inbox: `${domain}/users/${userName}/inbox`,
-      outbox: `${domain}/users/${userName}/outbox`,
-      preferredUsername: userName,
-      name: userName,
-      summary: userName,
-      icon: {
-        type: "Image",
-        mediaType: "image/png",
-        url: "https://pbs.twimg.com/profile_images/1398634166523097090/QhosMWKS_400x400.jpg",
       },
     };
   });
