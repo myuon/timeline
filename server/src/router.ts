@@ -4,7 +4,7 @@ import { z } from "zod";
 import { schemaForType } from "./helper/zod";
 import fetch from "node-fetch";
 
-const domain = `https://example.com`;
+const domain = `https://tl.ramda.io`;
 
 export const newRouter = (options?: IRouterOptions) => {
   const router = new Router(options);
@@ -28,7 +28,7 @@ export const newRouter = (options?: IRouterOptions) => {
         {
           rel: "self",
           type: "application/activity+json",
-          href: `${domain}/ap/users/${resource}`,
+          href: `${domain}/users/${resource}`,
         },
       ],
     };
@@ -85,6 +85,27 @@ export const newRouter = (options?: IRouterOptions) => {
         type: "Image",
         mediaType: "image/png",
         url: auth.photoURL,
+      },
+    };
+  });
+  router.get("/users/myuon", async (ctx) => {
+    const userName = "myuon";
+
+    ctx.body = {
+      "@context": "https://www.w3.org/ns/activitystreams",
+      type: "Person",
+      id: `${domain}/users/${userName}`,
+      following: `${domain}/users/${userName}/following`,
+      followers: `${domain}/users/${userName}/followers`,
+      inbox: `${domain}/users/${userName}/inbox`,
+      outbox: `${domain}/users/${userName}/outbox`,
+      preferredUsername: userName,
+      name: userName,
+      summary: userName,
+      icon: {
+        type: "Image",
+        mediaType: "image/png",
+        url: "https://pbs.twimg.com/profile_images/1398634166523097090/QhosMWKS_400x400.jpg",
       },
     };
   });
