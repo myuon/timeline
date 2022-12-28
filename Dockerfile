@@ -16,7 +16,7 @@ FROM gcr.io/distroless/nodejs:18
 WORKDIR /app
 ENV NODE_ENV production
 COPY --from=builder --chown=nonroot:nonroot /app/dist ./dist
-COPY --from=builder --chown=nonroot:nonroot /app/.secrets ./.secrets
+COPY --from=builder --chown=nonroot:nonroot /app/.secrets ./dist/.secrets
 COPY --from=deps --chown=nonroot:nonroot /app/node_modules ./node_modules
 USER nonroot
 

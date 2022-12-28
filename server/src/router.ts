@@ -1,9 +1,9 @@
 import Router, { IRouterOptions } from "koa-router";
-import fetch from "node-fetch";
 import fs from "fs";
 import path from "path";
 
-const domain = `https://tl.ramda.io`;
+const domain = `tl.ramda.io`;
+const userName = "myuon";
 
 export const newRouter = (options?: IRouterOptions) => {
   const router = new Router(options);
@@ -12,35 +12,37 @@ export const newRouter = (options?: IRouterOptions) => {
     ctx.set("Content-Type", "application/xrd+xml");
     ctx.body = `<?xml version="1.0" encoding="UTF-8"?>
 <XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0">
-  <Link rel="lrdd" template="${domain}/.well-known/webfinger?resource={uri}"/>
+  <Link rel="lrdd" template="https://${domain}/.well-known/webfinger?resource={uri}"/>
 </XRD>`;
   });
   router.get("/.well-known/webfinger", async (ctx) => {
-    const resource = ctx.query.resource as string | undefined;
-    if (!resource) {
-      ctx.throw(400, "Invalid resource");
+    if (ctx.query.resource !== `acct:${userName}@${domain}`) {
+      ctx.throw(404, "Not found");
       return;
     }
 
     ctx.body = {
-      subject: resource,
+      subject: `acct:${userName}@${domain}`,
+      aliases: [`https://${domain}/u/${userName}`],
       links: [
         {
           rel: "self",
           type: "application/activity+json",
-          href: `${domain}/users/${resource.split("acct:")[1].split("@")[0]}`,
+          href: `https://${domain}/u/${userName}`,
         },
       ],
     };
     ctx.set("Content-Type", "application/jrd+json");
   });
-  router.get("/users/:userName", async (ctx) => {
-    if (!ctx.params.userName.endsWith(".json")) {
-      ctx.body = ctx.params.userName;
+  router.get("/u/:userName", async (ctx) => {
+    if (ctx.params.userName !== userName) {
+      ctx.throw(404, "Not found");
       return;
     }
-
-    const userName = "myuon";
+    if (!ctx.accepts("application/activity+json")) {
+      ctx.body = userName;
+      return;
+    }
 
     ctx.body = {
       "@context": [
@@ -48,23 +50,23 @@ export const newRouter = (options?: IRouterOptions) => {
         "https://w3id.org/security/v1",
       ],
       type: "Person",
-      id: `${domain}/users/${userName}`,
-      following: `${domain}/users/${userName}/following`,
-      followers: `${domain}/users/${userName}/followers`,
-      inbox: `${domain}/users/${userName}/inbox`,
-      outbox: `${domain}/users/${userName}/outbox`,
+      id: `https://${domain}/u/${userName}`,
+      following: `https://${domain}/u/${userName}/following`,
+      followers: `https://${domain}/u/${userName}/followers`,
+      inbox: `https://${domain}/u/${userName}/inbox`,
+      outbox: `https://${domain}/u/${userName}/outbox`,
       preferredUsername: userName,
       name: userName,
-      summary: userName,
+      summary: `@${userName} on ${domain}`,
       icon: {
         type: "Image",
         mediaType: "image/png",
         url: "https://pbs.twimg.com/profile_images/1398634166523097090/QhosMWKS_400x400.jpg",
       },
-      url: `${domain}/users/${userName}`,
+      url: `https://${domain}/u/${userName}`,
       publicKey: {
-        id: `${domain}/users/${userName}#main-key`,
-        owner: `${domain}/users/${userName}`,
+        id: `https://${domain}/u/${userName}#main-key`,
+        owner: `https://${domain}/u/${userName}`,
         publicKeyPem: fs.readFileSync(
           path.join(__dirname, "../../.secrets/public.pem"),
           "utf-8"
@@ -73,72 +75,62 @@ export const newRouter = (options?: IRouterOptions) => {
     };
     ctx.set("Content-Type", "application/activity+json");
   });
-  router.get("/users/myuon/outbox", async (ctx) => {
-    const userName = "myuon";
+  router.get("/u/:userName/outbox", async (ctx) => {
+    if (ctx.params.userName !== userName) {
+      ctx.throw(404, "Not found");
+      return;
+    }
+    if (!ctx.accepts("application/activity+json")) {
+      ctx.body = userName;
+      return;
+    }
 
-    ctx.headers["Content-Type"] = "application/activity+json";
     ctx.body = {
-      "@context": "https://www.w3.org/ns/activitystreams",
+      "@context": ["https://www.w3.org/ns/activitystreams"],
       type: "OrderedCollection",
-      id: `${domain}/users/${userName}/outbox`,
+      id: `https://${domain}/u/${userName}/outbox`,
       totalItems: 0,
-      first: `${domain}/users/${userName}/outbox?page=true`,
+      orderedItems: [],
     };
+    ctx.set("Content-Type", "application/activity+json");
   });
-  router.get("/federation/:userName", async (ctx) => {
-    const userName = ctx.params.userName;
-    const [, domain] = userName.split("@");
-    const resp = await fetch(
-      `https://${domain}/.well-known/webfinger?resource=acct:${userName}`
-    );
-    if (!resp.ok) {
-      ctx.throw(400, "Invalid user name");
+  router.get("/u/:userName/followers", async (ctx) => {
+    if (ctx.params.userName !== userName) {
+      ctx.throw(404, "Not found");
       return;
     }
-
-    const data = (await resp.json()) as {
-      subject: string;
-      links: {
-        rel: string;
-        type: string;
-        href: string;
-      }[];
-    };
-    const self = data.links.find((link) => link.rel === "self");
-    const actorJsonUrl = self ? `${self.href}.json` : null;
-    if (!actorJsonUrl) {
-      ctx.throw(400, "Invalid user name");
+    if (!ctx.accepts("application/activity+json")) {
+      ctx.body = userName;
       return;
     }
-
-    const actorResp = await fetch(actorJsonUrl);
-    if (!actorResp.ok) {
-      ctx.throw(400, "Invalid user name");
-      return;
-    }
-
-    ctx.body = await actorResp.json();
-  });
-  router.get("/me", async (ctx) => {
-    const auth = ctx.state.auth;
 
     ctx.body = {
-      "@context": "https://www.w3.org/ns/activitystreams",
-      type: "Person",
-      id: `${domain}/users/${auth.uid}`,
-      following: `${domain}/users/${auth.uid}/following`,
-      followers: `${domain}/users/${auth.uid}/followers`,
-      inbox: `${domain}/users/${auth.uid}/inbox`,
-      outbox: `${domain}/users/${auth.uid}/outbox`,
-      preferredUsername: auth.name,
-      name: auth.name,
-      summary: auth.name,
-      icon: {
-        type: "Image",
-        mediaType: "image/png",
-        url: auth.photoURL,
-      },
+      "@context": ["https://www.w3.org/ns/activitystreams"],
+      type: "OrderedCollection",
+      id: `https://${domain}/u/${userName}/followers`,
+      totalItems: 0,
+      orderedItems: [],
     };
+    ctx.set("Content-Type", "application/activity+json");
+  });
+  router.get("/u/:userName/following", async (ctx) => {
+    if (ctx.params.userName !== userName) {
+      ctx.throw(404, "Not found");
+      return;
+    }
+    if (!ctx.accepts("application/activity+json")) {
+      ctx.body = userName;
+      return;
+    }
+
+    ctx.body = {
+      "@context": ["https://www.w3.org/ns/activitystreams"],
+      type: "OrderedCollection",
+      id: `https://${domain}/u/${userName}/following`,
+      totalItems: 0,
+      orderedItems: [],
+    };
+    ctx.set("Content-Type", "application/activity+json");
   });
 
   return router;
