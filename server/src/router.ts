@@ -9,34 +9,39 @@ export const newRouter = (options?: IRouterOptions) => {
   const router = new Router(options);
 
   router.get("/.well-known/host-meta", async (ctx) => {
+    ctx.set("Content-Type", "application/xrd+xml");
     ctx.body = `<?xml version="1.0" encoding="UTF-8"?>
 <XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0">
   <Link rel="lrdd" template="${domain}/.well-known/webfinger?resource={uri}"/>
 </XRD>`;
   });
   router.get("/.well-known/webfinger", async (ctx) => {
-    const resource = ctx.query.resource;
+    const resource = ctx.query.resource as string | undefined;
     if (!resource) {
       ctx.throw(400, "Invalid resource");
       return;
     }
 
-    ctx.headers["Content-Type"] = "application/activity+json";
     ctx.body = {
       subject: resource,
       links: [
         {
           rel: "self",
           type: "application/activity+json",
-          href: `${domain}/users/${resource}`,
+          href: `${domain}/users/${resource.split("acct:")[1].split("@")[0]}`,
         },
       ],
     };
+    ctx.set("Content-Type", "application/jrd+json");
   });
-  router.get("/users/myuon.json", async (ctx) => {
+  router.get("/users/:userName", async (ctx) => {
+    if (!ctx.params.userName.endsWith(".json")) {
+      ctx.body = ctx.params.userName;
+      return;
+    }
+
     const userName = "myuon";
 
-    ctx.headers["Content-Type"] = "application/activity+json";
     ctx.body = {
       "@context": [
         "https://www.w3.org/ns/activitystreams",
@@ -66,6 +71,7 @@ export const newRouter = (options?: IRouterOptions) => {
         ),
       },
     };
+    ctx.set("Content-Type", "application/activity+json");
   });
   router.get("/users/myuon/outbox", async (ctx) => {
     const userName = "myuon";
