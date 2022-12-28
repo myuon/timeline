@@ -1,6 +1,9 @@
 FROM node:19 as builder
 WORKDIR /app
-COPY . .
+COPY server/package*.json server/
+COPY server/yarn.lock server/
+COPY web/package*.json web/
+COPY web/yarn.lock web/
 RUN yarn install --frozen-lockfile
 RUN yarn build
 
