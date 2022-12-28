@@ -85,13 +85,42 @@ export const newRouter = (options?: IRouterOptions) => {
       return;
     }
 
-    ctx.body = {
-      "@context": ["https://www.w3.org/ns/activitystreams"],
-      type: "OrderedCollection",
-      id: `https://${domain}/u/${userName}/outbox`,
-      totalItems: 0,
-      orderedItems: [],
-    };
+    const page = ctx.query.page === "true";
+    if (page) {
+      ctx.body = {
+        "@context": "https://www.w3.org/ns/activitystreams",
+        type: "OrderedCollectionPage",
+        id: `https://${domain}/u/${userName}/outbox?page=true`,
+        partOf: `https://${domain}/u/${userName}/outbox`,
+        orderedItems: [
+          {
+            id: `https://${domain}/u/${userName}/s/1/activity`,
+            type: "Create",
+            actor: `https://${domain}/u/${userName}`,
+            cc: [`https://${domain}/u/${userName}/followers`],
+            to: ["https://www.w3.org/ns/activitystreams#Public"],
+            object: {
+              type: "Note",
+              id: `https://${domain}/u/${userName}/s/1`,
+              attributedTo: `https://${domain}/u/${userName}`,
+              content: "<p>Hello, World!</p>",
+              to: ["https://www.w3.org/ns/activitystreams#Public"],
+              cc: [],
+              url: `https://${domain}/u/${userName}/s/1`,
+            },
+            published: "2022-12-29T00:00:00.000Z",
+          },
+        ],
+      };
+    } else {
+      ctx.body = {
+        "@context": "https://www.w3.org/ns/activitystreams",
+        type: "OrderedCollection",
+        id: `https://${domain}/u/${userName}/outbox`,
+        totalItems: 1,
+        last: `https://${domain}/u/${userName}/outbox?page=true`,
+      };
+    }
     ctx.set("Content-Type", "application/activity+json");
   });
   router.get("/u/:userName/followers", async (ctx) => {
@@ -131,6 +160,9 @@ export const newRouter = (options?: IRouterOptions) => {
       orderedItems: [],
     };
     ctx.set("Content-Type", "application/activity+json");
+  });
+  router.get("/u/:userName/s/:id", async (ctx) => {
+    ctx.body = ctx.params.id;
   });
 
   return router;
