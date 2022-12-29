@@ -1,6 +1,7 @@
 import Router, { IRouterOptions } from "koa-router";
 import fs from "fs";
 import path from "path";
+import koaBody from "koa-body";
 
 const domain = `tl.ramda.io`;
 const userName = "myuon";
@@ -163,6 +164,10 @@ export const newRouter = (options?: IRouterOptions) => {
   });
   router.get("/u/:userName/s/:id", async (ctx) => {
     ctx.body = ctx.params.id;
+  });
+  router.post("/u/:userName/inbox", koaBody(), async (ctx) => {
+    ctx.log.info("request body: " + JSON.stringify(ctx.request.body));
+    ctx.body = "ok";
   });
 
   return router;
