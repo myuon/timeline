@@ -5,10 +5,11 @@ import koaBody from "koa-body";
 import { createNote } from "./handler/note";
 import { App } from "./handler/app";
 import dayjs from "dayjs";
-
-const domain = `tl.ramda.io`;
-const userName = "myuon";
-const userId = "3MKscE4d0USAk8FiNVj2kJDdprd2";
+import { z } from "zod";
+import { schemaForType } from "./helper/zod";
+import { Activity } from "@/shared/model/activity";
+import { follow } from "./handler/inbox";
+import { domain, userId, userName } from "./config";
 
 export const newRouter = (options?: IRouterOptions) => {
   const router = new Router<{ app: App }>(options);
@@ -175,8 +176,29 @@ export const newRouter = (options?: IRouterOptions) => {
     ctx.body = ctx.params.id;
   });
   router.post("/u/:userName/inbox", koaBody(), async (ctx) => {
-    ctx.log.info("request body: " + JSON.stringify(ctx.request.body));
-    ctx.body = "ok";
+    ctx.log.info("inbox request: " + JSON.stringify(ctx.request.body));
+
+    const schema = schemaForType<Activity>()(
+      z.object({
+        type: z.string(),
+        published: z.string().optional(),
+        actor: z.string().optional(),
+        object: z.string().optional(),
+        target: z.string().optional(),
+      })
+    );
+    const result = schema.safeParse(ctx.request.body);
+    if (!result.success) {
+      ctx.throw(400, result.error);
+      return;
+    }
+
+    const activity = result.data;
+    if (activity.type === "Follow") {
+      await follow(ctx.state.app, ctx, activity);
+    } else {
+      ctx.throw(400, "Unsupported activity type");
+    }
   });
 
   router.post("/api/note", koaBody(), async (ctx) => {
