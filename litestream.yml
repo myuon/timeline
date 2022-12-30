@@ -1,0 +1,4 @@
+dbs:
+  - path: ./dist/server/db.sqlite
+    replicas:
+      - url: gcs://default-myuon/tl/litestream/replicas
