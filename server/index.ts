@@ -9,11 +9,13 @@ import adminKey from "../.secrets/adminKey.json";
 import * as admin from "firebase-admin";
 import { authJwt } from "./src/middleware/auth";
 import proxy from "koa-proxies";
+import { newNoteRepository, NoteTable } from "./src/infra/noteRepository";
+import { App } from "./src/handler/app";
 
 const dataSource = new DataSource({
   type: "sqlite",
   database: path.join(__dirname, "db.sqlite"),
-  entities: [],
+  entities: [NoteTable],
   logging: true,
   synchronize: true,
 });
@@ -42,6 +44,13 @@ app.use(async (ctx, next) => {
   } else {
     await next();
   }
+});
+app.use(async (ctx, next) => {
+  ctx.state.app = {
+    noteRepository: newNoteRepository(dataSource.getRepository(NoteTable)),
+  } as App;
+
+  await next();
 });
 
 const router = newRouter({
