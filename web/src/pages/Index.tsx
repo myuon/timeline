@@ -1,24 +1,11 @@
 import { css } from "@emotion/react";
 import { Link } from "react-router-dom";
 import useSWRMutation from "swr/mutation";
-import useSWR from "swr";
 import { useAuthToken } from "../api/auth";
+import { CreateNoteRequest } from "@/shared/request/note";
 
 const searchUser = async (url: string, { arg: userName }: { arg: string }) => {
   const resp = await fetch(`${url}/${userName}`);
-  if (!resp.ok) {
-    throw new Error(resp.statusText);
-  }
-
-  return resp.json();
-};
-
-const getMe = async ([url, token]: [string, string]) => {
-  const resp = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
   if (!resp.ok) {
     throw new Error(resp.statusText);
   }
@@ -32,8 +19,6 @@ export const IndexPage = () => {
     `/api/ap/federation`,
     searchUser
   );
-  const { data: me } = useSWR(token ? ["/api/me", token] : null, getMe);
-  console.log(me);
 
   return (
     <>
@@ -66,8 +51,20 @@ export const IndexPage = () => {
       </pre>
 
       <form
-        onSubmit={() => {
-          console.log("submit");
+        onSubmit={async (event) => {
+          event.preventDefault();
+          const formData = new FormData(event.currentTarget);
+
+          await fetch("/api/note", {
+            method: "POST",
+            body: JSON.stringify({
+              content: formData.get("content"),
+            } as CreateNoteRequest),
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
         }}
         css={css`
           display: grid;
@@ -75,7 +72,7 @@ export const IndexPage = () => {
         `}
       >
         <label>
-          <textarea />
+          <textarea name="content" />
         </label>
 
         <button type="submit">投稿する</button>

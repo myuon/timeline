@@ -60,5 +60,11 @@ app.use(authJwt(auth));
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-app.listen(3000);
-console.log(`✨ Server running on http://localhost:3000`);
+const main = async () => {
+  await dataSource.initialize();
+
+  app.listen(3000);
+  console.log(`✨ Server running on http://localhost:3000`);
+};
+
+void main();
