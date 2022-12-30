@@ -1,24 +1,22 @@
 import { css } from "@emotion/react";
 import { Link } from "react-router-dom";
-import useSWRMutation from "swr/mutation";
 import { useAuthToken } from "../api/auth";
 import { CreateNoteRequest } from "@/shared/request/note";
-
-const searchUser = async (url: string, { arg: userName }: { arg: string }) => {
-  const resp = await fetch(`${url}/${userName}`);
-  if (!resp.ok) {
-    throw new Error(resp.statusText);
-  }
-
-  return resp.json();
-};
+import useSWR from "swr";
 
 export const IndexPage = () => {
   const token = useAuthToken();
-  const { trigger, data: user } = useSWRMutation(
-    `/api/ap/federation`,
-    searchUser
-  );
+  const { data: notes } = useSWR("/u/myuon/outbox?page=true", async (url) => {
+    const resp = await fetch(url, {
+      headers: {
+        "Content-Type": "application/activity+json",
+      },
+    });
+    if (resp.ok) {
+      return resp.json();
+    }
+  });
+  console.log(notes);
 
   return (
     <>
@@ -26,29 +24,30 @@ export const IndexPage = () => {
 
       <h2>/ Index</h2>
 
-      <form
+      <div
         css={css`
           display: grid;
-          gap: 8px;
+          gap: 16px;
         `}
-        onSubmit={async (event) => {
-          event.preventDefault();
-          const formData = new FormData(event.currentTarget);
-
-          await trigger(formData.get("userName") as string);
-        }}
       >
-        <label>
-          Seach for user:
-          <input type="text" name="userName" />
-        </label>
+        {notes?.orderedItems?.map((note: any) => (
+          <div
+            key={note.id}
+            css={css`
+              display: grid;
 
-        <button type="submit">Search</button>
-      </form>
-
-      <pre>
-        <code>{JSON.stringify(user, null, 2)}</code>
-      </pre>
+              p {
+                margin: 0;
+              }
+            `}
+          >
+            <p>{note.object.content}</p>
+            <p>
+              {note.published} - {note.actor}
+            </p>
+          </div>
+        ))}
+      </div>
 
       <form
         onSubmit={async (event) => {
