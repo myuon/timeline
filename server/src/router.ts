@@ -3,12 +3,15 @@ import fs from "fs";
 import path from "path";
 import koaBody from "koa-body";
 import { createNote } from "./handler/note";
+import { App } from "./handler/app";
+import dayjs from "dayjs";
 
 const domain = `tl.ramda.io`;
 const userName = "myuon";
+const userId = "3MKscE4d0USAk8FiNVj2kJDdprd2";
 
 export const newRouter = (options?: IRouterOptions) => {
-  const router = new Router(options);
+  const router = new Router<{ app: App }>(options);
 
   router.get("/.well-known/host-meta", async (ctx) => {
     ctx.set("Content-Type", "application/xrd+xml");
@@ -89,37 +92,42 @@ export const newRouter = (options?: IRouterOptions) => {
 
     const page = ctx.query.page === "true";
     if (page) {
+      const notes = await ctx.state.app.noteRepository.findLatest(userId, {
+        page: 0,
+        perPage: 5,
+      });
+
       ctx.body = {
         "@context": "https://www.w3.org/ns/activitystreams",
         type: "OrderedCollectionPage",
         id: `https://${domain}/u/${userName}/outbox?page=true`,
         partOf: `https://${domain}/u/${userName}/outbox`,
-        orderedItems: [
-          {
-            id: `https://${domain}/u/${userName}/s/1/activity`,
-            type: "Create",
-            actor: `https://${domain}/u/${userName}`,
-            cc: [`https://${domain}/u/${userName}/followers`],
+        orderedItems: notes.map((note) => ({
+          id: `https://${domain}/u/${userName}/s/${note.id}/activity`,
+          type: "Create",
+          actor: `https://${domain}/u/${userName}`,
+          cc: [`https://${domain}/u/${userName}/followers`],
+          to: ["https://www.w3.org/ns/activitystreams#Public"],
+          object: {
+            type: "Note",
+            id: `https://${domain}/u/${userName}/s/${note.id}`,
+            attributedTo: `https://${domain}/u/${userName}`,
+            content: note.content,
             to: ["https://www.w3.org/ns/activitystreams#Public"],
-            object: {
-              type: "Note",
-              id: `https://${domain}/u/${userName}/s/1`,
-              attributedTo: `https://${domain}/u/${userName}`,
-              content: "<p>Hello, World!</p>",
-              to: ["https://www.w3.org/ns/activitystreams#Public"],
-              cc: [],
-              url: `https://${domain}/u/${userName}/s/1`,
-            },
-            published: "2022-12-29T00:00:00.000Z",
+            cc: [],
+            url: `https://${domain}/u/${userName}/s/${note.id}`,
           },
-        ],
+          published: dayjs(note.createdAt).format("YYYY-MM-DDTHH:mm:ssZ"),
+        })),
       };
     } else {
+      const count = await ctx.state.app.noteRepository.findCount(userId);
+
       ctx.body = {
         "@context": "https://www.w3.org/ns/activitystreams",
         type: "OrderedCollection",
         id: `https://${domain}/u/${userName}/outbox`,
-        totalItems: 1,
+        totalItems: count,
         last: `https://${domain}/u/${userName}/outbox?page=true`,
       };
     }

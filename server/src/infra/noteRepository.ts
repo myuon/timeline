@@ -40,6 +40,24 @@ export const newNoteRepository = (repo: Repository<NoteTable>) => {
       const noteTable = NoteTable.fromModel(note);
       await repo.save(noteTable);
     },
+    findLatest: async (
+      userId: string,
+      pagination: {
+        page: number;
+        perPage: number;
+      }
+    ) => {
+      const records = await repo.find({
+        where: { userId },
+        order: { createdAt: "DESC" },
+        skip: pagination.page * pagination.perPage,
+        take: pagination.perPage,
+      });
+      return records.map((record) => record.toModel());
+    },
+    findCount: async (userId: string) => {
+      return await repo.count({ where: { userId } });
+    },
   };
 };
 export type NoteRepository = ReturnType<typeof newNoteRepository>;
