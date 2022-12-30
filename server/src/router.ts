@@ -144,12 +144,25 @@ export const newRouter = (options?: IRouterOptions) => {
       return;
     }
 
+    const count =
+      await ctx.state.app.followRelationRepository.findFollowersCount(
+        `https://${domain}/u/${userName}`
+      );
+    const followers =
+      await ctx.state.app.followRelationRepository.findFollowers(
+        `https://${domain}/u/${userName}`
+      );
+
     ctx.body = {
       "@context": ["https://www.w3.org/ns/activitystreams"],
       type: "OrderedCollection",
       id: `https://${domain}/u/${userName}/followers`,
-      totalItems: 0,
-      orderedItems: [],
+      totalItems: count,
+      orderedItems: followers.map((follower) => ({
+        "@context": ["https://www.w3.org/ns/activitystreams"],
+        type: "Person",
+        url: follower.userUrl,
+      })),
     };
     ctx.set("Content-Type", "application/activity+json");
   });

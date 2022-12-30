@@ -12,11 +12,15 @@ import proxy from "koa-proxies";
 import { newNoteRepository, NoteTable } from "./src/infra/noteRepository";
 import { App } from "./src/handler/app";
 import mount from "koa-mount";
+import {
+  FollowRelationTable,
+  newFollowRelationRepository,
+} from "./src/infra/followRelationRepository";
 
 const dataSource = new DataSource({
   type: "sqlite",
   database: path.join(__dirname, "db.sqlite"),
-  entities: [NoteTable],
+  entities: [NoteTable, FollowRelationTable],
   logging: true,
   synchronize: true,
 });
@@ -54,6 +58,9 @@ app.use(async (ctx, next) => {
   } else {
     ctx.state.app = {
       noteRepository: newNoteRepository(dataSource.getRepository(NoteTable)),
+      followRelationRepository: newFollowRelationRepository(
+        dataSource.getRepository(FollowRelationTable)
+      ),
     } as App;
 
     return await next();
