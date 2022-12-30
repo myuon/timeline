@@ -4,3 +4,4 @@ dist/
 .secrets/*
 !.secrets/.gitkeep
 
+yarn-error.log
