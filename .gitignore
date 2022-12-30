@@ -5,4 +5,4 @@ dist/
 !.secrets/.gitkeep
 
 yarn-error.log
-db.sqlite
+server/db.sqlite

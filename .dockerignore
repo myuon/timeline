@@ -1,3 +1,6 @@
 node_modules/
 dist/
 .git/
+web/node_modules/
+server/node_modules/
+

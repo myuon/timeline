@@ -20,6 +20,7 @@ ENV NODE_ENV production
 COPY --from=builder --chown=nonroot:nonroot /app/litestream.yml /etc/litestream.yml
 COPY --from=builder --chown=nonroot:nonroot /app/dist ./dist
 COPY --from=builder --chown=nonroot:nonroot /app/.secrets ./dist/.secrets
+COPY --from=builder --chown=nonroot:nonroot /app/db.sqlite ./dist/server/db.sqlite
 COPY --from=builder --chown=nonroot:nonroot /app/run.sh /run.sh
 COPY --from=builder --chown=nonroot:nonroot /usr/local/bin/litestream /usr/local/bin/litestream
 COPY --from=deps --chown=nonroot:nonroot /app/node_modules ./node_modules
