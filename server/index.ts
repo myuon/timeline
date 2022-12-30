@@ -11,6 +11,7 @@ import { authJwt } from "./src/middleware/auth";
 import proxy from "koa-proxies";
 import { newNoteRepository, NoteTable } from "./src/infra/noteRepository";
 import { App } from "./src/handler/app";
+import mount from "koa-mount";
 
 const dataSource = new DataSource({
   type: "sqlite",
@@ -35,9 +36,12 @@ const router = newRouter({
 
 app.use(authJwt(auth));
 app.use(
-  serveStaticProd({
-    path: path.resolve(__dirname, ".."),
-  })
+  mount(
+    "/web",
+    serveStaticProd({
+      path: path.resolve(__dirname, "..", "web"),
+    })
+  )
 );
 app.use(async (ctx, next) => {
   if (ctx.request.path.startsWith("/web")) {
