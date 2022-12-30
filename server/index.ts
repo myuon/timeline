@@ -28,43 +28,42 @@ const auth = admin.auth();
 const app = new Koa();
 
 app.use(logger());
-if (process.env.NODE_ENV !== "production") {
-  app.use(
-    proxy("/web", {
-      target: "http://localhost:5173",
-      changeOrigin: true,
-    })
-  );
-}
-app.use(async (ctx, next) => {
-  if (ctx.request.path.startsWith("/web")) {
-    serveStaticProd({
-      path: path.resolve(__dirname, ".."),
-    })(ctx, next);
-  } else {
-    await next();
-  }
-});
-app.use(async (ctx, next) => {
-  ctx.state.app = {
-    noteRepository: newNoteRepository(dataSource.getRepository(NoteTable)),
-  } as App;
-
-  await next();
-});
 
 const router = newRouter({
   prefix: "",
 });
+
 app.use(authJwt(auth));
+app.use(
+  serveStaticProd({
+    path: path.resolve(__dirname, ".."),
+  })
+);
+app.use(async (ctx, next) => {
+  if (ctx.request.path.startsWith("/web")) {
+    if (process.env.NODE_ENV !== "production") {
+      return proxy("/web", {
+        target: "http://localhost:5173",
+        changeOrigin: true,
+      })(ctx, next);
+    }
+  } else {
+    ctx.state.app = {
+      noteRepository: newNoteRepository(dataSource.getRepository(NoteTable)),
+    } as App;
+
+    return await next();
+  }
+});
 app.use(router.routes());
 app.use(router.allowedMethods());
 
 const main = async () => {
   await dataSource.initialize();
 
-  app.listen(3000);
-  console.log(`✨ Server running on http://localhost:3000`);
+  const port = process.env.PORT || 3000;
+  app.listen(port);
+  console.log(`✨ Server running on http://localhost:${port}`);
 };
 
 void main();

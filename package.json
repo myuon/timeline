@@ -11,7 +11,7 @@
     "dev": "concurrently \"yarn workspace web dev\" \"yarn workspace server dev\"",
     "prebuild": "rm -rf dist",
     "build": "yarn workspace web build && yarn workspace server build",
-    "start:prod": "NODE_ENV=production node dist/index.js",
+    "start:prod": "NODE_ENV=production node dist/server/index.js",
     "deploy": "docker build . --tag asia-northeast1-docker.pkg.dev/default-364617/timeline/latest && docker push asia-northeast1-docker.pkg.dev/default-364617/timeline/latest"
   }
 }
