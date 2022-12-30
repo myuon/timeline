@@ -12,4 +12,10 @@ export default defineConfig({
   build: {
     outDir: "../dist/web",
   },
+  // adhoc configuration for integrated dev server
+  server: {
+    hmr: {
+      port: 5173,
+    },
+  },
 });
