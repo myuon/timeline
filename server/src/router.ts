@@ -10,6 +10,14 @@ import { schemaForType } from "./helper/zod";
 import { Activity } from "@/shared/model/activity";
 import { follow } from "./handler/inbox";
 import { domain, userId, userName } from "./config";
+import { Middleware } from "koa";
+import CoBody from "co-body";
+
+const parseBody: Middleware = async (ctx, next) => {
+  ctx.request.body = await CoBody.json(ctx);
+
+  return next();
+};
 
 export const newRouter = (options?: IRouterOptions) => {
   const router = new Router<{ app: App }>(options);
@@ -188,7 +196,7 @@ export const newRouter = (options?: IRouterOptions) => {
   router.get("/u/:userName/s/:id", async (ctx) => {
     ctx.body = ctx.params.id;
   });
-  router.post("/u/:userName/inbox", koaBody(), async (ctx) => {
+  router.post("/u/:userName/inbox", parseBody, async (ctx) => {
     ctx.log.info("inbox request: " + JSON.stringify(ctx.request.body));
 
     const schema = schemaForType<Activity>()(

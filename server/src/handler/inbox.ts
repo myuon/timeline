@@ -5,7 +5,7 @@ import { domain, userId, userName } from "../config";
 import dayjs from "dayjs";
 
 export const follow = async (app: App, ctx: Context, activity: Activity) => {
-  if (activity.target !== `https://${domain}/u/${userName}`) {
+  if (activity.object !== `https://${domain}/u/${userName}`) {
     ctx.throw(400, "Bad request");
   }
 

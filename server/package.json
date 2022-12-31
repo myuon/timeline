@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "co-body": "^6.1.0",
     "dayjs": "^1.11.7",
     "firebase-admin": "^11.4.1",
     "koa": "^2.13.4",
