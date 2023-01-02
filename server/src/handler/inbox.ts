@@ -3,6 +3,7 @@ import { App } from "./app";
 import { Activity } from "@/shared/model/activity";
 import { domain, userId, userName } from "../config";
 import dayjs from "dayjs";
+import { ulid } from "ulid";
 
 export const follow = async (app: App, ctx: Context, activity: Activity) => {
   if (activity.object !== `https://${domain}/u/${userName}`) {
@@ -22,6 +23,7 @@ export const follow = async (app: App, ctx: Context, activity: Activity) => {
 
   ctx.body = {
     "@context": "https://www.w3.org/ns/activitystreams",
+    id: `https://${domain}/u/${userId}/s/${ulid()}`,
     type: "Accept",
     actor: `https://${domain}/u/${userId}`,
     object: activity,
