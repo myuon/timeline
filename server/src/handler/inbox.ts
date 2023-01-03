@@ -1,7 +1,7 @@
 import { Context } from "koa";
 import { App } from "./app";
 import { Activity } from "@/shared/model/activity";
-import { domain, userId, userName } from "../config";
+import { domain, userName } from "../config";
 import dayjs from "dayjs";
 import { ulid } from "ulid";
 import fs from "fs";
@@ -80,16 +80,16 @@ export const follow = async (app: App, ctx: Context, activity: Activity) => {
 
   const followRelation = {
     userUrl: activity.actor,
-    targetUserUrl: `https://${domain}/u/${userId}`,
+    targetUserUrl: `https://${domain}/u/${userName}`,
     createdAt: dayjs().unix(),
   };
   await app.followRelationRepository.create(followRelation);
 
   const document = {
     "@context": "https://www.w3.org/ns/activitystreams",
-    id: `https://${domain}/u/${userId}/s/${ulid()}`,
+    id: `https://${domain}/u/${userName}/s/${ulid()}`,
     type: "Accept",
-    actor: `https://${domain}/u/${userId}`,
+    actor: `https://${domain}/u/${userName}`,
     object: activity,
   };
 

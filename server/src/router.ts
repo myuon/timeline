@@ -9,7 +9,7 @@ import { z } from "zod";
 import { schemaForType } from "./helper/zod";
 import { Activity } from "@/shared/model/activity";
 import { follow, helloworld } from "./handler/inbox";
-import { domain, userId, userName } from "./config";
+import { domain, userName } from "./config";
 import { Middleware } from "koa";
 import CoBody from "co-body";
 
@@ -102,7 +102,7 @@ export const newRouter = (options?: IRouterOptions) => {
 
     const page = ctx.query.page === "true";
     if (page) {
-      const notes = await ctx.state.app.noteRepository.findLatest(userId, {
+      const notes = await ctx.state.app.noteRepository.findLatest(userName, {
         page: 0,
         perPage: 5,
       });
@@ -131,7 +131,7 @@ export const newRouter = (options?: IRouterOptions) => {
         })),
       };
     } else {
-      const count = await ctx.state.app.noteRepository.findCount(userId);
+      const count = await ctx.state.app.noteRepository.findCount(userName);
 
       ctx.body = {
         "@context": "https://www.w3.org/ns/activitystreams",
