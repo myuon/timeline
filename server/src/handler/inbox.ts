@@ -94,9 +94,9 @@ export const follow = async (app: App, ctx: Context, activity: Activity) => {
   };
 
   ctx.body = document;
-  ctx.headers = {
+  ctx.set({
     ...(await signHeaders("/inbox", document)),
-  };
+  });
 };
 
 export const helloworld = async (app: App, ctx: Context) => {
