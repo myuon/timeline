@@ -39,10 +39,11 @@ const signHeaders = async (path: string, body: object) => {
   );
   const digestString = Buffer.from(digest).toString("base64");
 
-  const signedString = `(request-target): post ${path}
-host: ${domain}
-date: ${now}
-digest: SHA-256=${digestString}`;
+  const signedString = [
+    `(request-target): post ${path}`,
+    `date: ${now}`,
+    `digest: SHA-256=${digestString}`,
+  ].join("\n");
   const key = await crypto.subtle.importKey(
     "pkcs8",
     privateKey,
@@ -60,7 +61,7 @@ digest: SHA-256=${digestString}`;
     Signature: [
       `keyId="https://${domain}/u/${userName}#main-key"`,
       `algorithm="rsa-sha256"`,
-      `headers="(request-target) host date digest"`,
+      `headers="(request-target) date digest"`,
       `signature="${Buffer.from(signature).toString("base64")}"`,
     ].join(","),
     Date: now,
