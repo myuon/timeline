@@ -16,7 +16,6 @@ import {
   FollowRelationTable,
   newFollowRelationRepository,
 } from "./src/infra/followRelationRepository";
-import sslify from "koa-sslify";
 import https from "https";
 import fs from "fs";
 
@@ -34,18 +33,7 @@ admin.initializeApp({
 
 const auth = admin.auth();
 
-const port = process.env.PORT || 3000;
-const httpsPort = Number(port) + 1;
-
 const app = new Koa();
-
-if (process.env.NODE_ENv === "development") {
-  app.use(
-    sslify({
-      port: httpsPort,
-    })
-  );
-}
 app.use(logger());
 
 const router = newRouter({
@@ -84,6 +72,9 @@ app.use(router.routes());
 app.use(router.allowedMethods());
 
 const main = async () => {
+  const port = process.env.PORT || 3000;
+  const httpsPort = Number(port) + 1;
+
   await dataSource.initialize();
 
   app.listen(port);
@@ -91,8 +82,6 @@ const main = async () => {
   console.log(`✨ Server running on http://localhost:${port}`);
 
   if (process.env.NODE_ENV === "development") {
-    const httpsPort = Number(port) + 1;
-
     https
       .createServer(
         {

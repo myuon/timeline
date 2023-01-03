@@ -94,7 +94,9 @@ export const follow = async (app: App, ctx: Context, activity: Activity) => {
   };
 
   ctx.body = document;
-  // ctx.headers = await signHeaders("/inbox", document);
+  ctx.headers = {
+    ...(await signHeaders("/inbox", document)),
+  };
 };
 
 export const helloworld = async (app: App, ctx: Context) => {
@@ -121,7 +123,7 @@ export const helloworld = async (app: App, ctx: Context) => {
     body: JSON.stringify(document),
     headers: {
       ...(await signHeaders("/inbox", document)),
-      Accept: "application/ld+json",
+      Accept: "application/activity+json",
     },
     agent: new https.Agent({
       rejectUnauthorized: false,
