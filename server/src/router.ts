@@ -80,6 +80,7 @@ export const newRouter = (options?: IRouterOptions) => {
       url: `https://${domain}/u/${userName}`,
       publicKey: {
         id: `https://${domain}/u/${userName}#main-key`,
+        type: "Key",
         owner: `https://${domain}/u/${userName}`,
         publicKeyPem: fs.readFileSync(
           path.join(__dirname, "../../.secrets/public.pem"),

@@ -16,6 +16,9 @@ import {
   FollowRelationTable,
   newFollowRelationRepository,
 } from "./src/infra/followRelationRepository";
+import sslify from "koa-sslify";
+import https from "https";
+import fs from "fs";
 
 const dataSource = new DataSource({
   type: "sqlite",
@@ -30,8 +33,19 @@ admin.initializeApp({
 });
 
 const auth = admin.auth();
+
+const port = process.env.PORT || 3000;
+const httpsPort = Number(port) + 1;
+
 const app = new Koa();
 
+if (process.env.NODE_ENv === "development") {
+  app.use(
+    sslify({
+      port: httpsPort,
+    })
+  );
+}
 app.use(logger());
 
 const router = newRouter({
@@ -72,10 +86,28 @@ app.use(router.allowedMethods());
 const main = async () => {
   await dataSource.initialize();
 
-  const port = process.env.PORT || 3000;
   app.listen(port);
   console.log(`Starting in ${process.env.NODE_ENV} mode`);
   console.log(`✨ Server running on http://localhost:${port}`);
+
+  if (process.env.NODE_ENV === "development") {
+    const httpsPort = Number(port) + 1;
+
+    https
+      .createServer(
+        {
+          key: fs.readFileSync(
+            path.join(__dirname, "../.secrets/server_key.pem")
+          ),
+          cert: fs.readFileSync(
+            path.join(__dirname, "../.secrets/server_crt.pem")
+          ),
+        },
+        app.callback()
+      )
+      .listen(httpsPort);
+    console.log(`✨ Server running on http://localhost:${httpsPort}`);
+  }
 };
 
 void main();
