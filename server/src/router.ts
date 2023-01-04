@@ -8,7 +8,7 @@ import dayjs from "dayjs";
 import { z } from "zod";
 import { schemaForType } from "./helper/zod";
 import { Activity } from "@/shared/model/activity";
-import { follow, helloworld } from "./handler/inbox";
+import { follow } from "./handler/inbox";
 import { domain, userName } from "./config";
 import { Middleware } from "koa";
 import CoBody from "co-body";
@@ -225,9 +225,6 @@ export const newRouter = (options?: IRouterOptions) => {
 
   router.post("/api/note", koaBody(), async (ctx) => {
     await createNote(ctx.state.app, ctx);
-  });
-  router.post("/api/helloworld", async (ctx) => {
-    await helloworld(ctx.state.app, ctx);
   });
 
   return router;
