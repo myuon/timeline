@@ -102,10 +102,13 @@ export const newRouter = (options?: IRouterOptions) => {
 
     const page = ctx.query.page === "true";
     if (page) {
-      const notes = await ctx.state.app.noteRepository.findLatest(userName, {
-        page: 0,
-        perPage: 5,
-      });
+      const notes = await ctx.state.app.noteRepository.findLatest(
+        `https://${domain}/u/${userName}`,
+        {
+          page: 0,
+          perPage: 5,
+        }
+      );
 
       ctx.body = {
         "@context": "https://www.w3.org/ns/activitystreams",

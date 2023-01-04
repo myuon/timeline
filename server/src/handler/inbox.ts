@@ -8,7 +8,6 @@ import fs from "fs";
 import path from "path";
 import { webcrypto as crypto } from "crypto";
 import fetch from "node-fetch";
-import https from "https";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 
