@@ -10,6 +10,7 @@ import fetch from "node-fetch";
 import utc from "dayjs/plugin/utc";
 import { pemToBuffer } from "../helper/pem";
 import { signHttpHeaders } from "../helper/signature";
+import { getInbox } from "./ap/api";
 dayjs.extend(utc);
 
 const privateKey = pemToBuffer(
@@ -60,24 +61,17 @@ export const follow = async (app: App, ctx: Context, activity: Activity) => {
     object: activity,
   };
 
-  const resp = await fetch(activity.actor, {
-    headers: {
-      Accept: "application/activity+json",
-    },
-  });
-  if (!resp.ok) {
-    console.error(await resp.text());
+  const { data: inbox, error } = await getInbox(activity.actor);
+  if (!inbox) {
+    console.error(error);
     ctx.throw(500, "Internal server error");
   }
 
-  const json = (await resp.json()) as { inbox: string };
-  ctx.log.info(`inbox: ${json.inbox}`);
-
-  const respAccept = await fetch(json.inbox, {
+  const respAccept = await fetch(inbox, {
     method: "POST",
     body: JSON.stringify(document),
     headers: {
-      ...(await signHeaders(new URL(json.inbox).pathname, document)),
+      ...(await signHeaders(new URL(inbox).pathname, document)),
       Accept: "application/activity+json",
     },
   });
