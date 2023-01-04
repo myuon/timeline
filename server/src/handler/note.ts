@@ -5,6 +5,7 @@ import { z } from "zod";
 import { App } from "./app";
 import { ulid } from "ulid";
 import { domain, userFirebaseId, userName } from "../config";
+import { Note } from "@/shared/model/note";
 
 export const createNote = async (app: App, ctx: Context) => {
   const schema = schemaForType<CreateNoteRequest>()(
@@ -21,7 +22,7 @@ export const createNote = async (app: App, ctx: Context) => {
     ctx.throw(401, "Unauthorized");
   }
 
-  const note = {
+  const note: Note = {
     id: ulid(),
     userId: `https://${domain}/u/${userName}`,
     content: result.data.content,
@@ -30,4 +31,6 @@ export const createNote = async (app: App, ctx: Context) => {
   await app.noteRepository.create(note);
 
   ctx.status = 201;
+
+  return note;
 };

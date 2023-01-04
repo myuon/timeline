@@ -4,22 +4,7 @@ import { Activity } from "@/shared/model/activity";
 import { userId } from "../config";
 import dayjs from "dayjs";
 import { ulid } from "ulid";
-import fs from "fs";
-import path from "path";
-import { pemToBuffer } from "../helper/pem";
-import { getInbox } from "./ap/api";
-import { signedFetcher } from "./ap/signedFetcher";
-
-const privateKey = pemToBuffer(
-  fs.readFileSync(
-    path.join(__dirname, "../../../.secrets/private.pem"),
-    "utf-8"
-  )
-);
-const signKey = {
-  privateKey,
-  keyId: `${userId}#main-key`,
-};
+import { deliveryActivity } from "./ap/delivery";
 
 export const follow = async (app: App, ctx: Context, activity: Activity) => {
   if (activity.object !== userId) {
@@ -45,18 +30,9 @@ export const follow = async (app: App, ctx: Context, activity: Activity) => {
     object: activity,
   };
 
-  const { data: inbox, error: inboxError } = await getInbox(activity.actor);
-  if (!inbox) {
-    console.error(inboxError);
-    ctx.throw(500, "Internal server error");
-  }
-
-  const { data, error } = await signedFetcher(signKey, inbox, {
-    method: "post",
-    body: document,
-  });
+  const { data, error } = await deliveryActivity(activity.actor, document);
   if (error) {
-    console.error(error);
+    ctx.log.error(error);
     ctx.throw(500, "Internal server error");
   }
   ctx.log.info(data);

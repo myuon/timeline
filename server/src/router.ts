@@ -4,15 +4,14 @@ import path from "path";
 import koaBody from "koa-body";
 import { createNote } from "./handler/note";
 import { App } from "./handler/app";
-import dayjs from "dayjs";
 import { z } from "zod";
 import { schemaForType } from "./helper/zod";
 import { Activity } from "@/shared/model/activity";
 import { follow } from "./handler/inbox";
 import { domain, userId, userName } from "./config";
 import { parseBody } from "./middleware/parseBody";
-import { serializeApNote } from "./handler/ap/note";
 import { serializeCreateNoteActivity } from "./handler/ap/activity";
+import { deliveryActivity } from "./handler/ap/delivery";
 
 export const newRouter = (options?: IRouterOptions) => {
   const router = new Router<{ app: App }>(options);
@@ -201,7 +200,21 @@ export const newRouter = (options?: IRouterOptions) => {
   });
 
   router.post("/api/note", koaBody(), async (ctx) => {
-    await createNote(ctx.state.app, ctx);
+    const note = await createNote(ctx.state.app, ctx);
+
+    // FIXME: delivery SHOULD be performed asynchronously
+    const activity = serializeCreateNoteActivity(userId, note);
+    const followers =
+      await ctx.state.app.followRelationRepository.findFollowers(userId);
+
+    followers.forEach(async (follower) => {
+      const { data, error } = await deliveryActivity(follower.userId, activity);
+      if (error) {
+        ctx.log.error(error);
+        return;
+      }
+      ctx.log.info(`deliveryActivity: ${data}`);
+    });
   });
 
   return router;
