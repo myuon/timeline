@@ -6,22 +6,11 @@ import dayjs from "dayjs";
 import { ulid } from "ulid";
 import fs from "fs";
 import path from "path";
-import { webcrypto as crypto } from "crypto";
 import fetch from "node-fetch";
 import utc from "dayjs/plugin/utc";
+import { pemToBuffer } from "../helper/pem";
+import { signHttpHeaders } from "../helper/signature";
 dayjs.extend(utc);
-
-const pemToBuffer = (pem: string) => {
-  const lines = pem.split("\n");
-  const encoded = lines
-    .filter(
-      (line) =>
-        !line.match(/(-----(BEGIN|END) (PUBLIC|PRIVATE) KEY-----)/) &&
-        Boolean(line)
-    )
-    .join("");
-  return Buffer.from(encoded, "base64");
-};
 
 const privateKey = pemToBuffer(
   fs.readFileSync(
@@ -31,18 +20,6 @@ const privateKey = pemToBuffer(
 );
 
 const signHeaders = async (path: string, body: object) => {
-  const now = new Date().toUTCString();
-  const digest = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(JSON.stringify(body))
-  );
-  const digestString = Buffer.from(digest).toString("base64");
-
-  const signedString = [
-    `(request-target): post ${path}`,
-    `date: ${now}`,
-    `digest: SHA-256=${digestString}`,
-  ].join("\n");
   const key = await crypto.subtle.importKey(
     "pkcs8",
     privateKey,
@@ -50,22 +27,13 @@ const signHeaders = async (path: string, body: object) => {
     false,
     ["sign"]
   );
-  const signature = await crypto.subtle.sign(
-    "RSASSA-PKCS1-v1_5",
-    key,
-    new TextEncoder().encode(signedString)
-  );
 
-  return {
-    Signature: [
-      `keyId="${userId}#main-key"`,
-      `algorithm="rsa-sha256"`,
-      `headers="(request-target) date digest"`,
-      `signature="${Buffer.from(signature).toString("base64")}"`,
-    ].join(","),
-    Date: now,
-    Digest: `SHA-256=${digestString}`,
-  };
+  return signHttpHeaders(key, {
+    keyId: `${userId}#main-key`,
+    body,
+    path,
+    method: "post",
+  });
 };
 
 export const follow = async (app: App, ctx: Context, activity: Activity) => {
