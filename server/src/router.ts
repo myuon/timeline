@@ -11,6 +11,8 @@ import { Activity } from "@/shared/model/activity";
 import { follow } from "./handler/inbox";
 import { domain, userId, userName } from "./config";
 import { parseBody } from "./middleware/parseBody";
+import { serializeApNote } from "./handler/ap/note";
+import { serializeCreateNoteActivity } from "./handler/ap/activity";
 
 export const newRouter = (options?: IRouterOptions) => {
   const router = new Router<{ app: App }>(options);
@@ -105,23 +107,9 @@ export const newRouter = (options?: IRouterOptions) => {
         type: "OrderedCollectionPage",
         id: `${userId}/outbox?page=true`,
         partOf: `${userId}/outbox`,
-        orderedItems: notes.map((note) => ({
-          id: `${userId}/s/${note.id}/activity`,
-          type: "Create",
-          actor: userId,
-          cc: [`${userId}/followers`],
-          to: ["https://www.w3.org/ns/activitystreams#Public"],
-          object: {
-            type: "Note",
-            id: `${userId}/s/${note.id}`,
-            attributedTo: userId,
-            content: note.content,
-            to: ["https://www.w3.org/ns/activitystreams#Public"],
-            cc: [],
-            url: `${userId}/s/${note.id}`,
-          },
-          published: dayjs(note.createdAt).format("YYYY-MM-DDTHH:mm:ssZ"),
-        })),
+        orderedItems: notes.map((note) =>
+          serializeCreateNoteActivity(userId, note)
+        ),
       };
     } else {
       const count = await ctx.state.app.noteRepository.findCount(userName);
