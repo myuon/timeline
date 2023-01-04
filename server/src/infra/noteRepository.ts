@@ -38,7 +38,7 @@ export const newNoteRepository = (repo: Repository<NoteTable>) => {
   return {
     create: async (note: Note) => {
       const noteTable = NoteTable.fromModel(note);
-      await repo.save(noteTable);
+      await repo.insert(noteTable);
     },
     findLatest: async (
       userId: string,
