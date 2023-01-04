@@ -6,12 +6,9 @@ import dayjs from "dayjs";
 import { ulid } from "ulid";
 import fs from "fs";
 import path from "path";
-import fetch from "node-fetch";
-import utc from "dayjs/plugin/utc";
 import { pemToBuffer } from "../helper/pem";
-import { signHttpHeaders } from "../helper/signature";
 import { getInbox } from "./ap/api";
-dayjs.extend(utc);
+import { signedFetcher } from "./ap/signedFetcher";
 
 const privateKey = pemToBuffer(
   fs.readFileSync(
@@ -19,22 +16,9 @@ const privateKey = pemToBuffer(
     "utf-8"
   )
 );
-
-const signHeaders = async (path: string, body: object) => {
-  const key = await crypto.subtle.importKey(
-    "pkcs8",
-    privateKey,
-    { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
-    false,
-    ["sign"]
-  );
-
-  return signHttpHeaders(key, {
-    keyId: `${userId}#main-key`,
-    body,
-    path,
-    method: "post",
-  });
+const signKey = {
+  privateKey,
+  keyId: `${userId}#main-key`,
 };
 
 export const follow = async (app: App, ctx: Context, activity: Activity) => {
@@ -61,25 +45,21 @@ export const follow = async (app: App, ctx: Context, activity: Activity) => {
     object: activity,
   };
 
-  const { data: inbox, error } = await getInbox(activity.actor);
+  const { data: inbox, error: inboxError } = await getInbox(activity.actor);
   if (!inbox) {
+    console.error(inboxError);
+    ctx.throw(500, "Internal server error");
+  }
+
+  const { data, error } = await signedFetcher(signKey, inbox, {
+    method: "post",
+    body: document,
+  });
+  if (error) {
     console.error(error);
     ctx.throw(500, "Internal server error");
   }
-
-  const respAccept = await fetch(inbox, {
-    method: "POST",
-    body: JSON.stringify(document),
-    headers: {
-      ...(await signHeaders(new URL(inbox).pathname, document)),
-      Accept: "application/activity+json",
-    },
-  });
-  if (!respAccept.ok) {
-    console.error(await respAccept.text());
-    ctx.throw(500, "Internal server error");
-  }
+  ctx.log.info(data);
 
   ctx.status = 200;
-  ctx.log.info(await respAccept.text());
 };
