@@ -1,5 +1,5 @@
 export interface FollowRelation {
-  userUrl: string;
-  targetUserUrl: string;
+  userId: string;
+  targetUserId: string;
   createdAt: number;
 }

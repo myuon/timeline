@@ -78,8 +78,8 @@ export const follow = async (app: App, ctx: Context, activity: Activity) => {
   }
 
   const followRelation = {
-    userUrl: activity.actor,
-    targetUserUrl: userId,
+    userId: activity.actor,
+    targetUserId: userId,
     createdAt: dayjs().unix(),
   };
   await app.followRelationRepository.create(followRelation);

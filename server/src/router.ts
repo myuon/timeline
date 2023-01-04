@@ -166,7 +166,7 @@ export const newRouter = (options?: IRouterOptions) => {
       orderedItems: followers.map((follower) => ({
         "@context": ["https://www.w3.org/ns/activitystreams"],
         type: "Person",
-        url: follower.userUrl,
+        url: follower.userId,
       })),
     };
     ctx.set("Content-Type", "application/activity+json");

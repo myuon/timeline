@@ -4,26 +4,26 @@ import { FollowRelation } from "@/shared/model/follow";
 @Entity()
 export class FollowRelationTable {
   @PrimaryColumn()
-  userUrl: string;
+  userId: string;
 
   @PrimaryColumn()
-  targetUserUrl: string;
+  targetUserId: string;
 
   @Column()
   createdAt: number;
 
   static fromModel(followRelation: FollowRelation): FollowRelationTable {
     const record = new FollowRelationTable();
-    record.userUrl = followRelation.userUrl;
-    record.targetUserUrl = followRelation.targetUserUrl;
+    record.userId = followRelation.userId;
+    record.targetUserId = followRelation.targetUserId;
     record.createdAt = followRelation.createdAt;
     return record;
   }
 
   toModel(): FollowRelation {
     return {
-      userUrl: this.userUrl,
-      targetUserUrl: this.targetUserUrl,
+      userId: this.userId,
+      targetUserId: this.targetUserId,
       createdAt: this.createdAt,
     };
   }
@@ -37,12 +37,12 @@ export const newFollowRelationRepository = (
       const record = FollowRelationTable.fromModel(followRelation);
       return repo.create(record);
     },
-    async findFollowersCount(targetUserUrl: string) {
-      const count = await repo.countBy({ targetUserUrl });
+    async findFollowersCount(targetUserId: string) {
+      const count = await repo.countBy({ targetUserId });
       return count;
     },
-    async findFollowers(targetUserUrl: string) {
-      const records = await repo.findBy({ targetUserUrl });
+    async findFollowers(targetUserId: string) {
+      const records = await repo.findBy({ targetUserId });
       const followRelations = records.map((record) => record.toModel());
       return followRelations;
     },
