@@ -1,3 +1,5 @@
+import fetch, { RequestInfo, RequestInit } from "node-fetch";
+
 export interface FetcherResult<T> {
   data?: T;
   error?: unknown;
