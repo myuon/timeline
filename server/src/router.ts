@@ -10,14 +10,7 @@ import { schemaForType } from "./helper/zod";
 import { Activity } from "@/shared/model/activity";
 import { follow } from "./handler/inbox";
 import { domain, userId, userName } from "./config";
-import { Middleware } from "koa";
-import CoBody from "co-body";
-
-const parseBody: Middleware = async (ctx, next) => {
-  ctx.request.body = await CoBody.json(ctx);
-
-  return next();
-};
+import { parseBody } from "./middleware/parseBody";
 
 export const newRouter = (options?: IRouterOptions) => {
   const router = new Router<{ app: App }>(options);
