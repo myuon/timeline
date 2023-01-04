@@ -203,18 +203,27 @@ export const newRouter = (options?: IRouterOptions) => {
     const note = await createNote(ctx.state.app, ctx);
 
     // FIXME: delivery SHOULD be performed asynchronously
+    ctx.log.info("delivery");
+
     const activity = serializeCreateNoteActivity(userId, note);
     const followers =
       await ctx.state.app.followRelationRepository.findFollowers(userId);
 
-    followers.forEach(async (follower) => {
-      const { data, error } = await deliveryActivity(follower.userId, activity);
-      if (error) {
-        ctx.log.error(error);
-        return;
-      }
-      ctx.log.info(`deliveryActivity: ${data}`);
-    });
+    await Promise.allSettled(
+      followers.map(async (follower) => {
+        const { data, error } = await deliveryActivity(
+          follower.userId,
+          activity
+        );
+        if (error) {
+          ctx.log.error(error);
+          return;
+        }
+        ctx.log.info(`deliveryActivity: ${data}`);
+      })
+    );
+
+    ctx.log.info("delivery end");
   });
 
   return router;
