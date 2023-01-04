@@ -10,7 +10,7 @@ export const getInbox = async (
       Accept: "application/activity+json",
     },
   });
-  if (!error) {
+  if (error) {
     return { error };
   }
 

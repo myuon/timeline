@@ -20,7 +20,7 @@ export const follow = async (app: App, ctx: Context, activity: Activity) => {
     targetUserId: userId,
     createdAt: dayjs().unix(),
   };
-  await app.followRelationRepository.create(followRelation);
+  await app.followRelationRepository.save(followRelation);
 
   const document = {
     "@context": "https://www.w3.org/ns/activitystreams",

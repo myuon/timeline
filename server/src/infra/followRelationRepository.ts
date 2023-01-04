@@ -37,6 +37,10 @@ export const newFollowRelationRepository = (
       const record = FollowRelationTable.fromModel(followRelation);
       return repo.insert(record);
     },
+    async save(followRelation: FollowRelation) {
+      const record = FollowRelationTable.fromModel(followRelation);
+      return repo.save(record);
+    },
     async findFollowersCount(targetUserId: string) {
       const count = await repo.countBy({ targetUserId });
       return count;
