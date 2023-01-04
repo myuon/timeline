@@ -1,5 +1,6 @@
 import { fetcher } from "../../helper/fetcher";
 import { signHttpHeaders } from "../../helper/signature";
+import { webcrypto as crypto } from "crypto";
 
 export const signedFetcher = async (
   signKey: {

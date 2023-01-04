@@ -1,3 +1,5 @@
+import { webcrypto as crypto } from "crypto";
+
 export const signHttpHeaders = async (
   signKey: CryptoKey,
   request: {
