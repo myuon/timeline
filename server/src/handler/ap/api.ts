@@ -14,9 +14,9 @@ export const getInbox = async (
     return { error };
   }
 
-  const schema = schemaForType<{ index: string }>()(
+  const schema = schemaForType<{ inbox: string }>()(
     z.object({
-      index: z.string(),
+      inbox: z.string(),
     })
   );
   const result = schema.safeParse(JSON.parse(data));
@@ -24,5 +24,5 @@ export const getInbox = async (
     return { error: result.error };
   }
 
-  return { data: result.data.index };
+  return { data: result.data.inbox };
 };
