@@ -93,10 +93,34 @@ export const follow = async (app: App, ctx: Context, activity: Activity) => {
     object: activity,
   };
 
-  ctx.body = document;
-  ctx.set({
-    ...(await signHeaders("/inbox", document)),
+  const resp = await fetch(activity.actor, {
+    headers: {
+      Accept: "application/activity+json",
+    },
   });
+  if (!resp.ok) {
+    console.error(await resp.text());
+    ctx.throw(500, "Internal server error");
+  }
+
+  const json = (await resp.json()) as { inbox: string };
+  ctx.log.info(`inbox: ${json.inbox}`);
+
+  const respAccept = await fetch(json.inbox, {
+    method: "POST",
+    body: JSON.stringify(document),
+    headers: {
+      ...(await signHeaders(new URL(json.inbox).pathname, document)),
+      Accept: "application/activity+json",
+    },
+  });
+  if (!respAccept.ok) {
+    console.error(await respAccept.text());
+    ctx.throw(500, "Internal server error");
+  }
+
+  ctx.status = 200;
+  ctx.log.info(await respAccept.text());
 };
 
 export const helloworld = async (app: App, ctx: Context) => {
