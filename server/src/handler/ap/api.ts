@@ -10,7 +10,7 @@ export const getInbox = async (
       Accept: "application/activity+json",
     },
   });
-  if (error) {
+  if (error || !data) {
     return { error };
   }
 
@@ -19,7 +19,7 @@ export const getInbox = async (
       index: z.string(),
     })
   );
-  const result = schema.safeParse(data);
+  const result = schema.safeParse(JSON.parse(data));
   if (!result.success) {
     return { error: result.error };
   }
