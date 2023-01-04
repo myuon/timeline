@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { schemaForType } from "../../helper/zod";
-import { fetcher, FetcherResult } from "./fetcher";
+import { fetcher, FetcherResult } from "../../helper/fetcher";
 
 export const getInbox = async (
   actor: string
