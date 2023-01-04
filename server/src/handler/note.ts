@@ -4,7 +4,7 @@ import { CreateNoteRequest } from "@/shared/request/note";
 import { z } from "zod";
 import { App } from "./app";
 import { ulid } from "ulid";
-import { domain, userId, userName } from "../config";
+import { domain, userFirebaseId, userName } from "../config";
 
 export const createNote = async (app: App, ctx: Context) => {
   const schema = schemaForType<CreateNoteRequest>()(
@@ -17,7 +17,7 @@ export const createNote = async (app: App, ctx: Context) => {
     ctx.throw(400, result.error);
   }
 
-  if (ctx.state.auth.uid !== userId) {
+  if (ctx.state.auth.uid !== userFirebaseId) {
     ctx.throw(401, "Unauthorized");
   }
 

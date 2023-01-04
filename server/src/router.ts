@@ -9,7 +9,7 @@ import { z } from "zod";
 import { schemaForType } from "./helper/zod";
 import { Activity } from "@/shared/model/activity";
 import { follow } from "./handler/inbox";
-import { domain, userName } from "./config";
+import { domain, userId, userName } from "./config";
 import { Middleware } from "koa";
 import CoBody from "co-body";
 
@@ -37,12 +37,12 @@ export const newRouter = (options?: IRouterOptions) => {
 
     ctx.body = {
       subject: `acct:${userName}@${domain}`,
-      aliases: [`https://${domain}/u/${userName}`],
+      aliases: [userId],
       links: [
         {
           rel: "self",
           type: "application/activity+json",
-          href: `https://${domain}/u/${userName}`,
+          href: userId,
         },
       ],
     };
@@ -64,11 +64,11 @@ export const newRouter = (options?: IRouterOptions) => {
         "https://w3id.org/security/v1",
       ],
       type: "Person",
-      id: `https://${domain}/u/${userName}`,
-      following: `https://${domain}/u/${userName}/following`,
-      followers: `https://${domain}/u/${userName}/followers`,
-      inbox: `https://${domain}/u/${userName}/inbox`,
-      outbox: `https://${domain}/u/${userName}/outbox`,
+      id: userId,
+      following: `${userId}/following`,
+      followers: `${userId}/followers`,
+      inbox: `${userId}/inbox`,
+      outbox: `${userId}/outbox`,
       preferredUsername: userName,
       name: userName,
       summary: `@${userName} on ${domain}`,
@@ -77,11 +77,11 @@ export const newRouter = (options?: IRouterOptions) => {
         mediaType: "image/png",
         url: "https://pbs.twimg.com/profile_images/1398634166523097090/QhosMWKS_400x400.jpg",
       },
-      url: `https://${domain}/u/${userName}`,
+      url: userId,
       publicKey: {
-        id: `https://${domain}/u/${userName}#main-key`,
+        id: `${userId}#main-key`,
         type: "Key",
-        owner: `https://${domain}/u/${userName}`,
+        owner: userId,
         publicKeyPem: fs.readFileSync(
           path.join(__dirname, "../../.secrets/public.pem"),
           "utf-8"
@@ -102,33 +102,30 @@ export const newRouter = (options?: IRouterOptions) => {
 
     const page = ctx.query.page === "true";
     if (page) {
-      const notes = await ctx.state.app.noteRepository.findLatest(
-        `https://${domain}/u/${userName}`,
-        {
-          page: 0,
-          perPage: 5,
-        }
-      );
+      const notes = await ctx.state.app.noteRepository.findLatest(userId, {
+        page: 0,
+        perPage: 5,
+      });
 
       ctx.body = {
         "@context": "https://www.w3.org/ns/activitystreams",
         type: "OrderedCollectionPage",
-        id: `https://${domain}/u/${userName}/outbox?page=true`,
-        partOf: `https://${domain}/u/${userName}/outbox`,
+        id: `${userId}/outbox?page=true`,
+        partOf: `${userId}/outbox`,
         orderedItems: notes.map((note) => ({
-          id: `https://${domain}/u/${userName}/s/${note.id}/activity`,
+          id: `${userId}/s/${note.id}/activity`,
           type: "Create",
-          actor: `https://${domain}/u/${userName}`,
-          cc: [`https://${domain}/u/${userName}/followers`],
+          actor: userId,
+          cc: [`${userId}/followers`],
           to: ["https://www.w3.org/ns/activitystreams#Public"],
           object: {
             type: "Note",
-            id: `https://${domain}/u/${userName}/s/${note.id}`,
-            attributedTo: `https://${domain}/u/${userName}`,
+            id: `${userId}/s/${note.id}`,
+            attributedTo: userId,
             content: note.content,
             to: ["https://www.w3.org/ns/activitystreams#Public"],
             cc: [],
-            url: `https://${domain}/u/${userName}/s/${note.id}`,
+            url: `${userId}/s/${note.id}`,
           },
           published: dayjs(note.createdAt).format("YYYY-MM-DDTHH:mm:ssZ"),
         })),
@@ -139,9 +136,9 @@ export const newRouter = (options?: IRouterOptions) => {
       ctx.body = {
         "@context": "https://www.w3.org/ns/activitystreams",
         type: "OrderedCollection",
-        id: `https://${domain}/u/${userName}/outbox`,
+        id: `${userId}/outbox`,
         totalItems: count,
-        last: `https://${domain}/u/${userName}/outbox?page=true`,
+        last: `${userId}/outbox?page=true`,
       };
     }
     ctx.set("Content-Type", "application/activity+json");
@@ -157,18 +154,14 @@ export const newRouter = (options?: IRouterOptions) => {
     }
 
     const count =
-      await ctx.state.app.followRelationRepository.findFollowersCount(
-        `https://${domain}/u/${userName}`
-      );
+      await ctx.state.app.followRelationRepository.findFollowersCount(userId);
     const followers =
-      await ctx.state.app.followRelationRepository.findFollowers(
-        `https://${domain}/u/${userName}`
-      );
+      await ctx.state.app.followRelationRepository.findFollowers(userId);
 
     ctx.body = {
       "@context": ["https://www.w3.org/ns/activitystreams"],
       type: "OrderedCollection",
-      id: `https://${domain}/u/${userName}/followers`,
+      id: `${userId}/followers`,
       totalItems: count,
       orderedItems: followers.map((follower) => ({
         "@context": ["https://www.w3.org/ns/activitystreams"],
@@ -191,7 +184,7 @@ export const newRouter = (options?: IRouterOptions) => {
     ctx.body = {
       "@context": ["https://www.w3.org/ns/activitystreams"],
       type: "OrderedCollection",
-      id: `https://${domain}/u/${userName}/following`,
+      id: `${userId}/following`,
       totalItems: 0,
       orderedItems: [],
     };

@@ -1,7 +1,7 @@
 import { Context } from "koa";
 import { App } from "./app";
 import { Activity } from "@/shared/model/activity";
-import { domain, userName } from "../config";
+import { userId } from "../config";
 import dayjs from "dayjs";
 import { ulid } from "ulid";
 import fs from "fs";
@@ -58,7 +58,7 @@ const signHeaders = async (path: string, body: object) => {
 
   return {
     Signature: [
-      `keyId="https://${domain}/u/${userName}#main-key"`,
+      `keyId="${userId}#main-key"`,
       `algorithm="rsa-sha256"`,
       `headers="(request-target) date digest"`,
       `signature="${Buffer.from(signature).toString("base64")}"`,
@@ -69,7 +69,7 @@ const signHeaders = async (path: string, body: object) => {
 };
 
 export const follow = async (app: App, ctx: Context, activity: Activity) => {
-  if (activity.object !== `https://${domain}/u/${userName}`) {
+  if (activity.object !== userId) {
     ctx.throw(400, "Bad request");
   }
 
@@ -79,16 +79,16 @@ export const follow = async (app: App, ctx: Context, activity: Activity) => {
 
   const followRelation = {
     userUrl: activity.actor,
-    targetUserUrl: `https://${domain}/u/${userName}`,
+    targetUserUrl: userId,
     createdAt: dayjs().unix(),
   };
   await app.followRelationRepository.create(followRelation);
 
   const document = {
     "@context": "https://www.w3.org/ns/activitystreams",
-    id: `https://${domain}/u/${userName}/s/${ulid()}`,
+    id: `${userId}/s/${ulid()}`,
     type: "Accept",
-    actor: `https://${domain}/u/${userName}`,
+    actor: userId,
     object: activity,
   };
 
