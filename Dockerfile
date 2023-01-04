@@ -2,8 +2,12 @@ FROM node:19 as builder
 ADD https://github.com/benbjohnson/litestream/releases/download/v0.3.9/litestream-v0.3.9-linux-amd64-static.tar.gz /tmp/litestream.tar.gz
 RUN tar -C /usr/local/bin -xzf /tmp/litestream.tar.gz
 WORKDIR /app
-COPY . .
+COPY server/package*.json server/
+COPY web/package*.json web/
+COPY ./package*.json ./
+COPY ./yarn.lock ./
 RUN yarn install --frozen-lockfile
+COPY . .
 RUN yarn build
 
 FROM node:19 as deps
