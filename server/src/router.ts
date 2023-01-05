@@ -194,6 +194,8 @@ export const newRouter = (options?: IRouterOptions) => {
     const activity = result.data;
     if (activity.type === "Follow") {
       await follow(ctx.state.app, ctx, activity);
+    } else if (activity.type === "Delete") {
+      ctx.status = 204;
     } else {
       ctx.throw(400, "Unsupported activity type");
     }
