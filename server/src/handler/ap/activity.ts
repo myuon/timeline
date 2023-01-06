@@ -8,6 +8,7 @@ export const serializeCreateNoteActivity = (
   note: Note
 ) => {
   return {
+    "@context": ["https://www.w3.org/ns/activitystreams"],
     id: `${userId}/s/${note.id}/activity`,
     type: "Create",
     actor: userId,

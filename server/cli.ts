@@ -12,17 +12,19 @@ export const run = async () => {
       return;
     }
 
-    const resp = await deliveryActivity(
-      to,
-      serializeCreateNoteActivity(userId, to, {
-        id: "1",
+    const activity = serializeCreateNoteActivity(
+      userId,
+      "https://www.w3.org/ns/activitystreams#Public",
+      {
+        id: dayjs().unix().toString(),
         userId,
-        content: `<p>Hello, world!, ${dayjs().format(
-          "YYYY-MM-DD HH:mm:ss"
-        )}</p>`,
+        content: `<p>Toot!, ${dayjs().format("YYYY-MM-DD HH:mm:ss")}</p>`,
         createdAt: dayjs().unix(),
-      })
+      }
     );
+
+    console.log(`Sending activity: ${JSON.stringify(activity, null, 2)}`);
+    const resp = await deliveryActivity(to, activity);
     console.log(resp);
   } else if (command === "reply") {
     const to = process.argv[3];
@@ -32,14 +34,21 @@ export const run = async () => {
       return;
     }
 
-    const activity = serializeCreateNoteActivity(userId, to, {
-      id: "1",
+    const activity = serializeCreateNoteActivity(
       userId,
-      content: `<p>Hello, world!, ${dayjs().format("YYYY-MM-DD HH:mm:ss")}</p>`,
-      createdAt: dayjs().unix(),
-    });
+      "https://www.w3.org/ns/activitystreams#Public",
+      {
+        id: dayjs().unix().toString(),
+        userId,
+        content: `<p>Hello, world!, ${dayjs().format(
+          "YYYY-MM-DD HH:mm:ss"
+        )}</p>`,
+        createdAt: dayjs().unix(),
+      }
+    );
     activity.object.inReplyTo = inReplyTo;
 
+    console.log(`Sending activity: ${JSON.stringify(activity, null, 2)}`);
     const resp = await deliveryActivity(to, activity);
     console.log(resp);
   } else {
