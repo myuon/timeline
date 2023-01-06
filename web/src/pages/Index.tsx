@@ -1,10 +1,12 @@
 import { css } from "@emotion/react";
 import { Link } from "react-router-dom";
-import { useAuthToken } from "../api/auth";
+import { useAuthGuard, useAuthToken } from "../api/auth";
 import { CreateNoteRequest } from "@/shared/request/note";
 import useSWR from "swr";
 
 export const IndexPage = () => {
+  useAuthGuard();
+
   const token = useAuthToken();
   const { data: notes } = useSWR("/u/myuon/outbox?page=true", async (url) => {
     const resp = await fetch(url, {
