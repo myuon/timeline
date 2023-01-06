@@ -2,13 +2,17 @@ import { Note } from "@/shared/model/note";
 import dayjs from "dayjs";
 import { serializeApNote } from "./note";
 
-export const serializeCreateNoteActivity = (userId: string, note: Note) => {
+export const serializeCreateNoteActivity = (
+  userId: string,
+  to: string,
+  note: Note
+) => {
   return {
     id: `${userId}/s/${note.id}/activity`,
     type: "Create",
     actor: userId,
     cc: [`${userId}/followers`],
-    to: ["https://www.w3.org/ns/activitystreams#Public"],
+    to: [to],
     object: serializeApNote(userId, note),
     published: dayjs(note.createdAt).toDate().toUTCString(),
   };

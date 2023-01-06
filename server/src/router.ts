@@ -107,7 +107,11 @@ export const newRouter = (options?: IRouterOptions) => {
         id: `${userId}/outbox?page=true`,
         partOf: `${userId}/outbox`,
         orderedItems: notes.map((note) =>
-          serializeCreateNoteActivity(userId, note)
+          serializeCreateNoteActivity(
+            userId,
+            "https://www.w3.org/ns/activitystreams#Public",
+            note
+          )
         ),
       };
     } else {
@@ -207,7 +211,11 @@ export const newRouter = (options?: IRouterOptions) => {
     // FIXME: delivery SHOULD be performed asynchronously
     ctx.log.info("delivery");
 
-    const activity = serializeCreateNoteActivity(userId, note);
+    const activity = serializeCreateNoteActivity(
+      userId,
+      "https://www.w3.org/ns/activitystreams#Public",
+      note
+    );
     const followers =
       await ctx.state.app.followRelationRepository.findFollowers(userId);
 

@@ -9,5 +9,6 @@ export const serializeApNote = (userId: string, note: Note) => {
     to: ["https://www.w3.org/ns/activitystreams#Public"],
     cc: [],
     url: `${userId}/s/${note.id}`,
+    inReplyTo: undefined as string | undefined,
   };
 };

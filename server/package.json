@@ -45,6 +45,7 @@
     "start": "ts-node index.ts | pino-pretty",
     "lint": "eslint .",
     "format": "eslint . --fix",
-    "postformat": "prettier --write ."
+    "postformat": "prettier --write .",
+    "cli": "ts-node cli.ts"
   }
 }
