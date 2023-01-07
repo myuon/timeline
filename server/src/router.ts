@@ -16,6 +16,8 @@ import {
 } from "./handler/ap/activity";
 import { deliveryActivity } from "./handler/ap/delivery";
 import { Context } from "koa";
+import { getActor } from "./handler/ap/api";
+import { ulid } from "ulid";
 
 const requireAuth = (ctx: Context) => {
   if (!ctx.state.auth) {
@@ -244,6 +246,34 @@ export const newRouter = (options?: IRouterOptions) => {
     }
 
     const activity = result.data;
+
+    if (!activity.actor) {
+      ctx.throw(400, "Missing actor");
+      return;
+    }
+
+    const actor = await ctx.state.app.actorRepository.findById(activity.actor);
+    if (!actor) {
+      const { data, error } = await getActor(activity.actor);
+      if (!data || error) {
+        ctx.log.warn(error);
+        ctx.throw(400, "Failed to get actor");
+        return;
+      }
+
+      await ctx.state.app.actorRepository.save({
+        id: ulid(),
+        federatedId: data?.id,
+        rawData: JSON.stringify(data),
+        inboxUrl: data?.inbox,
+        name: data?.name,
+        summary: data?.summary,
+        url: data?.url,
+        publicKeyPem: data?.publicKey?.publicKeyPem,
+        iconUrl: data?.icon?.url,
+      });
+    }
+
     if (activity.type === "Follow") {
       await follow(ctx.state.app, ctx, activity);
     } else if (activity.type === "Create") {
