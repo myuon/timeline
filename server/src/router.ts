@@ -7,7 +7,7 @@ import { App } from "./handler/app";
 import { z } from "zod";
 import { schemaForType } from "./helper/zod";
 import { Activity } from "@/shared/model/activity";
-import { follow } from "./handler/inbox";
+import { create, follow } from "./handler/inbox";
 import { domain, userId, userName } from "./config";
 import { parseBody } from "./middleware/parseBody";
 import {
@@ -224,7 +224,16 @@ export const newRouter = (options?: IRouterOptions) => {
         type: z.string(),
         published: z.string().optional(),
         actor: z.string().optional(),
-        object: z.string().optional(),
+        object: z
+          .string()
+          .or(
+            z.object({
+              id: z.string(),
+              type: z.string(),
+              content: z.string(),
+            })
+          )
+          .optional(),
         target: z.string().optional(),
       })
     );
@@ -237,6 +246,8 @@ export const newRouter = (options?: IRouterOptions) => {
     const activity = result.data;
     if (activity.type === "Follow") {
       await follow(ctx.state.app, ctx, activity);
+    } else if (activity.type === "Create") {
+      await create(ctx.state.app, ctx, activity);
     } else if (activity.type === "Delete") {
       ctx.status = 204;
     } else {

@@ -5,6 +5,7 @@ import { userId } from "../config";
 import dayjs from "dayjs";
 import { ulid } from "ulid";
 import { deliveryActivity } from "./ap/delivery";
+import { Note } from "@/shared/model/note";
 
 export const follow = async (app: App, ctx: Context, activity: Activity) => {
   if (activity.object !== userId) {
@@ -38,4 +39,24 @@ export const follow = async (app: App, ctx: Context, activity: Activity) => {
   ctx.log.info(data);
 
   ctx.status = 200;
+};
+
+export const create = async (app: App, ctx: Context, activity: Activity) => {
+  if (!activity.object) {
+    ctx.throw(400, "Bad request");
+  }
+  if (typeof activity.object === "string") {
+    ctx.throw(400, "Bad request");
+  }
+
+  const note = {
+    id: ulid(),
+    federatedId: activity.object.id,
+    userId: activity.actor,
+    content: activity.object.content,
+    createdAt: dayjs().unix(),
+  } as Note;
+
+  // NOTE: if the note is already exists, federatedId is not unique and cannot save it.
+  await app.noteRepository.save(note);
 };
