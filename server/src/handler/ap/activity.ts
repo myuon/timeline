@@ -33,3 +33,33 @@ export const serializeDeleteNoteActivity = (
     published: dayjs().toDate().toUTCString(),
   };
 };
+
+export const serializeFollowActivity = (
+  userId: string,
+  id: string,
+  objectId: string
+) => {
+  return {
+    "@context": ["https://www.w3.org/ns/activitystreams"],
+    id: `${userId}/activity/${id}`,
+    type: "Follow",
+    actor: userId,
+    object: objectId,
+    published: dayjs().toDate().toUTCString(),
+  };
+};
+
+export const serializeUndoActivity = (
+  userId: string,
+  id: string,
+  objectId: string
+) => {
+  return {
+    "@context": ["https://www.w3.org/ns/activitystreams"],
+    id: `${userId}/activity/${id}`,
+    type: "Undo",
+    actor: userId,
+    object: objectId,
+    published: dayjs().toDate().toUTCString(),
+  };
+};

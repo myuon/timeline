@@ -1,8 +1,11 @@
 import dayjs from "dayjs";
+import { ulid } from "ulid";
 import { userId } from "./src/config";
 import {
   serializeCreateNoteActivity,
   serializeDeleteNoteActivity,
+  serializeFollowActivity,
+  serializeUndoActivity,
 } from "./src/handler/ap/activity";
 import { deliveryActivity } from "./src/handler/ap/delivery";
 
@@ -63,6 +66,31 @@ export const run = async () => {
     }
 
     const activity = serializeDeleteNoteActivity(userId, url, url);
+
+    console.log(`Sending activity: ${JSON.stringify(activity, null, 2)}`);
+    const resp = await deliveryActivity(to, activity);
+    console.log(resp);
+  } else if (command === "follow") {
+    const to = process.argv[3];
+    if (!to) {
+      console.log("Usage: yarn cli follow <to>");
+      return;
+    }
+
+    const activity = serializeFollowActivity(userId, ulid(), to);
+
+    console.log(`Sending activity: ${JSON.stringify(activity, null, 2)}`);
+    const resp = await deliveryActivity(to, activity);
+    console.log(resp);
+  } else if (command === "undo") {
+    const to = process.argv[3];
+    const url = process.argv[4];
+    if (!to || !url) {
+      console.log("Usage: yarn cli undo <to> <url>");
+      return;
+    }
+
+    const activity = serializeUndoActivity(userId, ulid(), url);
 
     console.log(`Sending activity: ${JSON.stringify(activity, null, 2)}`);
     const resp = await deliveryActivity(to, activity);
