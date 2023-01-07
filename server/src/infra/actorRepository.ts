@@ -76,7 +76,7 @@ export const newActorRepository = (repo: Repository<ActorTable>) => {
     },
     save: async (actor: Actor) => {
       const actorTable = ActorTable.fromModel(actor);
-      await repo.insert(actorTable);
+      await repo.save(actorTable);
     },
   };
 };
