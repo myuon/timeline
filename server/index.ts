@@ -23,6 +23,7 @@ import {
   InboxItemTable,
   newInboxItemRepository,
 } from "./src/infra/inboxRepository";
+import { userActor } from "./src/config";
 
 const dataSource = new DataSource({
   type: "sqlite",
@@ -73,6 +74,8 @@ app.use(async (ctx, next) => {
         dataSource.getRepository(InboxItemTable)
       ),
     } as App;
+
+    await (ctx.state.app as App).actorRepository.save(userActor);
 
     return await next();
   }

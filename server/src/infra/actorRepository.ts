@@ -10,8 +10,8 @@ export class ActorTable {
   @Column()
   federatedId: string;
 
-  @Column()
-  rawData: string;
+  @Column({ nullable: true })
+  rawData?: string;
 
   @Column({ nullable: true })
   inboxUrl?: string;

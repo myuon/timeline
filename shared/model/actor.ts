@@ -1,7 +1,7 @@
 export interface Actor {
   id: string;
   federatedId: string;
-  rawData: string;
+  rawData?: string;
   inboxUrl?: string;
   name?: string;
   summary?: string;
