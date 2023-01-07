@@ -7,7 +7,7 @@ export interface Activity {
     | {
         id: string;
         type: string;
-        content: string;
+        content?: string;
       };
   target?: string;
   cc?: string[];
