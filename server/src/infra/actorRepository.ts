@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn, Repository, Unique } from "typeorm";
+import { Column, Entity, In, PrimaryColumn, Repository, Unique } from "typeorm";
 import { Actor } from "@/shared/model/actor";
 
 @Entity()
@@ -69,6 +69,10 @@ export const newActorRepository = (repo: Repository<ActorTable>) => {
     findByFederatedId: async (federatedId: string) => {
       const actor = await repo.findOneBy({ federatedId });
       return actor?.toModel();
+    },
+    findByIds: async (ids: string[]) => {
+      const actors = await repo.findBy({ id: In(ids) });
+      return actors.map((actor) => actor.toModel());
     },
     save: async (actor: Actor) => {
       const actorTable = ActorTable.fromModel(actor);

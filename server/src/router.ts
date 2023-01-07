@@ -421,11 +421,15 @@ export const newRouter = (options?: IRouterOptions) => {
     const notes = await ctx.state.app.noteRepository.findByIds(
       items.map((item) => item.itemId)
     );
+    const actors = await ctx.state.app.actorRepository.findByIds(
+      notes.map((note) => note.userId)
+    );
 
-    ctx.body = {
-      items,
-      notes,
-    };
+    ctx.body = items.map((item) => ({
+      ...item,
+      note: notes.find((note) => note.id === item.itemId),
+      actor: actors.find((actor) => actor.id === item.userId),
+    }));
   });
   router.post("/api/follow", koaBody(), async (ctx) => {
     requireAuth(ctx);
