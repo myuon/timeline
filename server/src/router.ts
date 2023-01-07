@@ -296,14 +296,14 @@ export const newRouter = (options?: IRouterOptions) => {
               );
             await Promise.all(
               followers.map(async (relation) => {
-                if (!relation.targetUserId.startsWith(`https://${domain}`)) {
+                if (!relation.userId.startsWith(`https://${domain}`)) {
                   return;
                 }
 
                 // = create an inbox item
                 await ctx.state.app.inboxItemRepository.create({
                   id: ulid(),
-                  userId: relation.targetUserId,
+                  userId: relation.userId,
                   type: "Note",
                   itemId: created.id,
                   createdAt: dayjs().unix(),
