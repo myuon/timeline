@@ -74,6 +74,10 @@ export const newActorRepository = (repo: Repository<ActorTable>) => {
       const actors = await repo.findBy({ id: In(ids) });
       return actors.map((actor) => actor.toModel());
     },
+    findByFederatedIds: async (federatedIds: string[]) => {
+      const actors = await repo.findBy({ federatedId: In(federatedIds) });
+      return actors.map((actor) => actor.toModel());
+    },
     save: async (actor: Actor) => {
       const actorTable = ActorTable.fromModel(actor);
       await repo.save(actorTable);

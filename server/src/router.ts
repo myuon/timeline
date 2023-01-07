@@ -422,13 +422,13 @@ export const newRouter = (options?: IRouterOptions) => {
     const notes = await ctx.state.app.noteRepository.findByIds(
       items.map((item) => item.itemId)
     );
-    const actors = await ctx.state.app.actorRepository.findByIds(
+    const actors = await ctx.state.app.actorRepository.findByFederatedIds(
       notes.map((note) => note.userId)
     );
 
     ctx.body = items.map((item) => {
       const note = notes.find((note) => note.id === item.itemId);
-      const actor = actors.find((actor) => actor.id === note?.userId);
+      const actor = actors.find((actor) => actor.federatedId === note?.userId);
 
       return {
         ...item,
