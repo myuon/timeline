@@ -3,22 +3,27 @@ import { Link } from "react-router-dom";
 import { useAuthGuard, useAuthToken } from "../api/auth";
 import { CreateNoteRequest } from "@/shared/request/note";
 import useSWR from "swr";
+import React from "react";
 
 export const IndexPage = () => {
   useAuthGuard();
 
   const { data: token } = useAuthToken();
-  const { data: notes } = useSWR("/u/myuon/outbox?page=true", async (url) => {
-    const resp = await fetch(url, {
-      headers: {
-        "Content-Type": "application/activity+json",
-      },
-    });
-    if (resp.ok) {
-      return resp.json();
+  const { data: notes, mutate: refetch } = useSWR(
+    "/u/myuon/outbox?page=true",
+    async (url) => {
+      const resp = await fetch(url, {
+        headers: {
+          "Content-Type": "application/activity+json",
+        },
+      });
+      if (resp.ok) {
+        return resp.json();
+      }
     }
-  });
-  console.log(notes);
+  );
+
+  const contentFormRef = React.useRef<HTMLTextAreaElement>(null);
 
   return (
     <>
@@ -66,6 +71,12 @@ export const IndexPage = () => {
               "Content-Type": "application/json",
             },
           });
+
+          if (contentFormRef.current) {
+            contentFormRef.current.value = "";
+          }
+
+          await refetch();
         }}
         css={css`
           display: grid;
@@ -73,7 +84,7 @@ export const IndexPage = () => {
         `}
       >
         <label>
-          <textarea name="content" />
+          <textarea name="content" ref={contentFormRef} />
         </label>
 
         <button type="submit">投稿する</button>
