@@ -13,12 +13,14 @@ import { parseBody } from "./middleware/parseBody";
 import {
   serializeCreateNoteActivity,
   serializeDeleteNoteActivity,
+  serializeFollowActivity,
 } from "./handler/ap/activity";
 import { deliveryActivity } from "./handler/ap/delivery";
 import { Context } from "koa";
 import { getActor } from "./handler/ap/api";
 import { ulid } from "ulid";
 import dayjs from "dayjs";
+import { ApiFollowRequest } from "@/shared/request/follow";
 
 const requireAuth = (ctx: Context) => {
   if (!ctx.state.auth) {
@@ -422,6 +424,44 @@ export const newRouter = (options?: IRouterOptions) => {
       items,
       notes,
     };
+  });
+  router.post("/api/follow", koaBody(), async (ctx) => {
+    requireAuth(ctx);
+
+    const schema = schemaForType<ApiFollowRequest>()(
+      z.object({
+        id: z.string(),
+      })
+    );
+    const result = schema.safeParse(ctx.request.body);
+    if (!result.success) {
+      ctx.throw(400, result.error);
+      return;
+    }
+
+    const { id } = result.data;
+    const { error: actorError } = await getActor(id);
+    if (actorError) {
+      ctx.log.error(actorError);
+      ctx.throw(400, "Failed to get actor");
+    }
+
+    const activity = serializeFollowActivity(userId, ulid(), id);
+    const { data, error } = await deliveryActivity(id, activity);
+    if (error) {
+      ctx.log.error(error);
+      ctx.throw(400, "Failed to delivery activity");
+    }
+
+    ctx.log.info(`followResponse: ${data}`);
+
+    await ctx.state.app.followRelationRepository.save({
+      userId: userId,
+      targetUserId: id,
+      createdAt: dayjs().unix(),
+    });
+
+    ctx.status = 204;
   });
 
   return router;

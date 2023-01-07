@@ -140,6 +140,30 @@ export const IndexPage = () => {
 
         <button type="submit">投稿する</button>
       </form>
+
+      <form
+        onSubmit={async (event) => {
+          event.preventDefault();
+
+          const formData = new FormData(event.currentTarget);
+          const id = formData.get("id");
+
+          await fetch("/api/follow", {
+            method: "POST",
+            body: JSON.stringify({
+              id,
+            }),
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+        }}
+      >
+        <input type="text" name="id" />
+
+        <button type="submit">Follow</button>
+      </form>
     </>
   );
 };
