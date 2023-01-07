@@ -40,9 +40,7 @@ export class InboxItemTable {
   }
 }
 
-export const newInboxItemRepository = async (
-  repo: Repository<InboxItemTable>
-) => {
+export const newInboxItemRepository = (repo: Repository<InboxItemTable>) => {
   return {
     async create(item: InboxItem) {
       const table = InboxItemTable.fromModel(item);

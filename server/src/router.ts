@@ -364,6 +364,18 @@ export const newRouter = (options?: IRouterOptions) => {
   });
   router.post("/api/timeline", async (ctx) => {
     requireAuth(ctx);
+
+    const items = await ctx.state.app.inboxItemRepository.findTimelineItems(
+      userId,
+      {
+        page: Number(ctx.query.page),
+        perPage: Number(ctx.query.perPage),
+        since: Number(ctx.query.since),
+        type: ctx.query.type as string,
+      }
+    );
+
+    ctx.body = items;
   });
 
   return router;
