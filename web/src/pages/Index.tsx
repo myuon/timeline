@@ -22,6 +22,23 @@ export const IndexPage = () => {
       }
     }
   );
+  const { data: inbox } = useSWR("/api/timeline", async (url) => {
+    const params = new URLSearchParams({
+      page: `0`,
+      size: `10`,
+      type: "Note",
+    });
+
+    const resp = await fetch(`${url}?${params}`, {
+      headers: {
+        "Content-Type": "application/activity+json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (resp.ok) {
+      return resp.json();
+    }
+  });
 
   const contentFormRef = React.useRef<HTMLTextAreaElement>(null);
 
@@ -30,6 +47,15 @@ export const IndexPage = () => {
       <Link to="/login">LOGIN</Link>
 
       <h2>/ Index</h2>
+
+      <p>Inbox (Note)</p>
+      <pre
+        css={css`
+          text-align: left;
+        `}
+      >
+        <code>{JSON.stringify(inbox, null, 2)}</code>
+      </pre>
 
       <div
         css={css`

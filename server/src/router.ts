@@ -402,14 +402,14 @@ export const newRouter = (options?: IRouterOptions) => {
 
     ctx.log.info("delivery end");
   });
-  router.post("/api/timeline", async (ctx) => {
+  router.get("/api/timeline", async (ctx) => {
     requireAuth(ctx);
 
     const items = await ctx.state.app.inboxItemRepository.findTimelineItems(
       userId,
       {
         page: Number(ctx.query.page),
-        perPage: Number(ctx.query.perPage),
+        size: Number(ctx.query.size),
         since: Number(ctx.query.since),
         type: ctx.query.type as string,
       }

@@ -50,7 +50,7 @@ export const newInboxItemRepository = (repo: Repository<InboxItemTable>) => {
       userId: string,
       condition: {
         page: number;
-        perPage: number;
+        size: number;
         since?: number;
         type?: string;
       }
@@ -59,8 +59,8 @@ export const newInboxItemRepository = (repo: Repository<InboxItemTable>) => {
         .createQueryBuilder("inbox")
         .where("inbox.userId = :userId", { userId })
         .orderBy("inbox.createdAt", "DESC")
-        .skip(condition.page * condition.perPage)
-        .take(condition.perPage);
+        .skip(condition.page * condition.size)
+        .take(condition.size);
       if (condition.since) {
         query.andWhere("inbox.createdAt > :since", { since: condition.since });
       }
