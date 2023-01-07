@@ -19,11 +19,15 @@ import {
 import https from "https";
 import fs from "fs";
 import { ActorTable, newActorRepository } from "./src/infra/actorRepository";
+import {
+  InboxItemTable,
+  newInboxItemRepository,
+} from "./src/infra/inboxRepository";
 
 const dataSource = new DataSource({
   type: "sqlite",
   database: path.join(__dirname, "db.sqlite"),
-  entities: [NoteTable, FollowRelationTable, ActorTable],
+  entities: [NoteTable, FollowRelationTable, ActorTable, InboxItemTable],
   logging: true,
   synchronize: true,
 });
@@ -65,6 +69,9 @@ app.use(async (ctx, next) => {
         dataSource.getRepository(FollowRelationTable)
       ),
       actorRepository: newActorRepository(dataSource.getRepository(ActorTable)),
+      inboxItemRepository: newInboxItemRepository(
+        dataSource.getRepository(InboxItemTable)
+      ),
     } as App;
 
     return await next();

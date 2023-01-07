@@ -362,6 +362,9 @@ export const newRouter = (options?: IRouterOptions) => {
 
     ctx.log.info("delivery end");
   });
+  router.post("/api/timeline", async (ctx) => {
+    requireAuth(ctx);
+  });
 
   return router;
 };
