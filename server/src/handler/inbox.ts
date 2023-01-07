@@ -61,4 +61,6 @@ export const create = async (app: App, ctx: Context, activity: Activity) => {
   await app.noteRepository.save(note);
 
   ctx.status = 200;
+
+  return note;
 };

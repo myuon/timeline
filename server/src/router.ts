@@ -18,6 +18,7 @@ import { deliveryActivity } from "./handler/ap/delivery";
 import { Context } from "koa";
 import { getActor } from "./handler/ap/api";
 import { ulid } from "ulid";
+import dayjs from "dayjs";
 
 const requireAuth = (ctx: Context) => {
   if (!ctx.state.auth) {
@@ -237,6 +238,7 @@ export const newRouter = (options?: IRouterOptions) => {
           )
           .optional(),
         target: z.string().optional(),
+        cc: z.array(z.string()).optional(),
       })
     );
     const result = schema.safeParse(ctx.request.body);
@@ -277,7 +279,36 @@ export const newRouter = (options?: IRouterOptions) => {
     if (activity.type === "Follow") {
       await follow(ctx.state.app, ctx, activity);
     } else if (activity.type === "Create") {
-      await create(ctx.state.app, ctx, activity);
+      const created = await create(ctx.state.app, ctx, activity);
+
+      // deliver to LOCAL followers
+      await Promise.all(
+        activity.cc?.map(async (cc) => {
+          if (cc.endsWith("/followers")) {
+            const userId = cc.replace("/followers", "");
+            const followers =
+              await ctx.state.app.followRelationRepository.findFollowers(
+                userId
+              );
+            await Promise.all(
+              followers.map(async (relation) => {
+                if (!relation.targetUserId.startsWith(`https://${domain}`)) {
+                  return;
+                }
+
+                // = create an inbox item
+                await ctx.state.app.inboxItemRepository.create({
+                  id: ulid(),
+                  userId: relation.targetUserId,
+                  type: "Note",
+                  itemId: created.id,
+                  createdAt: dayjs().unix(),
+                });
+              })
+            );
+          }
+        }) ?? []
+      );
     } else if (activity.type === "Delete") {
       ctx.status = 204;
     } else {
@@ -289,6 +320,15 @@ export const newRouter = (options?: IRouterOptions) => {
     requireAuth(ctx);
 
     const note = await createNote(ctx.state.app, ctx);
+
+    // = create an inbox item
+    await ctx.state.app.inboxItemRepository.create({
+      id: ulid(),
+      userId: userId,
+      type: "Note",
+      itemId: note.id,
+      createdAt: dayjs().unix(),
+    });
 
     // FIXME: delivery SHOULD be performed asynchronously
     ctx.log.info("delivery");

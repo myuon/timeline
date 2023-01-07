@@ -10,4 +10,5 @@ export interface Activity {
         content: string;
       };
   target?: string;
+  cc?: string[];
 }
