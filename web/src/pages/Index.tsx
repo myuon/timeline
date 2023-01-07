@@ -50,7 +50,29 @@ export const IndexPage = () => {
           >
             <p>{note.object.content}</p>
             <p>
-              {note.published} - {note.actor}
+              {note.published} -{" "}
+              <button
+                onClick={async () => {
+                  const ok = window.confirm("本当に削除しますか？");
+                  if (!ok) {
+                    return;
+                  }
+
+                  const noteId = note.id.split("s/")[1].split("/")[0];
+
+                  await fetch(`/api/note/${noteId}`, {
+                    method: "DELETE",
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                      "Content-Type": "application/json",
+                    },
+                  });
+
+                  await refetch();
+                }}
+              >
+                DELETE
+              </button>
             </p>
           </div>
         ))}

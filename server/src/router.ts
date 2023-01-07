@@ -10,7 +10,10 @@ import { Activity } from "@/shared/model/activity";
 import { follow } from "./handler/inbox";
 import { domain, userId, userName } from "./config";
 import { parseBody } from "./middleware/parseBody";
-import { serializeCreateNoteActivity } from "./handler/ap/activity";
+import {
+  serializeCreateNoteActivity,
+  serializeDeleteNoteActivity,
+} from "./handler/ap/activity";
 import { deliveryActivity } from "./handler/ap/delivery";
 
 export const newRouter = (options?: IRouterOptions) => {
@@ -215,6 +218,49 @@ export const newRouter = (options?: IRouterOptions) => {
       userId,
       "https://www.w3.org/ns/activitystreams#Public",
       note
+    );
+    const followers =
+      await ctx.state.app.followRelationRepository.findFollowers(userId);
+
+    await Promise.allSettled(
+      followers.map(async (follower) => {
+        const { data, error } = await deliveryActivity(
+          follower.userId,
+          activity
+        );
+        if (error) {
+          ctx.log.error(error);
+          return;
+        }
+        ctx.log.info(`deliveryActivity: ${data}`);
+      })
+    );
+
+    ctx.log.info("delivery end");
+  });
+  router.delete("/api/note/:id", async (ctx) => {
+    const note = await ctx.state.app.noteRepository.findById(ctx.params.id);
+    if (!note) {
+      ctx.throw(404, "Not found");
+      return;
+    }
+
+    if (note.userId !== userId) {
+      ctx.throw(403, "Forbidden");
+      return;
+    }
+
+    await ctx.state.app.noteRepository.delete(ctx.params.id);
+
+    ctx.status = 204;
+
+    // FIXME: delivery SHOULD be performed asynchronously
+    ctx.log.info("delivery");
+
+    const activity = serializeDeleteNoteActivity(
+      userId,
+      ctx.params.id,
+      `${userId}/s/${ctx.params.id}`
     );
     const followers =
       await ctx.state.app.followRelationRepository.findFollowers(userId);

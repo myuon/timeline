@@ -58,6 +58,16 @@ export const newNoteRepository = (repo: Repository<NoteTable>) => {
     findCount: async (userId: string) => {
       return await repo.count({ where: { userId } });
     },
+    findById: async (id: string) => {
+      const record = await repo.findOneBy({ id });
+      if (record === null) {
+        return undefined;
+      }
+      return record.toModel();
+    },
+    delete: async (id: string) => {
+      await repo.delete({ id });
+    },
   };
 };
 export type NoteRepository = ReturnType<typeof newNoteRepository>;
