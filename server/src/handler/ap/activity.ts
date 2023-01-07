@@ -18,3 +18,18 @@ export const serializeCreateNoteActivity = (
     published: dayjs(note.createdAt).toDate().toUTCString(),
   };
 };
+
+export const serializeDeleteNoteActivity = (
+  userId: string,
+  id: string,
+  objectId: string
+) => {
+  return {
+    "@context": ["https://www.w3.org/ns/activitystreams"],
+    id: `${userId}/activity/${id}`,
+    type: "Delete",
+    actor: userId,
+    object: objectId,
+    published: dayjs().toDate().toUTCString(),
+  };
+};

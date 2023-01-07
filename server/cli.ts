@@ -1,6 +1,9 @@
 import dayjs from "dayjs";
 import { userId } from "./src/config";
-import { serializeCreateNoteActivity } from "./src/handler/ap/activity";
+import {
+  serializeCreateNoteActivity,
+  serializeDeleteNoteActivity,
+} from "./src/handler/ap/activity";
 import { deliveryActivity } from "./src/handler/ap/delivery";
 
 export const run = async () => {
@@ -47,6 +50,19 @@ export const run = async () => {
       }
     );
     activity.object.inReplyTo = inReplyTo;
+
+    console.log(`Sending activity: ${JSON.stringify(activity, null, 2)}`);
+    const resp = await deliveryActivity(to, activity);
+    console.log(resp);
+  } else if (command === "delete") {
+    const to = process.argv[3];
+    const url = process.argv[4];
+    if (!to || !url) {
+      console.log("Usage: yarn cli delete <to> <url>");
+      return;
+    }
+
+    const activity = serializeDeleteNoteActivity(userId, url, url);
 
     console.log(`Sending activity: ${JSON.stringify(activity, null, 2)}`);
     const resp = await deliveryActivity(to, activity);
