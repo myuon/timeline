@@ -2,11 +2,12 @@ import { Column, Entity, PrimaryColumn, Repository, Unique } from "typeorm";
 import { Actor } from "@/shared/model/actor";
 
 @Entity()
+@Unique(["federatedId"])
 export class ActorTable {
   @PrimaryColumn({ length: 100 })
   id: string;
 
-  @Unique(["federatedId"])
+  @Column()
   federatedId: string;
 
   @Column()
