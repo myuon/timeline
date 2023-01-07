@@ -52,6 +52,35 @@ export const newRouter = (options?: IRouterOptions) => {
     };
     ctx.set("Content-Type", "application/jrd+json");
   });
+  router.get("/.well-known/nodeinfo", async (ctx) => {
+    ctx.body = {
+      links: [
+        {
+          rel: "http://nodeinfo.diaspora.software/ns/schema/2.1",
+          href: `https://${domain}/nodeinfo/2.1`,
+        },
+      ],
+    };
+    ctx.set("Content-Type", "application/json");
+  });
+  router.get("/nodeinfo/2.1", async (ctx) => {
+    ctx.body = {
+      version: "2.1",
+      software: {
+        name: "timeline",
+        version: "0.1.0",
+      },
+      protocols: ["activitypub"],
+      openRegistrations: false,
+      usage: {
+        users: {
+          total: 1,
+        },
+      },
+    };
+    ctx.set("Content-Type", "application/json");
+  });
+
   router.get("/u/:userName", async (ctx) => {
     if (ctx.params.userName !== userName) {
       ctx.throw(404, "Not found");
