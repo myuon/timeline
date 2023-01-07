@@ -6,6 +6,7 @@ import { App } from "./app";
 import { ulid } from "ulid";
 import { domain, userFirebaseId, userName } from "../config";
 import { Note } from "@/shared/model/note";
+import dayjs from "dayjs";
 
 export const createNote = async (app: App, ctx: Context) => {
   const schema = schemaForType<CreateNoteRequest>()(
@@ -26,7 +27,7 @@ export const createNote = async (app: App, ctx: Context) => {
     id: ulid(),
     userId: `https://${domain}/u/${userName}`,
     content: result.data.content,
-    createdAt: Date.now(),
+    createdAt: dayjs().unix(),
   };
   await app.noteRepository.create(note);
 
