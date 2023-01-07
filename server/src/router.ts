@@ -15,6 +15,13 @@ import {
   serializeDeleteNoteActivity,
 } from "./handler/ap/activity";
 import { deliveryActivity } from "./handler/ap/delivery";
+import { Context } from "koa";
+
+const requireAuth = (ctx: Context) => {
+  if (!ctx.state.auth) {
+    ctx.throw(401, "Unauthorized");
+  }
+};
 
 export const newRouter = (options?: IRouterOptions) => {
   const router = new Router<{ app: App }>(options);
@@ -209,6 +216,8 @@ export const newRouter = (options?: IRouterOptions) => {
   });
 
   router.post("/api/note", koaBody(), async (ctx) => {
+    requireAuth(ctx);
+
     const note = await createNote(ctx.state.app, ctx);
 
     // FIXME: delivery SHOULD be performed asynchronously
@@ -239,6 +248,8 @@ export const newRouter = (options?: IRouterOptions) => {
     ctx.log.info("delivery end");
   });
   router.delete("/api/note/:id", async (ctx) => {
+    requireAuth(ctx);
+
     const note = await ctx.state.app.noteRepository.findById(ctx.params.id);
     if (!note) {
       ctx.throw(404, "Not found");
