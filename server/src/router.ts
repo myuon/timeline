@@ -426,11 +426,16 @@ export const newRouter = (options?: IRouterOptions) => {
       notes.map((note) => note.userId)
     );
 
-    ctx.body = items.map((item) => ({
-      ...item,
-      note: notes.find((note) => note.id === item.itemId),
-      actor: actors.find((actor) => actor.id === item.userId),
-    })) as TimelineObject[];
+    ctx.body = items.map((item) => {
+      const note = notes.find((note) => note.id === item.itemId);
+      const actor = actors.find((actor) => actor.id === note?.userId);
+
+      return {
+        ...item,
+        note,
+        actor,
+      };
+    }) as TimelineObject[];
   });
   router.post("/api/follow", koaBody(), async (ctx) => {
     requireAuth(ctx);
