@@ -4,6 +4,8 @@ import { useAuthGuard, useAuthToken } from "../api/auth";
 import { CreateNoteRequest } from "@/shared/request/note";
 import useSWR from "swr";
 import React from "react";
+import dayjs from "dayjs";
+import { TimelineObject } from "@/shared/model/timeline";
 
 export const IndexPage = () => {
   useAuthGuard();
@@ -38,7 +40,7 @@ export const IndexPage = () => {
         },
       });
       if (resp.ok) {
-        return resp.json();
+        return (await resp.json()) as TimelineObject[];
       }
     }
   );
@@ -46,19 +48,54 @@ export const IndexPage = () => {
   const contentFormRef = React.useRef<HTMLTextAreaElement>(null);
 
   return (
-    <>
+    <section
+      css={css`
+        display: grid;
+        gap: 32px;
+      `}
+    >
       <Link to="/login">LOGIN</Link>
 
       <h2>/ Index</h2>
 
-      <p>Inbox (Note)</p>
-      <pre
+      <div
         css={css`
-          text-align: left;
+          display: grid;
+          gap: 16px;
         `}
       >
-        <code>{JSON.stringify(inbox, null, 2)}</code>
-      </pre>
+        {inbox?.map((item) => (
+          <div
+            key={item.id}
+            css={css`
+              display: grid;
+              grid-template-columns: auto 1fr;
+
+              p {
+                margin: 0;
+              }
+            `}
+          >
+            <div>
+              <img
+                src={item.actor?.iconUrl}
+                alt={item.actor?.name ?? "-"}
+                width={32}
+                height={32}
+              />
+            </div>
+            <div>
+              <p>{item.actor?.name}</p>
+              <p>{item.note?.content}</p>
+              <p>
+                {dayjs
+                  .unix(item.note?.createdAt ?? 0)
+                  .format("YYYY-MM-DD HH:mm:ss")}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
 
       <div
         css={css`
@@ -164,6 +201,6 @@ export const IndexPage = () => {
 
         <button type="submit">Follow</button>
       </form>
-    </>
+    </section>
   );
 };

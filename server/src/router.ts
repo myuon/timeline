@@ -21,6 +21,7 @@ import { getActor } from "./handler/ap/api";
 import { ulid } from "ulid";
 import dayjs from "dayjs";
 import { ApiFollowRequest } from "@/shared/request/follow";
+import { TimelineObject } from "@/shared/model/timeline";
 
 const requireAuth = (ctx: Context) => {
   if (!ctx.state.auth) {
@@ -429,7 +430,7 @@ export const newRouter = (options?: IRouterOptions) => {
       ...item,
       note: notes.find((note) => note.id === item.itemId),
       actor: actors.find((actor) => actor.id === item.userId),
-    }));
+    })) as TimelineObject[];
   });
   router.post("/api/follow", koaBody(), async (ctx) => {
     requireAuth(ctx);
