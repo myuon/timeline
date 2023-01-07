@@ -59,4 +59,6 @@ export const create = async (app: App, ctx: Context, activity: Activity) => {
 
   // NOTE: if the note is already exists, federatedId is not unique and cannot save it.
   await app.noteRepository.save(note);
+
+  ctx.status = 200;
 };
