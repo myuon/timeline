@@ -44,7 +44,7 @@ export const newInboxItemRepository = (repo: Repository<InboxItemTable>) => {
   return {
     async create(item: InboxItem) {
       const table = InboxItemTable.fromModel(item);
-      await repo.save(table);
+      await repo.insert(table);
     },
     async findTimelineItems(
       userId: string,
