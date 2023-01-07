@@ -22,7 +22,6 @@ export const useAuthToken = () => {
 
 export const useAuthGuard = () => {
   const navigate = useNavigate();
-
   useEffect(() => {
     void (async () => {
       const token = await getAuthToken();

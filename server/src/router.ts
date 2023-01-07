@@ -402,7 +402,7 @@ export const newRouter = (options?: IRouterOptions) => {
 
     ctx.log.info("delivery end");
   });
-  router.get("/api/timeline", async (ctx) => {
+  router.get("/api/timeline/note", async (ctx) => {
     requireAuth(ctx);
 
     const items = await ctx.state.app.inboxItemRepository.findTimelineItems(
@@ -414,8 +414,14 @@ export const newRouter = (options?: IRouterOptions) => {
         type: ctx.query.type as string,
       }
     );
+    const notes = await ctx.state.app.noteRepository.findByIds(
+      items.map((item) => item.itemId)
+    );
 
-    ctx.body = items;
+    ctx.body = {
+      items,
+      notes,
+    };
   });
 
   return router;

@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn, Repository, Unique } from "typeorm";
+import { Column, Entity, In, PrimaryColumn, Repository, Unique } from "typeorm";
 import { Note } from "@/shared/model/note";
 
 @Entity()
@@ -70,6 +70,10 @@ export const newNoteRepository = (repo: Repository<NoteTable>) => {
         return undefined;
       }
       return record.toModel();
+    },
+    findByIds: async (ids: string[]) => {
+      const records = await repo.findBy({ id: In(ids) });
+      return records.map((record) => record.toModel());
     },
     save: async (note: Note) => {
       const noteTable = NoteTable.fromModel(note);

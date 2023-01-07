@@ -10,16 +10,7 @@ export const LoginPage = () => {
   return (
     <button
       onClick={async () => {
-        const result = await signInWithPopup(auth, provider);
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        console.log(credential);
-
-        const token = await auth.currentUser?.getIdToken();
-        if (!token) {
-          return;
-        }
-        console.log(token);
-
+        await signInWithPopup(auth, provider);
         navigate("/");
       }}
     >

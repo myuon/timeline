@@ -22,23 +22,26 @@ export const IndexPage = () => {
       }
     }
   );
-  const { data: inbox } = useSWR("/api/timeline", async (url) => {
-    const params = new URLSearchParams({
-      page: `0`,
-      size: `10`,
-      type: "Note",
-    });
+  const { data: inbox } = useSWR(
+    token ? [token, "/api/timeline/note"] : null,
+    async () => {
+      const params = new URLSearchParams({
+        page: `0`,
+        size: `10`,
+        type: "Note",
+      });
 
-    const resp = await fetch(`${url}?${params}`, {
-      headers: {
-        "Content-Type": "application/activity+json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (resp.ok) {
-      return resp.json();
+      const resp = await fetch(`/api/timeline/note?${params}`, {
+        headers: {
+          "Content-Type": "application/activity+json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (resp.ok) {
+        return resp.json();
+      }
     }
-  });
+  );
 
   const contentFormRef = React.useRef<HTMLTextAreaElement>(null);
 
