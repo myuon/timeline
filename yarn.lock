@@ -4913,6 +4913,11 @@ resolve@^2.0.0-next.3:
     path-parse "^1.0.7"
     supports-preserve-symlinks-flag "^1.0.0"
 
+ress@^5.0.2:
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/ress/-/ress-5.0.2.tgz#bfe37c76cd8ca344ab69214bdeb677790a6d8730"
+  integrity sha512-oHBtOWo/Uc8SzQMbQNIKTcgi8wKmAs7IlNlRywmXudbOtF+c27FlOIq7tnwLDVcTywe6JXYo1pDXHO6kABwNYA==
+
 retry-request@^5.0.0:
   version "5.0.2"
   resolved "https://registry.yarnpkg.com/retry-request/-/retry-request-5.0.2.tgz#143d85f90c755af407fcc46b7166a4ba520e44da"
