@@ -23,8 +23,6 @@ import dayjs from "dayjs";
 import { ApiFollowRequest } from "@/shared/request/follow";
 import { TimelineObject } from "@/shared/model/timeline";
 import { importVerifyKey, verifyHttpHeaders } from "./helper/signature";
-import { webcrypto as crypto } from "crypto";
-import { pemToBuffer } from "./helper/pem";
 
 const requireAuth = (ctx: Context) => {
   if (!ctx.state.auth) {

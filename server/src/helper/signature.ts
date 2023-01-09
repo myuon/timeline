@@ -1,4 +1,5 @@
 import { webcrypto as crypto } from "crypto";
+import { getActor } from "../handler/ap/api";
 import { pemToBuffer } from "./pem";
 
 export const importSignKey = (pemString: string) =>
@@ -60,39 +61,55 @@ export const signHttpHeaders = async (
 
 export const verifyHttpHeaders = async (
   verifyKey: CryptoKey,
+  headers: string[],
+  signature: string,
   request: {
-    keyId: string;
     body: object;
     path: string;
     method: string;
-    headers: {
-      signature: string;
-      date: string;
-      digest: string;
-    };
+    headers: Record<string, string | undefined>;
   }
 ) => {
+  if (!headers.includes("digest")) {
+    return {
+      error: new Error("Digest header is required"),
+    };
+  }
+
   const digest = await crypto.subtle.digest(
     "SHA-256",
     new TextEncoder().encode(JSON.stringify(request.body))
   );
   const digestString = Buffer.from(digest).toString("base64");
+  if (request.headers.digest !== `SHA-256=${digestString}`) {
+    return {
+      error: new Error("Digest header is invalid"),
+    };
+  }
 
-  const signedString = [
+  const signedFragments = [
     `(request-target): ${request.method} ${request.path}`,
-    `date: ${request.headers.date}`,
-    `digest: SHA-256=${digestString}`,
-  ].join("\n");
+  ];
+  headers.forEach((header) => {
+    const value = request.headers[header];
+    signedFragments.push(`${header}: ${value}`);
+  });
 
-  const signature = Buffer.from(
-    request.headers.signature.split("=")[1],
-    "base64"
-  );
+  const signedString = signedFragments.join("\n");
 
-  return crypto.subtle.verify(
+  const ok = await crypto.subtle.verify(
     "RSASSA-PKCS1-v1_5",
     verifyKey,
-    signature,
+    Buffer.from(signature, "base64"),
     new TextEncoder().encode(signedString)
   );
+  if (!ok) {
+    return {
+      error: new Error("Signature is invalid"),
+    };
+  }
+
+  return {
+    error: undefined,
+  };
 };
