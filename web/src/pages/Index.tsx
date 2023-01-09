@@ -219,7 +219,13 @@ export const IndexPage = () => {
                   }
                 `}
               >
-                <p>{note.object.content}</p>
+                <p
+                  css={css`
+                    word-break: break-all;
+                  `}
+                >
+                  {note.object.content}
+                </p>
                 <p>
                   {note.published} -{" "}
                   <button
@@ -270,7 +276,7 @@ export const IndexPage = () => {
             css={css`
               display: grid;
               grid-template-columns: 1fr auto;
-              gap: 16px;
+              gap: 8px;
             `}
           >
             <TextField name="id" />
@@ -341,7 +347,11 @@ export const IndexPage = () => {
                     >
                       {item.actor?.name}
                     </p>
-                    <small>
+                    <small
+                      css={css`
+                        color: #999;
+                      `}
+                    >
                       {dayjs.unix(item.note?.createdAt ?? 0).fromNow()}
                     </small>
                   </div>
