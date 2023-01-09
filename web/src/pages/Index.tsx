@@ -6,6 +6,8 @@ import useSWR from "swr";
 import React from "react";
 import dayjs from "dayjs";
 import { TimelineObject } from "@/shared/model/timeline";
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
 
 export const IndexPage = () => {
   useAuthGuard();
@@ -61,7 +63,10 @@ export const IndexPage = () => {
       <div
         css={css`
           display: grid;
-          gap: 16px;
+          gap: 24px;
+          max-width: 500px;
+          padding: 8px 16px;
+          background-color: #303030;
         `}
       >
         {inbox?.map((item) => (
@@ -70,6 +75,7 @@ export const IndexPage = () => {
             css={css`
               display: grid;
               grid-template-columns: auto 1fr;
+              gap: 16px;
 
               p {
                 margin: 0;
@@ -80,18 +86,34 @@ export const IndexPage = () => {
               <img
                 src={item.actor?.iconUrl}
                 alt={item.actor?.name ?? "-"}
-                width={32}
-                height={32}
+                css={css`
+                  display: flex;
+                  width: 48px;
+                  aspect-ratio: 1;
+                  border-radius: 4px;
+                  object-fit: cover;
+                `}
               />
             </div>
             <div>
-              <p>{item.actor?.name}</p>
+              <div
+                css={css`
+                  display: flex;
+                  gap: 8px;
+                  justify-content: space-between;
+                `}
+              >
+                <p
+                  css={css`
+                    font-size: 18px;
+                    font-weight: 600;
+                  `}
+                >
+                  {item.actor?.name}
+                </p>
+                <small>{dayjs.unix(item.note?.createdAt ?? 0).fromNow()}</small>
+              </div>
               <p>{item.note?.content}</p>
-              <p>
-                {dayjs
-                  .unix(item.note?.createdAt ?? 0)
-                  .format("YYYY-MM-DD HH:mm:ss")}
-              </p>
             </div>
           </div>
         ))}
