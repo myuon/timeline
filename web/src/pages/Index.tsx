@@ -15,6 +15,7 @@ import {
   TextField,
 } from "../components/input";
 import { AnimatePresence, motion } from "framer-motion";
+import { Interweave } from "interweave";
 dayjs.extend(relativeTime);
 
 export const IndexPage = () => {
@@ -359,9 +360,7 @@ export const IndexPage = () => {
                       {dayjs.unix(item.note?.createdAt ?? 0).fromNow()}
                     </small>
                   </div>
-                  {item.note?.content.split("\n").map((t, index) => (
-                    <p key={index}>{t}</p>
-                  ))}
+                  <Interweave content={item.note?.content} />
                 </div>
               </motion.div>
             ))}

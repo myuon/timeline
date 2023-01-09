@@ -7,6 +7,15 @@ import { ulid } from "ulid";
 import { domain, userFirebaseId, userName } from "../config";
 import { Note } from "@/shared/model/note";
 import dayjs from "dayjs";
+import escape from "escape-html";
+
+const transformContent = (content: string) => {
+  const escaped = escape(content);
+  return `<p>${escaped
+    .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1">$1</a>')
+    .split("\n")
+    .reduce((x, y) => x + "<br />" + y)}</p>`;
+};
 
 export const createNote = async (app: App, ctx: Context) => {
   const schema = schemaForType<CreateNoteRequest>()(
@@ -26,7 +35,7 @@ export const createNote = async (app: App, ctx: Context) => {
   const note: Note = {
     id: ulid(),
     userId: `https://${domain}/u/${userName}`,
-    content: result.data.content,
+    content: transformContent(result.data.content),
     rawContent: result.data.content,
     createdAt: dayjs().unix(),
   };
