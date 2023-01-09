@@ -25,6 +25,7 @@ export const run = async () => {
         id: dayjs().unix().toString(),
         userId,
         content: `<p>Toot!, ${dayjs().format("YYYY-MM-DD HH:mm:ss")}</p>`,
+        rawContent: "",
         createdAt: dayjs().unix(),
       }
     );
@@ -49,6 +50,7 @@ export const run = async () => {
         content: `<p>Hello, world!, ${dayjs().format(
           "YYYY-MM-DD HH:mm:ss"
         )}</p>`,
+        rawContent: "",
         createdAt: dayjs().unix(),
       }
     );
