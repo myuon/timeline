@@ -242,27 +242,17 @@ export const newRouter = (options?: IRouterOptions) => {
       ctx.throw(400, "Missing keyId");
       return;
     }
-    const { data, error } = await getActor(keyId);
+    const { data, error: actorError } = await getActor(keyId);
     const publicKeyPem = data?.publicKey?.publicKeyPem;
-    if (error || !publicKeyPem) {
-      ctx.log.info(`(getKeyId) data: ${data}, error: ${error}`);
+    if (actorError || !publicKeyPem) {
+      ctx.log.info(`(getKeyId) data: ${data}, error: ${actorError}`);
       ctx.throw(400, "Invalid keyId");
       return;
     }
 
     const headers = signaturePairs.find((p) => p[0] === "headers")?.[1];
-    if (!headers || !headers.startsWith("(request-target)")) {
-      ctx.log.info(`(headers) headers: ${headers}`);
-      ctx.throw(400, "Invalid headers");
-      return;
-    }
-
     const signature = signaturePairs.find((p) => p[0] === "signature")?.[1];
-    if (!signature) {
-      ctx.log.info(`(signature) signature: ${signature}`);
-      ctx.throw(400, "Invalid signature");
-      return;
-    }
+    const algorithm = signaturePairs.find((p) => p[0] === "algorithm")?.[1];
 
     const key = await importVerifyKey(publicKeyPem);
 
@@ -277,19 +267,20 @@ export const newRouter = (options?: IRouterOptions) => {
       return;
     }
 
-    const ok = await verifyHttpHeaders(key, {
-      keyId,
-      body: ctx.request.body,
-      path: ctx.request.path,
-      method: ctx.request.method,
-      headers: {
-        signature,
-        date,
-        digest: ctx.request.headers.digest as string,
-      },
-    });
-    if (!ok) {
-      ctx.throw(400, "Verification failed");
+    const { error } = await verifyHttpHeaders(
+      key,
+      algorithm ?? "",
+      headers ?? "",
+      signature ?? "",
+      {
+        body: ctx.request.body,
+        path: ctx.request.path,
+        method: ctx.request.method,
+        headers: ctx.request.headers as Record<string, string | undefined>,
+      }
+    );
+    if (error) {
+      ctx.throw(400, `Verification failed: ${error}`);
       return;
     }
 
