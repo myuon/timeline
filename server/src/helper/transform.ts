@@ -27,7 +27,9 @@ export const transformContent = (content: string) => {
     if (node.url) {
       escaped += `<a href="${
         node.url
-      }" rel="noopener noreferer" target="_blank">${escape(node.url)}</a>`;
+      }" rel="noopener noreferer" target="_blank">${escape(
+        node.url.split("://")[1]
+      )}</a>`;
     }
   }
 
