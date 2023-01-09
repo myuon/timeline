@@ -199,7 +199,11 @@ export const IndexPage = () => {
           </div>
 
           <div>
-            <TextField icon={<i className="bi-search" />} placeholder="検索" />
+            <TextField
+              icon={<i className="bi-search" />}
+              placeholder="検索"
+              autoComplete="search"
+            />
           </div>
 
           <div
