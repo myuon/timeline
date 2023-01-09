@@ -9,6 +9,11 @@ import { TimelineObject } from "@/shared/model/timeline";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Actor } from "@/shared/model/actor";
 import { Button } from "../components/button";
+import {
+  styleInputBase,
+  styleInputWrapper,
+  TextField,
+} from "../components/input";
 dayjs.extend(relativeTime);
 
 export const IndexPage = () => {
@@ -84,104 +89,189 @@ export const IndexPage = () => {
         <div
           css={css`
             display: grid;
-            gap: 16px;
+            gap: 32px;
           `}
         >
           <div
-            css={css`
-              display: flex;
-              gap: 16px;
-              align-items: flex-start;
-            `}
-          >
-            <img
-              src={me?.iconUrl}
-              alt={me?.name ?? "-"}
-              css={css`
-                display: flex;
-                width: 48px;
-                aspect-ratio: 1;
-                border-radius: 4px;
-                object-fit: cover;
-              `}
-            />
-
-            <div>
-              <p
-                css={css`
-                  font-size: 18px;
-                  font-weight: 600;
-                `}
-              >
-                {me?.name}
-              </p>
-
-              <p
-                css={css`
-                  color: #999;
-                `}
-              >
-                {me?.name}@{me ? new URL(me?.federatedId).host : ""}
-              </p>
-            </div>
-          </div>
-
-          <form
-            onSubmit={async (event) => {
-              event.preventDefault();
-              const formData = new FormData(event.currentTarget);
-
-              const content = formData.get("content");
-              if (!content) {
-                return;
-              }
-
-              await fetch("/api/note", {
-                method: "POST",
-                body: JSON.stringify({
-                  content,
-                } as CreateNoteRequest),
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                  "Content-Type": "application/json",
-                },
-              });
-
-              if (contentFormRef.current) {
-                contentFormRef.current.value = "";
-              }
-
-              await refetch();
-            }}
             css={css`
               display: grid;
               gap: 16px;
             `}
           >
-            <textarea
-              name="content"
-              placeholder="いまどうしてる？"
-              ref={contentFormRef}
-              css={css`
-                width: 100%;
-                padding: 8px 12px;
-                font-size: 16px;
-                color: inherit;
-                resize: none;
-                background-color: #303030;
-                border-radius: 4px;
-              `}
-              rows={5}
-            />
-
             <div
               css={css`
                 display: flex;
-                justify-content: flex-end;
+                gap: 16px;
+                align-items: flex-start;
               `}
             >
-              <Button type="submit">投稿する</Button>
+              <img
+                src={me?.iconUrl}
+                alt={me?.name ?? "-"}
+                css={css`
+                  display: flex;
+                  width: 48px;
+                  aspect-ratio: 1;
+                  border-radius: 4px;
+                  object-fit: cover;
+                `}
+              />
+
+              <div>
+                <p
+                  css={css`
+                    font-size: 18px;
+                    font-weight: 600;
+                  `}
+                >
+                  {me?.name}
+                </p>
+
+                <p
+                  css={css`
+                    color: #999;
+                  `}
+                >
+                  {me?.name}@{me ? new URL(me?.federatedId).host : ""}
+                </p>
+              </div>
             </div>
+
+            <form
+              onSubmit={async (event) => {
+                event.preventDefault();
+                const formData = new FormData(event.currentTarget);
+
+                const content = formData.get("content");
+                if (!content) {
+                  return;
+                }
+
+                await fetch("/api/note", {
+                  method: "POST",
+                  body: JSON.stringify({
+                    content,
+                  } as CreateNoteRequest),
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                  },
+                });
+
+                if (contentFormRef.current) {
+                  contentFormRef.current.value = "";
+                }
+
+                await refetch();
+              }}
+              css={css`
+                display: grid;
+                gap: 16px;
+              `}
+            >
+              <textarea
+                name="content"
+                placeholder="いまどうしてる？"
+                ref={contentFormRef}
+                css={[
+                  styleInputBase,
+                  styleInputWrapper,
+                  css`
+                    resize: none;
+                  `,
+                ]}
+                rows={5}
+              />
+
+              <div
+                css={css`
+                  display: flex;
+                  justify-content: flex-end;
+                `}
+              >
+                <Button type="submit">投稿する</Button>
+              </div>
+            </form>
+          </div>
+
+          <div>
+            <TextField icon={<i className="bi-search" />} placeholder="検索" />
+          </div>
+
+          <div
+            css={css`
+              display: grid;
+              gap: 16px;
+            `}
+          >
+            {notes?.orderedItems?.map((note: any) => (
+              <div
+                key={note.id}
+                css={css`
+                  display: grid;
+
+                  p {
+                    margin: 0;
+                  }
+                `}
+              >
+                <p>{note.object.content}</p>
+                <p>
+                  {note.published} -{" "}
+                  <button
+                    onClick={async () => {
+                      const ok = window.confirm("本当に削除しますか？");
+                      if (!ok) {
+                        return;
+                      }
+
+                      const noteId = note.id.split("s/")[1].split("/")[0];
+
+                      await fetch(`/api/note/${noteId}`, {
+                        method: "DELETE",
+                        headers: {
+                          Authorization: `Bearer ${token}`,
+                          "Content-Type": "application/json",
+                        },
+                      });
+
+                      await refetch();
+                    }}
+                  >
+                    DELETE
+                  </button>
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <form
+            onSubmit={async (event) => {
+              event.preventDefault();
+
+              const formData = new FormData(event.currentTarget);
+              const id = formData.get("id");
+
+              await fetch("/api/follow", {
+                method: "POST",
+                body: JSON.stringify({
+                  id,
+                }),
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "application/json",
+                },
+              });
+            }}
+            css={css`
+              display: grid;
+              grid-template-columns: 1fr auto;
+              gap: 16px;
+            `}
+          >
+            <TextField name="id" />
+
+            <Button type="submit">Follow</Button>
           </form>
         </div>
 
@@ -246,77 +336,6 @@ export const IndexPage = () => {
           ))}
         </div>
       </div>
-
-      <div
-        css={css`
-          display: grid;
-          gap: 16px;
-        `}
-      >
-        {notes?.orderedItems?.map((note: any) => (
-          <div
-            key={note.id}
-            css={css`
-              display: grid;
-
-              p {
-                margin: 0;
-              }
-            `}
-          >
-            <p>{note.object.content}</p>
-            <p>
-              {note.published} -{" "}
-              <button
-                onClick={async () => {
-                  const ok = window.confirm("本当に削除しますか？");
-                  if (!ok) {
-                    return;
-                  }
-
-                  const noteId = note.id.split("s/")[1].split("/")[0];
-
-                  await fetch(`/api/note/${noteId}`, {
-                    method: "DELETE",
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                      "Content-Type": "application/json",
-                    },
-                  });
-
-                  await refetch();
-                }}
-              >
-                DELETE
-              </button>
-            </p>
-          </div>
-        ))}
-      </div>
-
-      <form
-        onSubmit={async (event) => {
-          event.preventDefault();
-
-          const formData = new FormData(event.currentTarget);
-          const id = formData.get("id");
-
-          await fetch("/api/follow", {
-            method: "POST",
-            body: JSON.stringify({
-              id,
-            }),
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          });
-        }}
-      >
-        <input type="text" name="id" />
-
-        <Button type="submit">Follow</Button>
-      </form>
     </section>
   );
 };
