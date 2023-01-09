@@ -54,7 +54,7 @@ export const IndexPage = () => {
       }
     },
     {
-      refreshInterval: 5 * 1000,
+      refreshInterval: 30 * 1000,
     }
   );
   const { data: me } = useSWR(token ? [token, "/api/me"] : null, async () => {
