@@ -38,7 +38,7 @@ button {
   color: inherit;
 }
 
-input,  button {
+input {
   color: inherit;
   border: 1px solid rgba(255, 255, 255, 0.12);
 }

@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import { TimelineObject } from "@/shared/model/timeline";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Actor } from "@/shared/model/actor";
+import { Button } from "../components/button";
 dayjs.extend(relativeTime);
 
 export const IndexPage = () => {
@@ -75,7 +76,7 @@ export const IndexPage = () => {
       <div
         css={css`
           display: grid;
-          grid-template-columns: 280px 500px;
+          grid-template-columns: 320px 500px;
           gap: 32px;
           align-items: flex-start;
         `}
@@ -120,7 +121,7 @@ export const IndexPage = () => {
                   color: #999;
                 `}
               >
-                {me?.name}@{new URL(me?.federatedId ?? "").host}
+                {me?.name}@{me ? new URL(me?.federatedId).host : ""}
               </p>
             </div>
           </div>
@@ -157,23 +158,30 @@ export const IndexPage = () => {
               gap: 16px;
             `}
           >
-            <label>
-              <textarea
-                name="content"
-                ref={contentFormRef}
-                css={css`
-                  width: 100%;
-                  padding: 8px 12px;
-                  font-size: 16px;
-                  color: inherit;
-                  background-color: #303030;
-                  border-radius: 4px;
-                `}
-                rows={5}
-              />
-            </label>
+            <textarea
+              name="content"
+              placeholder="いまどうしてる？"
+              ref={contentFormRef}
+              css={css`
+                width: 100%;
+                padding: 8px 12px;
+                font-size: 16px;
+                color: inherit;
+                resize: none;
+                background-color: #303030;
+                border-radius: 4px;
+              `}
+              rows={5}
+            />
 
-            <button type="submit">投稿する</button>
+            <div
+              css={css`
+                display: flex;
+                justify-content: flex-end;
+              `}
+            >
+              <Button type="submit">投稿する</Button>
+            </div>
           </form>
         </div>
 
@@ -307,7 +315,7 @@ export const IndexPage = () => {
       >
         <input type="text" name="id" />
 
-        <button type="submit">Follow</button>
+        <Button type="submit">Follow</Button>
       </form>
     </section>
   );
