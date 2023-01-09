@@ -278,9 +278,9 @@ export const IndexPage = () => {
         <div
           css={css`
             display: grid;
-            gap: 24px;
+            gap: 32px;
             max-width: 500px;
-            padding: 8px 16px;
+            padding: 16px 16px;
             background-color: #303030;
           `}
         >
@@ -310,7 +310,12 @@ export const IndexPage = () => {
                   `}
                 />
               </div>
-              <div>
+              <div
+                css={css`
+                  display: grid;
+                  gap: 4px;
+                `}
+              >
                 <div
                   css={css`
                     display: flex;
@@ -330,7 +335,9 @@ export const IndexPage = () => {
                     {dayjs.unix(item.note?.createdAt ?? 0).fromNow()}
                   </small>
                 </div>
-                <p>{item.note?.content}</p>
+                {item.note?.content.split("\n").map((t, index) => (
+                  <p key={index}>{t}</p>
+                ))}
               </div>
             </div>
           ))}
