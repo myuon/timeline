@@ -171,10 +171,15 @@ export const IndexPage = () => {
           event.preventDefault();
           const formData = new FormData(event.currentTarget);
 
+          const content = formData.get("content");
+          if (!content) {
+            return;
+          }
+
           await fetch("/api/note", {
             method: "POST",
             body: JSON.stringify({
-              content: formData.get("content"),
+              content,
             } as CreateNoteRequest),
             headers: {
               Authorization: `Bearer ${token}`,
