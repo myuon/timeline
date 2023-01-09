@@ -70,6 +70,13 @@ export const newInboxItemRepository = (repo: Repository<InboxItemTable>) => {
       const items = await query.getMany();
       return items.map((item) => item.toModel());
     },
+    async findByItemId(type: string, itemId: string) {
+      const item = await repo.findBy({ type, itemId });
+      return item.map((item) => item.toModel());
+    },
+    async delete(id: string) {
+      await repo.delete({ id });
+    },
   };
 };
 

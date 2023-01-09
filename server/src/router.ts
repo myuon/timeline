@@ -465,6 +465,17 @@ export const newRouter = (options?: IRouterOptions) => {
     );
 
     ctx.log.info("delivery end");
+
+    // remove from inboxes
+    const items = await ctx.state.app.inboxItemRepository.findByItemId(
+      "Note",
+      note.id
+    );
+    await Promise.all(
+      items.map(async (item) => {
+        await ctx.state.app.inboxItemRepository.delete(item.id);
+      })
+    );
   });
   router.get("/api/timeline/note", async (ctx) => {
     requireAuth(ctx);
