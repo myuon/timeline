@@ -15,7 +15,7 @@ export const serializeCreateNoteActivity = (
     cc: [`${userId}/followers`],
     to: [to],
     object: serializeApNote(userId, note),
-    published: dayjs(note.createdAt).toDate().toUTCString(),
+    published: dayjs.unix(note.createdAt).toDate().toUTCString(),
   };
 };
 
