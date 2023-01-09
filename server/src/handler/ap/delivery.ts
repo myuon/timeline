@@ -1,18 +1,15 @@
-import { pemToBuffer } from "../../helper/pem";
 import { getInbox } from "./api";
 import fs from "fs";
 import path from "path";
 import { userId } from "../../config";
 import { signedFetcher } from "./signedFetcher";
 
-const privateKey = pemToBuffer(
-  fs.readFileSync(
-    path.join(__dirname, "../../../../.secrets/private.pem"),
-    "utf-8"
-  )
+const privateKeyPemString = fs.readFileSync(
+  path.join(__dirname, "../../../../.secrets/private.pem"),
+  "utf-8"
 );
 const signKey = {
-  privateKey,
+  privateKeyPemString,
   keyId: `${userId}#main-key`,
 };
 

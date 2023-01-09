@@ -22,6 +22,9 @@ import { ulid } from "ulid";
 import dayjs from "dayjs";
 import { ApiFollowRequest } from "@/shared/request/follow";
 import { TimelineObject } from "@/shared/model/timeline";
+import { importVerifyKey, verifyHttpHeaders } from "./helper/signature";
+import { webcrypto as crypto } from "crypto";
+import { pemToBuffer } from "./helper/pem";
 
 const requireAuth = (ctx: Context) => {
   if (!ctx.state.auth) {
@@ -224,6 +227,74 @@ export const newRouter = (options?: IRouterOptions) => {
   });
   router.post("/u/:userName/inbox", parseBody, async (ctx) => {
     ctx.log.info("inbox request: " + JSON.stringify(ctx.request.body));
+
+    // verify
+    const signatureHeader = ctx.request.headers.signature as string | undefined;
+    if (!signatureHeader) {
+      ctx.throw(400, "Missing signature header");
+      return;
+    }
+    const signaturePairs = signatureHeader.split(",").map((s) => {
+      const pair = s.trim().split("=");
+      return [pair[0], pair[1].replace(/"/g, "")];
+    });
+
+    const keyId = signaturePairs.find((p) => p[0] === "keyId")?.[1];
+    if (!keyId) {
+      ctx.throw(400, "Missing keyId");
+      return;
+    }
+    const { data, error } = await getActor(keyId);
+    const publicKeyPem = data?.publicKey?.publicKeyPem;
+    if (error || !publicKeyPem) {
+      ctx.log.info(`(getKeyId) data: ${data}, error: ${error}`);
+      ctx.throw(400, "Invalid keyId");
+      return;
+    }
+
+    const headers = signaturePairs.find((p) => p[0] === "headers")?.[1];
+    if (!headers || !headers.startsWith("(request-target)")) {
+      ctx.log.info(`(headers) headers: ${headers}`);
+      ctx.throw(400, "Invalid headers");
+      return;
+    }
+
+    const signature = signaturePairs.find((p) => p[0] === "signature")?.[1];
+    if (!signature) {
+      ctx.log.info(`(signature) signature: ${signature}`);
+      ctx.throw(400, "Invalid signature");
+      return;
+    }
+
+    const key = await importVerifyKey(publicKeyPem);
+
+    const date = ctx.request.headers.date as string | undefined;
+    if (!date) {
+      ctx.throw(400, "Missing date header");
+      return;
+    }
+    if (Math.abs(Date.now() - new Date(date).getTime()) > 1000 * 60 * 5) {
+      ctx.log.info(`(date) date: ${date}`);
+      ctx.throw(400, "Invalid date");
+      return;
+    }
+
+    const ok = await verifyHttpHeaders(key, {
+      keyId,
+      body: ctx.request.body,
+      path: ctx.request.path,
+      method: ctx.request.method,
+      headers: {
+        signature,
+        date,
+        digest: ctx.request.headers.digest as string,
+        host: ctx.request.headers.host as string,
+      },
+    });
+    if (!ok) {
+      ctx.throw(400, "Verification failed");
+      return;
+    }
 
     const schema = schemaForType<Activity>()(
       z.object({

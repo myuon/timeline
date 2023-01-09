@@ -1,22 +1,15 @@
 import { fetcher } from "../../helper/fetcher";
-import { signHttpHeaders } from "../../helper/signature";
-import { webcrypto as crypto } from "crypto";
+import { importSignKey, signHttpHeaders } from "../../helper/signature";
 
 export const signedFetcher = async (
   signKey: {
-    privateKey: Buffer;
+    privateKeyPemString: string;
     keyId: string;
   },
   url: string,
   init: { method: string; body: object }
 ) => {
-  const key = await crypto.subtle.importKey(
-    "pkcs8",
-    signKey.privateKey,
-    { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
-    false,
-    ["sign"]
-  );
+  const key = await importSignKey(signKey.privateKeyPemString);
 
   return fetcher(url, {
     method: init.method,
