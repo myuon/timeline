@@ -3,5 +3,6 @@ export interface Note {
   federatedId?: string;
   userId: string;
   content: string;
+  rawContent: string;
   createdAt: number;
 }

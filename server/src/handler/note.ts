@@ -27,6 +27,7 @@ export const createNote = async (app: App, ctx: Context) => {
     id: ulid(),
     userId: `https://${domain}/u/${userName}`,
     content: result.data.content,
+    rawContent: result.data.content,
     createdAt: dayjs().unix(),
   };
   await app.noteRepository.create(note);

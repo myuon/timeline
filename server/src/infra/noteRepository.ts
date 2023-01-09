@@ -13,6 +13,9 @@ export class NoteTable {
   @Column()
   content: string;
 
+  @Column({ default: "" })
+  rawContent: string;
+
   @Column()
   createdAt: number;
 
@@ -25,6 +28,7 @@ export class NoteTable {
     noteTable.federatedId = note.federatedId;
     noteTable.userId = note.userId;
     noteTable.content = note.content;
+    noteTable.rawContent = note.rawContent;
     noteTable.createdAt = note.createdAt;
     return noteTable;
   }
@@ -33,6 +37,7 @@ export class NoteTable {
     return {
       id: this.id,
       userId: this.userId,
+      rawContent: this.rawContent,
       content: this.content,
       createdAt: this.createdAt,
       federatedId: this.federatedId,
