@@ -52,6 +52,9 @@ export const IndexPage = () => {
       if (resp.ok) {
         return (await resp.json()) as TimelineObject[];
       }
+    },
+    {
+      refreshInterval: 5 * 1000,
     }
   );
   const { data: me } = useSWR(token ? [token, "/api/me"] : null, async () => {
