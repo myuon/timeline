@@ -1,6 +1,9 @@
 import { webcrypto as crypto } from "crypto";
-import { getActor } from "../handler/ap/api";
 import { pemToBuffer } from "./pem";
+
+/* For HTTP Signatures, see:
+ *   https://datatracker.ietf.org/doc/html/draft-richanna-http-message-signatures-00 (Internet-Draft)
+ */
 
 export const importSignKey = (pemString: string) =>
   crypto.subtle.importKey(
@@ -61,7 +64,8 @@ export const signHttpHeaders = async (
 
 export const verifyHttpHeaders = async (
   verifyKey: CryptoKey,
-  headers: string[],
+  algorithm: string,
+  headersString: string,
   signature: string,
   request: {
     body: object;
@@ -70,6 +74,22 @@ export const verifyHttpHeaders = async (
     headers: Record<string, string | undefined>;
   }
 ) => {
+  if (algorithm !== "rsa-sha256") {
+    return {
+      error: new Error("Only rsa-sha256 is supported"),
+    };
+  }
+
+  if (!headersString.startsWith("(request-target)")) {
+    return {
+      error: new Error("Expect (request-target) in headers"),
+    };
+  }
+  const headers = headersString
+    .replace("(request-target)", "")
+    .trim()
+    .split(" ");
+
   if (!headers.includes("digest")) {
     return {
       error: new Error("Digest header is required"),
@@ -88,7 +108,10 @@ export const verifyHttpHeaders = async (
   }
 
   const signedFragments = [
-    `(request-target): ${request.method} ${request.path}`,
+    `(request-target): ${
+      // SPEC: Canonicalize the method to lower case
+      request.method.toLowerCase()
+    } ${request.path}`,
   ];
   headers.forEach((header) => {
     const value = request.headers[header];

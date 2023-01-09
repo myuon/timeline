@@ -15,7 +15,8 @@ it("should verify a signature", async () => {
 
   const { error } = await verifyHttpHeaders(
     verifyKey,
-    ["host", "date", "digest", "content-type", "collection-synchronization"],
+    "rsa-sha256",
+    "(request-target) host date digest content-type collection-synchronization",
     "WN66XiBJhXcKlAGowCoR80qwJaHqN9NRzxXo3SWn8sTs3Y17dm787QxxDokfRw5qLqvtI02dMzLl1+zH86nfDQQBiiKt0LdBrDh2ijT2cII0EaxgxMdPWH6mCvZNmK4MEn6YGA2Rc/BH0wVkQWRHVlmplFjKtaF/DhMtKpTVcukxRXFfaUxrjfv5kpwloOl817CoJaqlxPlIHje2W1tTP+aB+QJ7+OguVd0ZFokCRFR/rI92OtuohbPqGjfdmSMkKCY583udH4tdfO8Hrn2NTnK9JJ9oYyhtwo46XIhQscOuYAvm8eNGH9pP4noNu0AmWeC5pMTB5WT/wTcI4ZKS/w==",
     {
       path: "/u/myuon/inbox",
