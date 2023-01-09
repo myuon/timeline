@@ -14,6 +14,7 @@ import {
   styleInputWrapper,
   TextField,
 } from "../components/input";
+import { AnimatePresence, motion } from "framer-motion";
 dayjs.extend(relativeTime);
 
 export const IndexPage = () => {
@@ -281,66 +282,73 @@ export const IndexPage = () => {
             gap: 32px;
             max-width: 500px;
             padding: 16px 16px;
+            overflow: hidden;
             background-color: #303030;
+            border-radius: 4px;
           `}
         >
-          {inbox?.map((item) => (
-            <div
-              key={item.id}
-              css={css`
-                display: grid;
-                grid-template-columns: auto 1fr;
-                gap: 16px;
-
-                p {
-                  margin: 0;
-                }
-              `}
-            >
-              <div>
-                <img
-                  src={item.actor?.iconUrl}
-                  alt={item.actor?.name ?? "-"}
-                  css={css`
-                    display: flex;
-                    width: 48px;
-                    aspect-ratio: 1;
-                    border-radius: 4px;
-                    object-fit: cover;
-                  `}
-                />
-              </div>
-              <div
+          <AnimatePresence initial={false}>
+            {inbox?.map((item) => (
+              <motion.div
+                key={item.id}
+                layout
+                initial={{ y: -100 }}
+                animate={{ y: 0 }}
                 css={css`
                   display: grid;
-                  gap: 4px;
+                  grid-template-columns: auto 1fr;
+                  gap: 16px;
+
+                  p {
+                    margin: 0;
+                  }
                 `}
               >
+                <div>
+                  <img
+                    src={item.actor?.iconUrl}
+                    alt={item.actor?.name ?? "-"}
+                    css={css`
+                      display: flex;
+                      width: 48px;
+                      aspect-ratio: 1;
+                      border-radius: 4px;
+                      object-fit: cover;
+                    `}
+                  />
+                </div>
                 <div
                   css={css`
-                    display: flex;
-                    gap: 8px;
-                    justify-content: space-between;
+                    display: grid;
+                    gap: 4px;
                   `}
                 >
-                  <p
+                  <div
                     css={css`
-                      font-size: 18px;
-                      font-weight: 600;
+                      display: flex;
+                      gap: 8px;
+                      justify-content: space-between;
                     `}
                   >
-                    {item.actor?.name}
-                  </p>
-                  <small>
-                    {dayjs.unix(item.note?.createdAt ?? 0).fromNow()}
-                  </small>
+                    <p
+                      css={css`
+                        font-size: 18px;
+                        font-weight: 600;
+                      `}
+                    >
+                      {item.actor?.name}
+                    </p>
+                    <small>
+                      {dayjs.unix(item.note?.createdAt ?? 0).fromNow()}
+                    </small>
+                  </div>
+                  {item.note?.content.split("\n").map((t, index) => (
+                    <p key={index}>{t}</p>
+                  ))}
                 </div>
-                {item.note?.content.split("\n").map((t, index) => (
-                  <p key={index}>{t}</p>
-                ))}
-              </div>
-            </div>
-          ))}
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       </div>
     </section>
