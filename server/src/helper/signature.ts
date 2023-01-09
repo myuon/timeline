@@ -12,7 +12,7 @@ export const importSignKey = (pemString: string) =>
 
 export const importVerifyKey = (pemString: string) =>
   crypto.subtle.importKey(
-    "pkcs8",
+    "spki",
     pemToBuffer(pemString),
     { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
     false,
@@ -69,7 +69,6 @@ export const verifyHttpHeaders = async (
       signature: string;
       date: string;
       digest: string;
-      host: string;
     };
   }
 ) => {
@@ -81,7 +80,6 @@ export const verifyHttpHeaders = async (
 
   const signedString = [
     `(request-target): ${request.method} ${request.path}`,
-    `host: ${request.headers.host}`,
     `date: ${request.headers.date}`,
     `digest: SHA-256=${digestString}`,
   ].join("\n");

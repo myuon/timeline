@@ -28,11 +28,13 @@
     "@types/koa-pino-logger": "^3.0.1",
     "@types/koa-router": "^7.4.4",
     "@types/koa-static": "^4.0.2",
+    "@types/mocha": "^10.0.1",
     "@types/node-fetch": "^2.6.2",
     "@typescript-eslint/eslint-plugin": "^5.40.1",
     "@typescript-eslint/parser": "^5.40.1",
     "eslint": "^8.26.0",
     "eslint-config-prettier": "^8.5.0",
+    "mocha": "^10.2.0",
     "nodemon": "^2.0.20",
     "pino-pretty": "^9.1.1",
     "prettier": "^2.7.1",
@@ -46,6 +48,7 @@
     "lint": "eslint .",
     "format": "eslint . --fix",
     "postformat": "prettier --write .",
-    "cli": "ts-node cli.ts"
+    "cli": "ts-node cli.ts",
+    "test": "mocha --require ts-node/register --recursive ./test/**/*.spec.ts"
   }
 }

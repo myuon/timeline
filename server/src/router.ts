@@ -288,7 +288,6 @@ export const newRouter = (options?: IRouterOptions) => {
         signature,
         date,
         digest: ctx.request.headers.digest as string,
-        host: ctx.request.headers.host as string,
       },
     });
     if (!ok) {

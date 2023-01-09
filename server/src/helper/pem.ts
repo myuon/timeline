@@ -7,5 +7,6 @@ export const pemToBuffer = (pem: string) => {
         Boolean(line)
     )
     .join("");
+
   return Buffer.from(encoded, "base64");
 };
