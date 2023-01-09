@@ -7,6 +7,7 @@ import React from "react";
 import dayjs from "dayjs";
 import { TimelineObject } from "@/shared/model/timeline";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { Actor } from "@/shared/model/actor";
 dayjs.extend(relativeTime);
 
 export const IndexPage = () => {
@@ -46,6 +47,17 @@ export const IndexPage = () => {
       }
     }
   );
+  const { data: me } = useSWR(token ? [token, "/api/me"] : null, async () => {
+    const resp = await fetch(`/api/me`, {
+      headers: {
+        "Content-Type": "application/activity+json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (resp.ok) {
+      return (await resp.json()) as Actor;
+    }
+  });
 
   const contentFormRef = React.useRef<HTMLTextAreaElement>(null);
 
@@ -63,60 +75,168 @@ export const IndexPage = () => {
       <div
         css={css`
           display: grid;
-          gap: 24px;
-          max-width: 500px;
-          padding: 8px 16px;
-          background-color: #303030;
+          grid-template-columns: 280px 500px;
+          gap: 32px;
+          align-items: flex-start;
         `}
       >
-        {inbox?.map((item) => (
+        <div
+          css={css`
+            display: grid;
+            gap: 16px;
+          `}
+        >
           <div
-            key={item.id}
             css={css`
-              display: grid;
-              grid-template-columns: auto 1fr;
+              display: flex;
               gap: 16px;
-
-              p {
-                margin: 0;
-              }
+              align-items: flex-start;
             `}
           >
+            <img
+              src={me?.iconUrl}
+              alt={me?.name ?? "-"}
+              css={css`
+                display: flex;
+                width: 48px;
+                aspect-ratio: 1;
+                border-radius: 4px;
+                object-fit: cover;
+              `}
+            />
+
             <div>
-              <img
-                src={item.actor?.iconUrl}
-                alt={item.actor?.name ?? "-"}
+              <p
                 css={css`
-                  display: flex;
-                  width: 48px;
-                  aspect-ratio: 1;
-                  border-radius: 4px;
-                  object-fit: cover;
-                `}
-              />
-            </div>
-            <div>
-              <div
-                css={css`
-                  display: flex;
-                  gap: 8px;
-                  justify-content: space-between;
+                  font-size: 18px;
+                  font-weight: 600;
                 `}
               >
-                <p
-                  css={css`
-                    font-size: 18px;
-                    font-weight: 600;
-                  `}
-                >
-                  {item.actor?.name}
-                </p>
-                <small>{dayjs.unix(item.note?.createdAt ?? 0).fromNow()}</small>
-              </div>
-              <p>{item.note?.content}</p>
+                {me?.name}
+              </p>
+
+              <p
+                css={css`
+                  color: #999;
+                `}
+              >
+                {me?.name}@{new URL(me?.federatedId ?? "").host}
+              </p>
             </div>
           </div>
-        ))}
+
+          <form
+            onSubmit={async (event) => {
+              event.preventDefault();
+              const formData = new FormData(event.currentTarget);
+
+              const content = formData.get("content");
+              if (!content) {
+                return;
+              }
+
+              await fetch("/api/note", {
+                method: "POST",
+                body: JSON.stringify({
+                  content,
+                } as CreateNoteRequest),
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "application/json",
+                },
+              });
+
+              if (contentFormRef.current) {
+                contentFormRef.current.value = "";
+              }
+
+              await refetch();
+            }}
+            css={css`
+              display: grid;
+              gap: 16px;
+            `}
+          >
+            <label>
+              <textarea
+                name="content"
+                ref={contentFormRef}
+                css={css`
+                  width: 100%;
+                  padding: 8px 12px;
+                  font-size: 16px;
+                  color: inherit;
+                  background-color: #303030;
+                  border-radius: 4px;
+                `}
+                rows={5}
+              />
+            </label>
+
+            <button type="submit">投稿する</button>
+          </form>
+        </div>
+
+        <div
+          css={css`
+            display: grid;
+            gap: 24px;
+            max-width: 500px;
+            padding: 8px 16px;
+            background-color: #303030;
+          `}
+        >
+          {inbox?.map((item) => (
+            <div
+              key={item.id}
+              css={css`
+                display: grid;
+                grid-template-columns: auto 1fr;
+                gap: 16px;
+
+                p {
+                  margin: 0;
+                }
+              `}
+            >
+              <div>
+                <img
+                  src={item.actor?.iconUrl}
+                  alt={item.actor?.name ?? "-"}
+                  css={css`
+                    display: flex;
+                    width: 48px;
+                    aspect-ratio: 1;
+                    border-radius: 4px;
+                    object-fit: cover;
+                  `}
+                />
+              </div>
+              <div>
+                <div
+                  css={css`
+                    display: flex;
+                    gap: 8px;
+                    justify-content: space-between;
+                  `}
+                >
+                  <p
+                    css={css`
+                      font-size: 18px;
+                      font-weight: 600;
+                    `}
+                  >
+                    {item.actor?.name}
+                  </p>
+                  <small>
+                    {dayjs.unix(item.note?.createdAt ?? 0).fromNow()}
+                  </small>
+                </div>
+                <p>{item.note?.content}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div
@@ -165,45 +285,6 @@ export const IndexPage = () => {
           </div>
         ))}
       </div>
-
-      <form
-        onSubmit={async (event) => {
-          event.preventDefault();
-          const formData = new FormData(event.currentTarget);
-
-          const content = formData.get("content");
-          if (!content) {
-            return;
-          }
-
-          await fetch("/api/note", {
-            method: "POST",
-            body: JSON.stringify({
-              content,
-            } as CreateNoteRequest),
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          });
-
-          if (contentFormRef.current) {
-            contentFormRef.current.value = "";
-          }
-
-          await refetch();
-        }}
-        css={css`
-          display: grid;
-          gap: 16px;
-        `}
-      >
-        <label>
-          <textarea name="content" ref={contentFormRef} />
-        </label>
-
-        <button type="submit">投稿する</button>
-      </form>
 
       <form
         onSubmit={async (event) => {

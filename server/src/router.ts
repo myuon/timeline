@@ -8,7 +8,7 @@ import { z } from "zod";
 import { schemaForType } from "./helper/zod";
 import { Activity } from "@/shared/model/activity";
 import { create, follow } from "./handler/inbox";
-import { domain, userId, userName } from "./config";
+import { domain, userActor, userId, userName } from "./config";
 import { parseBody } from "./middleware/parseBody";
 import {
   serializeCreateNoteActivity,
@@ -474,6 +474,11 @@ export const newRouter = (options?: IRouterOptions) => {
     });
 
     ctx.status = 204;
+  });
+  router.get("/api/me", async (ctx) => {
+    requireAuth(ctx);
+
+    ctx.body = userActor;
   });
 
   return router;
