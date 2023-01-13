@@ -7,7 +7,15 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { Link } from "react-router-dom";
 dayjs.extend(relativeTime);
 
-export const ANote = ({ actor, note }: { actor?: Actor; note?: Note }) => (
+export const ANote = ({
+  actor,
+  note,
+  onDelete,
+}: {
+  actor?: Actor;
+  note?: Note;
+  onDelete?: () => void;
+}) => (
   <div
     css={css`
       display: grid;
@@ -65,6 +73,15 @@ export const ANote = ({ actor, note }: { actor?: Actor; note?: Note }) => (
         </small>
       </div>
       <Interweave content={note?.content} />
+
+      <div
+        css={css`
+          display: flex;
+          justify-content: flex-end;
+        `}
+      >
+        <button onClick={onDelete}>DELETE</button>
+      </div>
     </div>
   </div>
 );

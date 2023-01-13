@@ -19,19 +19,6 @@ export const IndexPage = () => {
   useAuthGuard();
 
   const { data: token } = useAuthToken();
-  const { data: notes, mutate: refetch } = useSWR(
-    "/u/myuon/outbox?page=true",
-    async (url) => {
-      const resp = await fetch(url, {
-        headers: {
-          "Content-Type": "application/activity+json",
-        },
-      });
-      if (resp.ok) {
-        return resp.json();
-      }
-    }
-  );
   const { data: inbox } = useSWR(
     token ? [token, "/api/timeline/note"] : null,
     async () => {
@@ -163,8 +150,6 @@ export const IndexPage = () => {
                 if (contentFormRef.current) {
                   contentFormRef.current.value = "";
                 }
-
-                await refetch();
               }}
               css={css`
                 display: grid;
@@ -202,59 +187,6 @@ export const IndexPage = () => {
               placeholder="検索"
               autoComplete="search"
             />
-          </div>
-
-          <div
-            css={css`
-              display: grid;
-              gap: 16px;
-            `}
-          >
-            {notes?.orderedItems?.map((note: any) => (
-              <div
-                key={note.id}
-                css={css`
-                  display: grid;
-
-                  p {
-                    margin: 0;
-                  }
-                `}
-              >
-                <p
-                  css={css`
-                    word-break: break-all;
-                  `}
-                >
-                  {note.object.content}
-                </p>
-                <p>
-                  {note.published} -{" "}
-                  <button
-                    onClick={async () => {
-                      const ok = window.confirm("本当に削除しますか？");
-                      if (!ok) {
-                        return;
-                      }
-
-                      const noteId = note.id.split("s/")[1].split("/")[0];
-
-                      await fetch(`/api/note/${noteId}`, {
-                        method: "DELETE",
-                        headers: {
-                          Authorization: `Bearer ${token}`,
-                          "Content-Type": "application/json",
-                        },
-                      });
-
-                      await refetch();
-                    }}
-                  >
-                    DELETE
-                  </button>
-                </p>
-              </div>
-            ))}
           </div>
 
           <form
@@ -315,7 +247,25 @@ export const IndexPage = () => {
                   }
                 `}
               >
-                <ANote actor={item.actor} note={item.note} />
+                <ANote
+                  actor={item.actor}
+                  note={item.note}
+                  onDelete={async () => {
+                    const ok = window.confirm("本当に削除しますか？");
+                    console.log(item.note);
+                    if (!ok) {
+                      return;
+                    }
+
+                    await fetch(`/api/note/${item.note?.id}`, {
+                      method: "DELETE",
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                      },
+                    });
+                  }}
+                />
               </motion.div>
             ))}
           </AnimatePresence>
