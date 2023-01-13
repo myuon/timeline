@@ -23,6 +23,7 @@ import dayjs from "dayjs";
 import { ApiFollowRequest } from "@/shared/request/follow";
 import { TimelineObject } from "@/shared/model/timeline";
 import { importVerifyKey, verifyHttpHeaders } from "./helper/signature";
+import { Person } from "@/shared/model/person";
 
 const requireAuth = (ctx: Context) => {
   if (!ctx.state.auth) {
@@ -127,7 +128,7 @@ export const newRouter = (options?: IRouterOptions) => {
           "utf-8"
         ),
       },
-    };
+    } as Person;
     ctx.set("Content-Type", "application/activity+json");
   });
   router.get("/u/:userName/outbox", async (ctx) => {
