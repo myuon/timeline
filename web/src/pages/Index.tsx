@@ -1,5 +1,5 @@
 import { css } from "@emotion/react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuthGuard, useAuthToken } from "../api/auth";
 import { CreateNoteRequest } from "@/shared/request/note";
 import useSWR from "swr";
@@ -55,6 +55,8 @@ export const IndexPage = () => {
   });
 
   const contentFormRef = React.useRef<HTMLTextAreaElement>(null);
+
+  const navigate = useNavigate();
 
   return (
     <section
@@ -181,13 +183,25 @@ export const IndexPage = () => {
             </form>
           </div>
 
-          <div>
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+
+              const formData = new FormData(event.currentTarget);
+              const search = formData.get("search");
+
+              if (search) {
+                navigate(`/u/${search}`);
+              }
+            }}
+          >
             <TextField
               icon={<i className="bi-search" />}
               placeholder="検索"
               autoComplete="search"
+              name="search"
             />
-          </div>
+          </form>
 
           <form
             onSubmit={async (event) => {
