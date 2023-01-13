@@ -1,25 +1,27 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { assertIsDefined } from "../helper/assert";
-import { Person } from "@/shared/model/person";
 import useSWR from "swr";
 import { css } from "@emotion/react";
+import { Actor } from "@/shared/model/actor";
+import { Note } from "@/shared/model/note";
+import { ANote } from "./features/note/Note";
 
 export const UserPage = () => {
   const { username } = useParams<{ username: string }>();
   assertIsDefined(username);
 
-  const { data: actor } = useSWR(`/u/${username}`, async (url) => {
+  const { data: actor } = useSWR(`/api/user/${username}`, async (url) => {
     const resp = await fetch(url, {
       headers: {
         "Content-Type": "application/activity+json",
       },
     });
     if (resp.ok) {
-      return (await resp.json()) as Person;
+      return (await resp.json()) as Actor;
     }
   });
   const { data: notes } = useSWR(
-    actor ? `/u/${username}/outbox?page=true` : null,
+    `/api/user/${username}/notes?page=0&size=10`,
     async (url) => {
       const resp = await fetch(url, {
         headers: {
@@ -27,7 +29,7 @@ export const UserPage = () => {
         },
       });
       if (resp.ok) {
-        return (await resp.json()) as Person;
+        return (await resp.json()) as Note[];
       }
     }
   );
@@ -40,6 +42,8 @@ export const UserPage = () => {
         max-width: 550px;
       `}
     >
+      <Link to="/">INDEX</Link>
+
       <h2>/u/{username}</h2>
 
       <div
@@ -64,7 +68,7 @@ export const UserPage = () => {
           `}
         >
           <img
-            src={actor?.icon.url}
+            src={actor?.iconUrl}
             alt=""
             css={css`
               width: 88px;
@@ -96,6 +100,18 @@ export const UserPage = () => {
 
           <p>{actor?.summary}</p>
         </div>
+      </div>
+
+      <div
+        css={css`
+          display: grid;
+          gap: 16px;
+          margin-top: 32px;
+        `}
+      >
+        {notes?.map((note) => (
+          <ANote key={note.id} actor={actor} note={note} />
+        ))}
       </div>
     </div>
   );

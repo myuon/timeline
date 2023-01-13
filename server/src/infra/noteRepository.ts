@@ -55,14 +55,14 @@ export const newNoteRepository = (repo: Repository<NoteTable>) => {
       userId: string,
       pagination: {
         page: number;
-        perPage: number;
+        size: number;
       }
     ) => {
       const records = await repo.find({
         where: { userId },
         order: { createdAt: "DESC" },
-        skip: pagination.page * pagination.perPage,
-        take: pagination.perPage,
+        skip: pagination.page * pagination.size,
+        take: pagination.size,
       });
       return records.map((record) => record.toModel());
     },

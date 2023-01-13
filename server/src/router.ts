@@ -145,7 +145,7 @@ export const newRouter = (options?: IRouterOptions) => {
     if (page) {
       const notes = await ctx.state.app.noteRepository.findLatest(userId, {
         page: 0,
-        perPage: 5,
+        size: 5,
       });
 
       ctx.body = {
@@ -550,6 +550,27 @@ export const newRouter = (options?: IRouterOptions) => {
     requireAuth(ctx);
 
     ctx.body = userActor;
+  });
+  router.get("/api/user/:userId", async (ctx) => {
+    const userId = `https://${domain}/u/${ctx.params.userId}`;
+
+    const actor = await ctx.state.app.actorRepository.findById(userId);
+    if (!actor) {
+      ctx.throw(404, "Not found");
+      return;
+    }
+
+    ctx.body = actor;
+  });
+  router.get("/api/user/:userId/notes", async (ctx) => {
+    const userId = `https://${domain}/u/${ctx.params.userId}`;
+
+    const notes = await ctx.state.app.noteRepository.findLatest(userId, {
+      page: Number(ctx.query.page),
+      size: Number(ctx.query.size),
+    });
+
+    ctx.body = notes;
   });
 
   return router;

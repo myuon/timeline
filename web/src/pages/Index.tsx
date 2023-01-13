@@ -4,9 +4,7 @@ import { useAuthGuard, useAuthToken } from "../api/auth";
 import { CreateNoteRequest } from "@/shared/request/note";
 import useSWR from "swr";
 import React from "react";
-import dayjs from "dayjs";
 import { TimelineObject } from "@/shared/model/timeline";
-import relativeTime from "dayjs/plugin/relativeTime";
 import { Actor } from "@/shared/model/actor";
 import { Button } from "../components/button";
 import {
@@ -15,8 +13,7 @@ import {
   TextField,
 } from "../components/input";
 import { AnimatePresence, motion } from "framer-motion";
-import { Interweave } from "interweave";
-dayjs.extend(relativeTime);
+import { ANote } from "./features/note/Note";
 
 export const IndexPage = () => {
   useAuthGuard();
@@ -318,50 +315,7 @@ export const IndexPage = () => {
                   }
                 `}
               >
-                <div>
-                  <img
-                    src={item.actor?.iconUrl}
-                    alt={item.actor?.name ?? "-"}
-                    css={css`
-                      display: flex;
-                      width: 48px;
-                      aspect-ratio: 1;
-                      border-radius: 4px;
-                      object-fit: cover;
-                    `}
-                  />
-                </div>
-                <div
-                  css={css`
-                    display: grid;
-                    gap: 4px;
-                  `}
-                >
-                  <div
-                    css={css`
-                      display: flex;
-                      gap: 8px;
-                      justify-content: space-between;
-                    `}
-                  >
-                    <p
-                      css={css`
-                        font-size: 18px;
-                        font-weight: 600;
-                      `}
-                    >
-                      {item.actor?.name}
-                    </p>
-                    <small
-                      css={css`
-                        color: #999;
-                      `}
-                    >
-                      {dayjs.unix(item.note?.createdAt ?? 0).fromNow()}
-                    </small>
-                  </div>
-                  <Interweave content={item.note?.content} />
-                </div>
+                <ANote actor={item.actor} note={item.note} />
               </motion.div>
             ))}
           </AnimatePresence>
