@@ -80,7 +80,9 @@ export const ANote = ({
           justify-content: flex-end;
         `}
       >
-        <button onClick={onDelete}>DELETE</button>
+        <button onClick={onDelete}>
+          <i className="bi-trash" />
+        </button>
       </div>
     </div>
   </div>
