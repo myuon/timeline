@@ -226,6 +226,7 @@ export const IndexPage = () => {
             max-width: 500px;
             padding: 16px 16px;
             overflow: hidden;
+            word-break: break-all;
             background-color: #303030;
             border-radius: 4px;
           `}
@@ -239,12 +240,7 @@ export const IndexPage = () => {
                 animate={{ y: 0 }}
                 css={css`
                   display: grid;
-                  grid-template-columns: auto 1fr;
                   gap: 16px;
-
-                  p {
-                    margin: 0;
-                  }
                 `}
               >
                 <ANote
