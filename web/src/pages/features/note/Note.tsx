@@ -4,6 +4,7 @@ import { css } from "@emotion/react";
 import dayjs from "dayjs";
 import { Interweave } from "interweave";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { Link } from "react-router-dom";
 dayjs.extend(relativeTime);
 
 export const ANote = ({ actor, note }: { actor?: Actor; note?: Note }) => (
@@ -18,7 +19,7 @@ export const ANote = ({ actor, note }: { actor?: Actor; note?: Note }) => (
       }
     `}
   >
-    <div>
+    <Link to={`/u/${actor?.federatedId.split("/").pop()}`}>
       <img
         src={actor?.iconUrl}
         alt={actor?.name ?? "-"}
@@ -30,7 +31,7 @@ export const ANote = ({ actor, note }: { actor?: Actor; note?: Note }) => (
           object-fit: cover;
         `}
       />
-    </div>
+    </Link>
     <div
       css={css`
         display: grid;
@@ -44,14 +45,17 @@ export const ANote = ({ actor, note }: { actor?: Actor; note?: Note }) => (
           justify-content: space-between;
         `}
       >
-        <p
+        <Link
+          to={`/u/${actor?.federatedId.split("/").pop()}`}
           css={css`
             font-size: 18px;
             font-weight: 600;
+            color: inherit;
+            text-decoration: none;
           `}
         >
           {actor?.name}
-        </p>
+        </Link>
         <small
           css={css`
             color: #999;
