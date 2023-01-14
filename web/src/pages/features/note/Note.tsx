@@ -27,7 +27,7 @@ export const ANote = ({
       }
     `}
   >
-    <Link to={`/u/${actor?.name}`}>
+    <Link to={`/u/${actor?.name || actor?.userId}`}>
       <img
         src={actor?.iconUrl}
         alt={actor?.name ?? "-"}
@@ -54,7 +54,7 @@ export const ANote = ({
         `}
       >
         <Link
-          to={`/u/${actor?.name}`}
+          to={`/u/${actor?.name || actor?.userId}`}
           css={css`
             font-size: 18px;
             font-weight: 600;
@@ -62,7 +62,7 @@ export const ANote = ({
             text-decoration: none;
           `}
         >
-          {actor?.name}
+          {actor?.name || actor?.userId}
         </Link>
         <small
           css={css`
