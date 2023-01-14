@@ -1,8 +1,8 @@
 import { InboxItem } from "./inbox";
-import { ActorPresented } from "./actor";
+import { Actor } from "./actor";
 import { Note } from "./note";
 
 export interface TimelineObject extends InboxItem {
-  actor?: ActorPresented;
+  actor?: Actor;
   note?: Note;
 }

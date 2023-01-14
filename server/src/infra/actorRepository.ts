@@ -7,7 +7,7 @@ export class ActorTable {
   @PrimaryColumn({ length: 100 })
   id: string;
 
-  @Column()
+  @Column({ name: "userId" })
   federatedId: string;
 
   @Column({ nullable: true })

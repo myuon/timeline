@@ -1,4 +1,4 @@
-import { ActorPresented } from "@/shared/model/actor";
+import { Actor } from "@/shared/model/actor";
 import { Note } from "@/shared/model/note";
 import { css } from "@emotion/react";
 import dayjs from "dayjs";
@@ -12,7 +12,7 @@ export const ANote = ({
   note,
   onDelete,
 }: {
-  actor?: ActorPresented;
+  actor?: Actor;
   note?: Note;
   onDelete?: () => void;
 }) => (
