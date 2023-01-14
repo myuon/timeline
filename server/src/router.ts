@@ -579,20 +579,62 @@ export const newRouter = (options?: IRouterOptions) => {
 
     const actors = await ctx.state.app.actorRepository.findAll();
 
+    const toAccountId = (federatedId: string) => {
+      const url = new URL(federatedId);
+      const domain = url.hostname;
+      const name = url.pathname.split("/").pop();
+
+      return `${name}@${domain}`;
+    };
+
     await Promise.all(
       actors.map(async (actor) => {
         if (actor.federatedId.startsWith("https://")) {
-          const url = new URL(actor.federatedId);
-          const domain = url.hostname;
-          const name = url.pathname.split("/").pop();
-
-          const accountId = `${name}@${domain}`;
-
-          console.log(accountId);
-
           await ctx.state.app.actorRepository.save({
             ...actor,
-            federatedId: accountId,
+            federatedId: toAccountId(actor.federatedId),
+          });
+        }
+      })
+    );
+
+    const notes = await ctx.state.app.noteRepository.findAll();
+
+    await Promise.all(
+      notes.map(async (note) => {
+        if (note.userId.startsWith("https://")) {
+          await ctx.state.app.noteRepository.save({
+            ...note,
+            userId: toAccountId(note.userId),
+          });
+        }
+      })
+    );
+
+    const followRelations =
+      await ctx.state.app.followRelationRepository.findAll();
+
+    await Promise.all(
+      followRelations.map(async (followRelation) => {
+        // delete first
+        await ctx.state.app.followRelationRepository.delete(followRelation);
+
+        await ctx.state.app.followRelationRepository.create({
+          ...followRelation,
+          userId: toAccountId(followRelation.userId),
+          targetUserId: toAccountId(followRelation.targetUserId),
+        });
+      })
+    );
+
+    const inboxItems = await ctx.state.app.inboxItemRepository.findAll();
+
+    await Promise.all(
+      inboxItems.map(async (inboxItem) => {
+        if (inboxItem.userId.startsWith("https://")) {
+          await ctx.state.app.inboxItemRepository.create({
+            ...inboxItem,
+            userId: toAccountId(inboxItem.userId),
           });
         }
       })

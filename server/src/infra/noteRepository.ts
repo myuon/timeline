@@ -87,6 +87,10 @@ export const newNoteRepository = (repo: Repository<NoteTable>) => {
     delete: async (id: string) => {
       await repo.delete({ id });
     },
+    findAll: async () => {
+      const records = await repo.find();
+      return records.map((record) => record.toModel());
+    },
   };
 };
 export type NoteRepository = ReturnType<typeof newNoteRepository>;

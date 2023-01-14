@@ -50,6 +50,18 @@ export const newFollowRelationRepository = (
       const followRelations = records.map((record) => record.toModel());
       return followRelations;
     },
+    async findAll() {
+      const records = await repo.find();
+      const followRelations = records.map((record) => record.toModel());
+      return followRelations;
+    },
+    async delete(followRelation: FollowRelation) {
+      const record = FollowRelationTable.fromModel(followRelation);
+      return repo.delete({
+        userId: record.userId,
+        targetUserId: record.targetUserId,
+      });
+    },
   };
 };
 export type FollowRelationRepository = ReturnType<

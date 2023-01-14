@@ -77,6 +77,14 @@ export const newInboxItemRepository = (repo: Repository<InboxItemTable>) => {
     async delete(id: string) {
       await repo.delete({ id });
     },
+    async findAll() {
+      const items = await repo.find();
+      return items.map((item) => item.toModel());
+    },
+    async save(item: InboxItem) {
+      const table = InboxItemTable.fromModel(item);
+      await repo.save(table);
+    },
   };
 };
 
