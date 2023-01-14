@@ -13,6 +13,6 @@
     "build": "yarn workspace web build && yarn workspace server build",
     "start:prod": "NODE_ENV=production node dist/server/index.js",
     "deploy": "docker build . --tag asia-northeast1-docker.pkg.dev/default-364617/timeline/latest && docker push asia-northeast1-docker.pkg.dev/default-364617/timeline/latest && gcloud run deploy timeline --image asia-northeast1-docker.pkg.dev/default-364617/timeline/latest --region asia-northeast1",
-    "sync:litestream": "rm dist/server/db.sqlite && litestream restore -if-replica-exists -config litestream.yml ./dist/server/db.sqlite"
+    "sync:litestream": "(rm dist/server/db.sqlite || true) && litestream restore -if-replica-exists -config litestream.yml ./dist/server/db.sqlite"
   }
 }

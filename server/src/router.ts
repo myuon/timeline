@@ -632,7 +632,7 @@ export const newRouter = (options?: IRouterOptions) => {
     await Promise.all(
       inboxItems.map(async (inboxItem) => {
         if (inboxItem.userId.startsWith("https://")) {
-          await ctx.state.app.inboxItemRepository.create({
+          await ctx.state.app.inboxItemRepository.save({
             ...inboxItem,
             userId: toAccountId(inboxItem.userId),
           });
