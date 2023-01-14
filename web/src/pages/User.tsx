@@ -5,6 +5,7 @@ import { css } from "@emotion/react";
 import { ActorPresented } from "@/shared/model/actor";
 import { Note } from "@/shared/model/note";
 import { ANote } from "./features/note/Note";
+import { Button } from "../components/button";
 
 export const UserPage = () => {
   const { username } = useParams<{ username: string }>();
@@ -62,43 +63,66 @@ export const UserPage = () => {
 
         <div
           css={css`
-            display: grid;
-            gap: 16px;
-            margin-left: 16px;
+            margin: 0 16px;
           `}
         >
-          <img
-            src={actor?.iconUrl}
-            alt=""
-            css={css`
-              width: 88px;
-              aspect-ratio: 1;
-              margin-top: calc(-88px / 2);
-              border: 4px solid #fff;
-              border-radius: 4px;
-            `}
-          />
-
           <div
             css={css`
               display: grid;
-              gap: 4px;
+              gap: 16px;
             `}
           >
-            <h3
+            <img
+              src={actor?.iconUrl}
+              alt=""
               css={css`
-                font-size: 24px;
-                font-weight: 700;
-                line-height: 24px;
+                width: 88px;
+                aspect-ratio: 1;
+                margin-top: calc(-88px / 2);
+                border: 4px solid #fff;
+                border-radius: 4px;
+              `}
+            />
+
+            <div
+              css={css`
+                display: grid;
+                grid-template-columns: 1fr auto;
               `}
             >
-              {actor?.name}
-            </h3>
+              <div
+                css={css`
+                  display: grid;
+                  gap: 16px;
+                `}
+              >
+                <div
+                  css={css`
+                    display: grid;
+                    gap: 4px;
+                  `}
+                >
+                  <h3
+                    css={css`
+                      font-size: 24px;
+                      font-weight: 700;
+                      line-height: 24px;
+                    `}
+                  >
+                    {actor?.name}
+                  </h3>
 
-            <p>{actor?.url}</p>
+                  <p>{actor?.url}</p>
+                </div>
+
+                <p>{actor?.summary}</p>
+              </div>
+
+              <div>
+                <Button>フォロー</Button>
+              </div>
+            </div>
           </div>
-
-          <p>{actor?.summary}</p>
         </div>
       </div>
 
