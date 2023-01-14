@@ -113,7 +113,7 @@ export const IndexPage = () => {
                     color: #999;
                   `}
                 >
-                  {me?.name}@{me ? new URL(me?.federatedId).host : ""}
+                  {me?.federatedId}
                 </p>
               </div>
             </div>

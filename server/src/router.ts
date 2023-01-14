@@ -22,7 +22,6 @@ import dayjs from "dayjs";
 import { importVerifyKey, verifyHttpHeaders } from "./helper/signature";
 import { Person } from "../../shared/model/person";
 import { Activity } from "../../shared/model/activity";
-import { presentActor } from "../../shared/model/actor";
 import { TimelineObject } from "../../shared/model/timeline";
 import { ApiFollowRequest } from "../../shared/request/follow";
 
@@ -144,10 +143,13 @@ export const newRouter = (options?: IRouterOptions) => {
 
     const page = ctx.query.page === "true";
     if (page) {
-      const notes = await ctx.state.app.noteRepository.findLatest(userId, {
-        page: 0,
-        size: 5,
-      });
+      const notes = await ctx.state.app.noteRepository.findLatest(
+        `${userId}@${domain}`,
+        {
+          page: 0,
+          size: 5,
+        }
+      );
 
       ctx.body = {
         "@context": "https://www.w3.org/ns/activitystreams",
@@ -505,7 +507,7 @@ export const newRouter = (options?: IRouterOptions) => {
       return {
         ...item,
         note,
-        actor: actor ? presentActor(actor, domain) : undefined,
+        actor,
       };
     }) as TimelineObject[];
   });
@@ -553,23 +555,28 @@ export const newRouter = (options?: IRouterOptions) => {
     ctx.body = userActor;
   });
   router.get("/api/user/:userId", async (ctx) => {
-    const userId = `https://${domain}/u/${ctx.params.userId}`;
+    const userId = ctx.params.userId;
 
-    const actor = await ctx.state.app.actorRepository.findById(userId);
+    const actor = await ctx.state.app.actorRepository.findByFederatedId(
+      userId.includes("@") ? userId : `${userId}@${domain}`
+    );
     if (!actor) {
       ctx.throw(404, "Not found");
       return;
     }
 
-    ctx.body = presentActor(actor, domain);
+    ctx.body = actor;
   });
   router.get("/api/user/:userId/notes", async (ctx) => {
-    const userId = `https://${domain}/u/${ctx.params.userId}`;
+    const userId = ctx.params.userId;
 
-    const notes = await ctx.state.app.noteRepository.findLatest(userId, {
-      page: Number(ctx.query.page),
-      size: Number(ctx.query.size),
-    });
+    const notes = await ctx.state.app.noteRepository.findLatest(
+      userId.includes("@") ? userId : `${userId}@${domain}`,
+      {
+        page: Number(ctx.query.page),
+        size: Number(ctx.query.size),
+      }
+    );
 
     ctx.body = notes;
   });

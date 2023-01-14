@@ -2,12 +2,12 @@ import { Link, useParams } from "react-router-dom";
 import { assertIsDefined } from "../helper/assert";
 import useSWR from "swr";
 import { css } from "@emotion/react";
-import { ActorPresented } from "@/shared/model/actor";
 import { Note } from "@/shared/model/note";
 import { ANote } from "./features/note/Note";
 import { Button } from "../components/button";
 import { useMe } from "../api/api";
 import { useAuthToken } from "../api/auth";
+import { Actor } from "@/shared/model/actor";
 
 export const UserPage = () => {
   const { username } = useParams<{ username: string }>();
@@ -20,7 +20,7 @@ export const UserPage = () => {
       },
     });
     if (resp.ok) {
-      return (await resp.json()) as ActorPresented;
+      return (await resp.json()) as Actor;
     }
   });
   const { data: notes } = useSWR(
