@@ -116,7 +116,7 @@ export const UserPage = () => {
                     {actor?.name}
                   </h3>
 
-                  <p>{actor?.url}</p>
+                  <p>{actor?.userId}</p>
                 </div>
 
                 <p>{actor?.summary}</p>

@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import pluginRewriteAll from "vite-plugin-rewrite-all";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -8,14 +9,13 @@ export default defineConfig({
     react({
       jsxImportSource: "@emotion/react",
     }),
+    pluginRewriteAll(),
   ],
   build: {
     outDir: "../dist/web",
   },
   // adhoc configuration for integrated dev server
   server: {
-    hmr: {
-      port: 5173,
-    },
+    port: 5173,
   },
 });
