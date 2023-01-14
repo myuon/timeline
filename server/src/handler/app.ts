@@ -1,3 +1,4 @@
+import { ParameterizedContext } from "koa";
 import { ActorRepository } from "../infra/actorRepository";
 import { FollowRelationRepository } from "../infra/followRelationRepository";
 import { InboxItemRepository } from "../infra/inboxRepository";
@@ -9,3 +10,5 @@ export interface App {
   actorRepository: ActorRepository;
   inboxItemRepository: InboxItemRepository;
 }
+
+export type Context = ParameterizedContext<{ app: App }>;

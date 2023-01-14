@@ -320,9 +320,7 @@ export const newRouter = (options?: IRouterOptions) => {
       return;
     }
 
-    const actor = await ctx.state.app.actorRepository.findByFederatedId(
-      activity.actor
-    );
+    const actor = await ctx.state.app.actorRepository.findByUrl(activity.actor);
     if (!actor) {
       const { data, error } = await getActor(activity.actor);
       if (!data || error) {

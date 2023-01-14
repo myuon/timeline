@@ -86,6 +86,10 @@ export const newActorRepository = (repo: Repository<ActorTable>) => {
       const actors = await repo.find();
       return actors.map((actor) => actor.toModel());
     },
+    findByUrl: async (url: string) => {
+      const actor = await repo.findOneBy({ url });
+      return actor?.toModel();
+    },
   };
 };
 
