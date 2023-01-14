@@ -8,7 +8,7 @@ export const userIdUrl = `https://${domain}/u/${userName}`;
 
 export const userActor: Actor = {
   id: userIdUrl,
-  federatedId: userId,
+  userId: userId,
   rawData: undefined,
   iconUrl:
     "https://pbs.twimg.com/profile_images/1398634166523097090/QhosMWKS_400x400.jpg",

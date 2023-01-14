@@ -2,13 +2,13 @@ import { Column, Entity, In, PrimaryColumn, Repository, Unique } from "typeorm";
 import { Actor } from "../../../shared/model/actor";
 
 @Entity()
-@Unique(["federatedId"])
+@Unique(["userId"])
 export class ActorTable {
   @PrimaryColumn({ length: 100 })
   id: string;
 
-  @Column({ name: "userId" })
-  federatedId: string;
+  @Column({ length: 100 })
+  userId: string;
 
   @Column({ nullable: true })
   rawData?: string;
@@ -34,7 +34,7 @@ export class ActorTable {
   static fromModel(actor: Actor): ActorTable {
     const actorTable = new ActorTable();
     actorTable.id = actor.id;
-    actorTable.federatedId = actor.federatedId;
+    actorTable.userId = actor.userId;
     actorTable.rawData = actor.rawData;
     actorTable.inboxUrl = actor.inboxUrl;
     actorTable.name = actor.name;
@@ -48,7 +48,7 @@ export class ActorTable {
   toModel(): Actor {
     return {
       id: this.id,
-      federatedId: this.federatedId,
+      userId: this.userId,
       rawData: this.rawData,
       inboxUrl: this.inboxUrl,
       name: this.name,
@@ -67,7 +67,7 @@ export const newActorRepository = (repo: Repository<ActorTable>) => {
       return actor?.toModel();
     },
     findByFederatedId: async (federatedId: string) => {
-      const actor = await repo.findOneBy({ federatedId });
+      const actor = await repo.findOneBy({ userId: federatedId });
       return actor?.toModel();
     },
     findByIds: async (ids: string[]) => {
@@ -75,7 +75,7 @@ export const newActorRepository = (repo: Repository<ActorTable>) => {
       return actors.map((actor) => actor.toModel());
     },
     findByFederatedIds: async (federatedIds: string[]) => {
-      const actors = await repo.findBy({ federatedId: In(federatedIds) });
+      const actors = await repo.findBy({ userId: In(federatedIds) });
       return actors.map((actor) => actor.toModel());
     },
     save: async (actor: Actor) => {

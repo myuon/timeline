@@ -333,7 +333,7 @@ export const newRouter = (options?: IRouterOptions) => {
 
       await ctx.state.app.actorRepository.save({
         id: ulid(),
-        federatedId: data?.id,
+        userId: data?.id,
         rawData: JSON.stringify(data),
         inboxUrl: data?.inbox,
         name: data?.name,
@@ -502,7 +502,7 @@ export const newRouter = (options?: IRouterOptions) => {
 
     ctx.body = items.map((item) => {
       const note = notes.find((note) => note.id === item.itemId);
-      const actor = actors.find((actor) => actor.federatedId === note?.userId);
+      const actor = actors.find((actor) => actor.userId === note?.userId);
 
       return {
         ...item,
@@ -602,7 +602,7 @@ export const newRouter = (options?: IRouterOptions) => {
       actors.map(async (actor) => {
         await ctx.state.app.actorRepository.save({
           ...actor,
-          federatedId: toAccountId(actor.federatedId),
+          userId: toAccountId(actor.userId),
         });
       })
     );
