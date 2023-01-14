@@ -6,7 +6,6 @@ import { createNote } from "./handler/note";
 import { App } from "./handler/app";
 import { z } from "zod";
 import { schemaForType } from "./helper/zod";
-import { Activity } from "@/shared/model/activity";
 import { create, follow } from "./handler/inbox";
 import { domain, userActor, userId, userName } from "./config";
 import { parseBody } from "./middleware/parseBody";
@@ -20,29 +19,12 @@ import { Context } from "koa";
 import { getActor } from "./handler/ap/api";
 import { ulid } from "ulid";
 import dayjs from "dayjs";
-import { ApiFollowRequest } from "@/shared/request/follow";
-import { TimelineObject } from "@/shared/model/timeline";
 import { importVerifyKey, verifyHttpHeaders } from "./helper/signature";
-import { Person } from "@/shared/model/person";
-import {
-  Actor,
-  ActorPresented,
-  presentActor as toActorPresented3,
-} from "@/shared/model/actor";
-
-const toActorPresented = (a: any, b: any) => undefined as any;
-
-export const toActorPresented2 = (
-  actor: Actor,
-  domain: string
-): ActorPresented => {
-  return {
-    ...actor,
-    accountId: actor.federatedId.startsWith(`https://${domain}`)
-      ? actor.name
-      : `${actor.name}@${new URL(actor.federatedId).hostname}`,
-  };
-};
+import { Person } from "../../shared/model/person";
+import { Activity } from "../../shared/model/activity";
+import { presentActor } from "../../shared/model/actor";
+import { TimelineObject } from "../../shared/model/timeline";
+import { ApiFollowRequest } from "../../shared/request/follow";
 
 const requireAuth = (ctx: Context) => {
   if (!ctx.state.auth) {
@@ -523,7 +505,7 @@ export const newRouter = (options?: IRouterOptions) => {
       return {
         ...item,
         note,
-        actor: actor ? toActorPresented(actor, domain) : undefined,
+        actor: actor ? presentActor(actor, domain) : undefined,
       };
     }) as TimelineObject[];
   });
@@ -579,7 +561,7 @@ export const newRouter = (options?: IRouterOptions) => {
       return;
     }
 
-    ctx.body = toActorPresented(actor, domain);
+    ctx.body = presentActor(actor, domain);
   });
   router.get("/api/user/:userId/notes", async (ctx) => {
     const userId = `https://${domain}/u/${ctx.params.userId}`;

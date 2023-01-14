@@ -1,4 +1,4 @@
-import { Note } from "@/shared/model/note";
+import { Note } from "../../../../shared/model/note";
 import dayjs from "dayjs";
 import { serializeApNote } from "./note";
 

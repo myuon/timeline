@@ -1,4 +1,4 @@
-import { Note } from "@/shared/model/note";
+import { Note } from "../../../../shared/model/note";
 
 export const serializeApNote = (userId: string, note: Note) => {
   return {

@@ -1,4 +1,4 @@
-import { Actor } from "@/shared/model/actor";
+import { Actor } from "../../shared/model/actor";
 
 export const domain = `tl.ramda.io`;
 export const userName = "myuon";

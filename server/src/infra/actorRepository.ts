@@ -1,5 +1,5 @@
 import { Column, Entity, In, PrimaryColumn, Repository, Unique } from "typeorm";
-import { Actor } from "@/shared/model/actor";
+import { Actor } from "../../../shared/model/actor";
 
 @Entity()
 @Unique(["federatedId"])

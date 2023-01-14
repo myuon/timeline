@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryColumn, Repository } from "typeorm";
-import { FollowRelation } from "@/shared/model/follow";
+import { FollowRelation } from "../../../shared/model/follow";
 
 @Entity()
 export class FollowRelationTable {

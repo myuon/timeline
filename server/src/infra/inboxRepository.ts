@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryColumn, Repository, Unique } from "typeorm";
-import { InboxItem } from "@/shared/model/inbox";
+import { InboxItem } from "../../../shared/model/inbox";
 
 @Entity()
 @Unique(["type", "itemId"])

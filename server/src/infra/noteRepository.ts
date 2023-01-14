@@ -1,5 +1,5 @@
 import { Column, Entity, In, PrimaryColumn, Repository, Unique } from "typeorm";
-import { Note } from "@/shared/model/note";
+import { Note } from "../../../shared/model/note";
 
 @Entity()
 @Unique(["federatedId"])

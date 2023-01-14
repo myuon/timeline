@@ -1,11 +1,11 @@
 import { Context } from "koa";
 import { schemaForType } from "../helper/zod";
-import { CreateNoteRequest } from "@/shared/request/note";
+import { CreateNoteRequest } from "../../../shared/request/note";
 import { z } from "zod";
 import { App } from "./app";
 import { ulid } from "ulid";
 import { domain, userFirebaseId, userName } from "../config";
-import { Note } from "@/shared/model/note";
+import { Note } from "../../../shared/model/note";
 import dayjs from "dayjs";
 import { transformContent } from "../helper/transform";
 
