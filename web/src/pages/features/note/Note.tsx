@@ -1,4 +1,4 @@
-import { Actor } from "@/shared/model/actor";
+import { ActorPresented } from "@/shared/model/actor";
 import { Note } from "@/shared/model/note";
 import { css } from "@emotion/react";
 import dayjs from "dayjs";
@@ -12,7 +12,7 @@ export const ANote = ({
   note,
   onDelete,
 }: {
-  actor?: Actor;
+  actor?: ActorPresented;
   note?: Note;
   onDelete?: () => void;
 }) => (
@@ -27,7 +27,7 @@ export const ANote = ({
       }
     `}
   >
-    <Link to={`/u/${actor?.federatedId.split("/").pop()}`}>
+    <Link to={`/u/${actor?.name}`}>
       <img
         src={actor?.iconUrl}
         alt={actor?.name ?? "-"}
@@ -54,7 +54,7 @@ export const ANote = ({
         `}
       >
         <Link
-          to={`/u/${actor?.federatedId.split("/").pop()}`}
+          to={`/u/${actor?.name}`}
           css={css`
             font-size: 18px;
             font-weight: 600;

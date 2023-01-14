@@ -2,7 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import { assertIsDefined } from "../helper/assert";
 import useSWR from "swr";
 import { css } from "@emotion/react";
-import { Actor } from "@/shared/model/actor";
+import { ActorPresented } from "@/shared/model/actor";
 import { Note } from "@/shared/model/note";
 import { ANote } from "./features/note/Note";
 
@@ -17,7 +17,7 @@ export const UserPage = () => {
       },
     });
     if (resp.ok) {
-      return (await resp.json()) as Actor;
+      return (await resp.json()) as ActorPresented;
     }
   });
   const { data: notes } = useSWR(

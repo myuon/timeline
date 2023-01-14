@@ -24,6 +24,25 @@ import { ApiFollowRequest } from "@/shared/request/follow";
 import { TimelineObject } from "@/shared/model/timeline";
 import { importVerifyKey, verifyHttpHeaders } from "./helper/signature";
 import { Person } from "@/shared/model/person";
+import {
+  Actor,
+  ActorPresented,
+  presentActor as toActorPresented3,
+} from "@/shared/model/actor";
+
+const toActorPresented = (a: any, b: any) => undefined as any;
+
+export const toActorPresented2 = (
+  actor: Actor,
+  domain: string
+): ActorPresented => {
+  return {
+    ...actor,
+    accountId: actor.federatedId.startsWith(`https://${domain}`)
+      ? actor.name
+      : `${actor.name}@${new URL(actor.federatedId).hostname}`,
+  };
+};
 
 const requireAuth = (ctx: Context) => {
   if (!ctx.state.auth) {
@@ -504,7 +523,7 @@ export const newRouter = (options?: IRouterOptions) => {
       return {
         ...item,
         note,
-        actor,
+        actor: actor ? toActorPresented(actor, domain) : undefined,
       };
     }) as TimelineObject[];
   });
@@ -560,7 +579,7 @@ export const newRouter = (options?: IRouterOptions) => {
       return;
     }
 
-    ctx.body = actor;
+    ctx.body = toActorPresented(actor, domain);
   });
   router.get("/api/user/:userId/notes", async (ctx) => {
     const userId = `https://${domain}/u/${ctx.params.userId}`;
