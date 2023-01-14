@@ -5,7 +5,6 @@ import { CreateNoteRequest } from "@/shared/request/note";
 import useSWR from "swr";
 import React from "react";
 import { TimelineObject } from "@/shared/model/timeline";
-import { Actor } from "@/shared/model/actor";
 import { Button } from "../components/button";
 import {
   styleInputBase,
@@ -14,6 +13,7 @@ import {
 } from "../components/input";
 import { AnimatePresence, motion } from "framer-motion";
 import { ANote } from "./features/note/Note";
+import { useMe } from "../api/api";
 
 export const IndexPage = () => {
   useAuthGuard();
@@ -42,17 +42,7 @@ export const IndexPage = () => {
       refreshInterval: 30 * 1000,
     }
   );
-  const { data: me } = useSWR(token ? [token, "/api/me"] : null, async () => {
-    const resp = await fetch(`/api/me`, {
-      headers: {
-        "Content-Type": "application/activity+json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (resp.ok) {
-      return (await resp.json()) as Actor;
-    }
-  });
+  const { data: me } = useMe(token);
 
   const contentFormRef = React.useRef<HTMLTextAreaElement>(null);
 

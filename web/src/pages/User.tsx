@@ -6,6 +6,8 @@ import { ActorPresented } from "@/shared/model/actor";
 import { Note } from "@/shared/model/note";
 import { ANote } from "./features/note/Note";
 import { Button } from "../components/button";
+import { useMe } from "../api/api";
+import { useAuthToken } from "../api/auth";
 
 export const UserPage = () => {
   const { username } = useParams<{ username: string }>();
@@ -34,6 +36,8 @@ export const UserPage = () => {
       }
     }
   );
+  const { data: token } = useAuthToken();
+  const { data: me } = useMe(token);
 
   return (
     <div
@@ -118,9 +122,7 @@ export const UserPage = () => {
                 <p>{actor?.summary}</p>
               </div>
 
-              <div>
-                <Button>フォロー</Button>
-              </div>
+              <div>{me?.name !== username && <Button>フォロー</Button>}</div>
             </div>
           </div>
         </div>
