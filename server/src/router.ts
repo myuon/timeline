@@ -7,7 +7,7 @@ import { App } from "./handler/app";
 import { z } from "zod";
 import { schemaForType } from "./helper/zod";
 import { create, follow } from "./handler/inbox";
-import { domain, userActor, userId, userName } from "./config";
+import { domain, userActor, userId, userIdUrl, userName } from "./config";
 import { parseBody } from "./middleware/parseBody";
 import {
   serializeCreateNoteActivity,
@@ -24,6 +24,7 @@ import { Person } from "../../shared/model/person";
 import { Activity } from "../../shared/model/activity";
 import { TimelineObject } from "../../shared/model/timeline";
 import { ApiFollowRequest } from "../../shared/request/follow";
+import { fetcher } from "./helper/fetcher";
 
 const requireAuth = (ctx: Context) => {
   if (!ctx.state.auth) {
@@ -49,12 +50,12 @@ export const newRouter = (options?: IRouterOptions) => {
 
     ctx.body = {
       subject: `acct:${userName}@${domain}`,
-      aliases: [userId],
+      aliases: [userIdUrl],
       links: [
         {
           rel: "self",
           type: "application/activity+json",
-          href: userId,
+          href: userIdUrl,
         },
       ],
     };
@@ -577,6 +578,24 @@ export const newRouter = (options?: IRouterOptions) => {
     );
 
     ctx.body = notes;
+  });
+  router.post("/api/user/:userId/sync", async (ctx) => {
+    requireAuth(ctx);
+
+    const userId = ctx.params.userId;
+    const domain = userId.split("@")[1];
+
+    const { data } = await fetcher(
+      `https://${domain}/.well-known/webfinger?resource=acct:${userId}`
+    );
+    if (!data) {
+      ctx.throw(400, "Failed to fetch webfinger");
+      return;
+    }
+    const resourceData = JSON.parse(data);
+    const href = resourceData.links.find(
+      (link: any) => link.rel === "self"
+    )?.href;
   });
 
   router.post("/api/migrate", async (ctx) => {
