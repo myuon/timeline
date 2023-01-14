@@ -331,7 +331,6 @@ export const newRouter = (options?: IRouterOptions) => {
       }
 
       await ctx.state.app.actorRepository.save({
-        id: ulid(),
         userId: data?.id,
         rawData: JSON.stringify(data),
         inboxUrl: data?.inbox,
@@ -495,7 +494,7 @@ export const newRouter = (options?: IRouterOptions) => {
     const notes = await ctx.state.app.noteRepository.findByIds(
       items.map((item) => item.itemId)
     );
-    const actors = await ctx.state.app.actorRepository.findByFederatedIds(
+    const actors = await ctx.state.app.actorRepository.findByUserIds(
       notes.map((note) => note.userId)
     );
 
@@ -556,7 +555,7 @@ export const newRouter = (options?: IRouterOptions) => {
   router.get("/api/user/:userId", async (ctx) => {
     const userId = ctx.params.userId;
 
-    const actor = await ctx.state.app.actorRepository.findByFederatedId(
+    const actor = await ctx.state.app.actorRepository.findByUserId(
       userId.includes("@") ? userId : `${userId}@${domain}`
     );
     if (!actor) {

@@ -1,5 +1,4 @@
 export interface Actor {
-  id: string;
   userId: string;
   rawData?: string;
   inboxUrl?: string;

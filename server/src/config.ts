@@ -7,7 +7,6 @@ export const userId = `${userName}@${domain}`;
 export const userIdUrl = `https://${domain}/u/${userName}`;
 
 export const userActor: Actor = {
-  id: userIdUrl,
   userId: userId,
   rawData: undefined,
   iconUrl:
