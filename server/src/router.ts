@@ -574,5 +574,32 @@ export const newRouter = (options?: IRouterOptions) => {
     ctx.body = notes;
   });
 
+  router.post("/api/migrate", async (ctx) => {
+    requireAuth(ctx);
+
+    const actors = await ctx.state.app.actorRepository.findAll();
+
+    await Promise.all(
+      actors.map(async (actor) => {
+        if (actor.federatedId.startsWith("https://")) {
+          const url = new URL(actor.federatedId);
+          const domain = url.hostname;
+          const name = url.pathname.split("/").pop();
+
+          const accountId = `${name}@${domain}`;
+
+          console.log(accountId);
+
+          await ctx.state.app.actorRepository.save({
+            ...actor,
+            federatedId: accountId,
+          });
+        }
+      })
+    );
+
+    ctx.status = 204;
+  });
+
   return router;
 };

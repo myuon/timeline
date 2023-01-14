@@ -82,6 +82,10 @@ export const newActorRepository = (repo: Repository<ActorTable>) => {
       const actorTable = ActorTable.fromModel(actor);
       await repo.save(actorTable);
     },
+    findAll: async () => {
+      const actors = await repo.find();
+      return actors.map((actor) => actor.toModel());
+    },
   };
 };
 
