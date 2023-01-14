@@ -8,6 +8,7 @@ import { Button } from "../components/button";
 import { useMe } from "../api/api";
 import { useAuthToken } from "../api/auth";
 import { Actor } from "@/shared/model/actor";
+import { Interweave } from "interweave";
 
 export const UserPage = () => {
   const { username } = useParams<{ username: string }>();
@@ -119,7 +120,7 @@ export const UserPage = () => {
                   <p>{actor?.userId}</p>
                 </div>
 
-                <p>{actor?.summary}</p>
+                <Interweave content={actor?.summary} />
               </div>
 
               <div>{me?.name !== username && <Button>フォロー</Button>}</div>
