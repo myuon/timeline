@@ -580,6 +580,10 @@ export const newRouter = (options?: IRouterOptions) => {
     const actors = await ctx.state.app.actorRepository.findAll();
 
     const toAccountId = (federatedId: string) => {
+      if (!federatedId.startsWith("https://")) {
+        return federatedId;
+      }
+
       const url = new URL(federatedId);
       const domain = url.hostname;
       const name = url.pathname.split("/").pop();
@@ -589,12 +593,10 @@ export const newRouter = (options?: IRouterOptions) => {
 
     await Promise.all(
       actors.map(async (actor) => {
-        if (actor.federatedId.startsWith("https://")) {
-          await ctx.state.app.actorRepository.save({
-            ...actor,
-            federatedId: toAccountId(actor.federatedId),
-          });
-        }
+        await ctx.state.app.actorRepository.save({
+          ...actor,
+          federatedId: toAccountId(actor.federatedId),
+        });
       })
     );
 
@@ -602,12 +604,10 @@ export const newRouter = (options?: IRouterOptions) => {
 
     await Promise.all(
       notes.map(async (note) => {
-        if (note.userId.startsWith("https://")) {
-          await ctx.state.app.noteRepository.save({
-            ...note,
-            userId: toAccountId(note.userId),
-          });
-        }
+        await ctx.state.app.noteRepository.save({
+          ...note,
+          userId: toAccountId(note.userId),
+        });
       })
     );
 
@@ -631,12 +631,10 @@ export const newRouter = (options?: IRouterOptions) => {
 
     await Promise.all(
       inboxItems.map(async (inboxItem) => {
-        if (inboxItem.userId.startsWith("https://")) {
-          await ctx.state.app.inboxItemRepository.save({
-            ...inboxItem,
-            userId: toAccountId(inboxItem.userId),
-          });
-        }
+        await ctx.state.app.inboxItemRepository.save({
+          ...inboxItem,
+          userId: toAccountId(inboxItem.userId),
+        });
       })
     );
 
