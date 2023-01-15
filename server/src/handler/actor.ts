@@ -9,7 +9,7 @@ export const syncActor = async (ctx: Context, url: string) => {
     ctx.throw(400, "Failed to get actor");
   }
 
-  const name = data.name || data.preferredUsername;
+  const name = data.preferredUsername || data.name;
   if (!name) {
     ctx.throw(400, "No name for actor");
   }
