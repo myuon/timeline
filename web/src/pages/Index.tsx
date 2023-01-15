@@ -221,6 +221,23 @@ export const IndexPage = () => {
 
             <Button type="submit">Follow</Button>
           </form>
+
+          <div
+            css={css`
+              display: grid;
+              justify-content: center;
+            `}
+          >
+            <img
+              src="/assets/timeline.png"
+              alt=""
+              css={css`
+                display: flex;
+                width: 48px;
+                aspect-ratio: 1;
+              `}
+            />
+          </div>
         </div>
 
         <div

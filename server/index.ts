@@ -2,7 +2,7 @@ import "reflect-metadata";
 import Koa from "koa";
 import logger from "koa-pino-logger";
 import * as path from "path";
-import { serveStaticProd } from "./src/middleware/serve";
+import { serveStatic, serveStaticProd } from "./src/middleware/serve";
 import { newRouter } from "./src/router";
 import { DataSource } from "typeorm";
 import adminKey from "../.secrets/adminKey.json";
@@ -54,6 +54,22 @@ const router = newRouter({
 });
 
 app.use(authJwt(auth));
+app.use(
+  mount(
+    "/assets",
+    serveStatic({
+      path: path.resolve(__dirname, "assets"),
+    })
+  )
+);
+app.use(
+  mount(
+    "/web/assets",
+    serveStatic({
+      path: path.resolve(__dirname, "assets"),
+    })
+  )
+);
 app.use(
   mount(
     "/web",

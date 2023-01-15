@@ -24,3 +24,17 @@ export const serveStaticProd =
       return next();
     }
   };
+
+export const serveStatic =
+  (options: { path: string; excludePrefix?: string }): Middleware =>
+  async (ctx, next) => {
+    if (
+      options.excludePrefix
+        ? !ctx.request.path.startsWith(options.excludePrefix)
+        : true
+    ) {
+      return serve(options.path)(ctx, fallbackNext(options.path)(ctx, next));
+    } else {
+      return next();
+    }
+  };

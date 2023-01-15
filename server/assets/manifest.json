@@ -1,0 +1,19 @@
+{
+  "theme_color": "#f43f5e",
+  "background_color": "#242424",
+  "display": "standalone",
+  "start_url": "/web",
+  "name": "timeline",
+  "short_name": "timeline",
+  "description": "https://github.com/myuon/timeline",
+  "icons": [
+    {
+      "sizes": "96x96",
+      "src": "/assets/android-chrome-96x96.png"
+    },
+    {
+      "sizes": "114x114",
+      "src": "/assets/apple-touch-icon.png"
+    }
+  ]
+}

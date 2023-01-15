@@ -34,7 +34,7 @@ import { TimelineObject } from "../../shared/model/timeline";
 import { ApiFollowRequest } from "../../shared/request/follow";
 import { fetcher } from "./helper/fetcher";
 import { syncActor } from "./handler/actor";
-import { Share } from "../../shared/model/share";
+import send from "koa-send";
 
 const requireAuth = (ctx: Context) => {
   if (!ctx.state.auth) {
@@ -45,6 +45,16 @@ const requireAuth = (ctx: Context) => {
 export const newRouter = (options?: IRouterOptions) => {
   const router = new Router<{ app: App; auth?: any }>(options);
 
+  router.get("/manifest.json", async (ctx) => {
+    await send(ctx, "manifest.json", {
+      root: path.resolve(__dirname, "..", "assets"),
+    });
+  });
+  router.get("/favicon.ico", async (ctx) => {
+    await send(ctx, "favicon.ico", {
+      root: path.resolve(__dirname, "..", "assets"),
+    });
+  });
   router.get("/.well-known/host-meta", async (ctx) => {
     ctx.set("Content-Type", "application/xrd+xml");
     ctx.body = `<?xml version="1.0" encoding="UTF-8"?>
