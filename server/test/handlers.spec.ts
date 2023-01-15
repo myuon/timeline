@@ -3,7 +3,7 @@ import supertest from "supertest";
 import { newApp } from "../src/app";
 import { DataSource } from "typeorm";
 import { entities } from "../src/infra/db";
-import { domain, userFirebaseId, userId } from "../src/config";
+import { domain, userFirebaseId, userId, userIdUrl } from "../src/config";
 import { Middleware } from "koa";
 import { NoteTable, newNoteRepository } from "../src/infra/noteRepository";
 import {
@@ -16,6 +16,7 @@ import {
   newInboxItemRepository,
 } from "../src/infra/inboxRepository";
 import { newShareRepository, ShareTable } from "../src/infra/shareRepository";
+import { Activity } from "../../shared/model/activity";
 
 const dataSource = new DataSource({
   type: "sqlite",
@@ -36,7 +37,7 @@ const authMiddleware: Middleware = (ctx, next) => {
   return next();
 };
 
-let delivered: { to: string; activity: object }[] = [];
+let delivered: { to: string; activity: Activity }[] = [];
 
 const appContext = {
   noteRepository: newNoteRepository(dataSource.getRepository(NoteTable)),
@@ -49,7 +50,7 @@ const appContext = {
   ),
   shareRepository: newShareRepository(dataSource.getRepository(ShareTable)),
   deliveryClient: {
-    deliveryActivity: async (to: string, activity: object) => {
+    deliveryActivity: async (to: string, activity: Activity) => {
       delivered.push({ to, activity });
 
       return { data: undefined };
@@ -102,12 +103,21 @@ describe("api", () => {
         .post("/api/note")
         .set("Authorization", "Bearer test_token")
         .send({
-          content: "<p>Hello, World!</p>",
+          content: "Hello, World!",
         })
         .expect(201);
 
       assert.equal(delivered.length, 1);
       assert.equal(delivered[0].to, "test@example.com");
+      assert.equal(delivered[0].activity.type, "Create");
+      assert.match(
+        (delivered[0].activity as any).id,
+        new RegExp(`^${userIdUrl}/s/(.*)/activity$`)
+      );
+      assert.equal(
+        (delivered[0].activity.object as any).content,
+        "<p>Hello, World!</p>"
+      );
     });
   });
 });
