@@ -63,3 +63,18 @@ export const serializeUndoActivity = (
     published: dayjs().toDate().toUTCString(),
   };
 };
+
+export const serializeAnnounceActivity = (
+  userId: string,
+  id: string,
+  objectId: string
+) => {
+  return {
+    "@context": ["https://www.w3.org/ns/activitystreams"],
+    id: `${userId}/activity/${id}`,
+    type: "Announce",
+    actor: userId,
+    object: objectId,
+    published: dayjs().toDate().toUTCString(),
+  };
+};

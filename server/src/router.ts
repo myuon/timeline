@@ -10,6 +10,7 @@ import { create, follow } from "./handler/inbox";
 import { domain, userActor, userId, userIdUrl, userName } from "./config";
 import { parseBody } from "./middleware/parseBody";
 import {
+  serializeAnnounceActivity,
   serializeCreateNoteActivity,
   serializeDeleteNoteActivity,
   serializeFollowActivity,
@@ -26,6 +27,7 @@ import { TimelineObject } from "../../shared/model/timeline";
 import { ApiFollowRequest } from "../../shared/request/follow";
 import { fetcher } from "./helper/fetcher";
 import { syncActor } from "./handler/actor";
+import { Share } from "../../shared/model/share";
 
 const requireAuth = (ctx: Context) => {
   if (!ctx.state.auth) {
@@ -34,7 +36,7 @@ const requireAuth = (ctx: Context) => {
 };
 
 export const newRouter = (options?: IRouterOptions) => {
-  const router = new Router<{ app: App }>(options);
+  const router = new Router<{ app: App; auth?: any }>(options);
 
   router.get("/.well-known/host-meta", async (ctx) => {
     ctx.set("Content-Type", "application/xrd+xml");
@@ -160,7 +162,7 @@ export const newRouter = (options?: IRouterOptions) => {
         partOf: `${userId}/outbox`,
         orderedItems: notes.map((note) =>
           serializeCreateNoteActivity(
-            userId,
+            userIdUrl,
             "https://www.w3.org/ns/activitystreams#Public",
             note
           )
@@ -172,9 +174,9 @@ export const newRouter = (options?: IRouterOptions) => {
       ctx.body = {
         "@context": "https://www.w3.org/ns/activitystreams",
         type: "OrderedCollection",
-        id: `${userId}/outbox`,
+        id: `${userIdUrl}/outbox`,
         totalItems: count,
-        last: `${userId}/outbox?page=true`,
+        last: `${userIdUrl}/outbox?page=true`,
       };
     }
     ctx.set("Content-Type", "application/activity+json");
@@ -197,7 +199,7 @@ export const newRouter = (options?: IRouterOptions) => {
     ctx.body = {
       "@context": ["https://www.w3.org/ns/activitystreams"],
       type: "OrderedCollection",
-      id: `${userId}/followers`,
+      id: `${userIdUrl}/followers`,
       totalItems: count,
       orderedItems: followers.map((follower) => ({
         "@context": ["https://www.w3.org/ns/activitystreams"],
@@ -220,7 +222,7 @@ export const newRouter = (options?: IRouterOptions) => {
     ctx.body = {
       "@context": ["https://www.w3.org/ns/activitystreams"],
       type: "OrderedCollection",
-      id: `${userId}/following`,
+      id: `${userIdUrl}/following`,
       totalItems: 0,
       orderedItems: [],
     };
@@ -385,7 +387,7 @@ export const newRouter = (options?: IRouterOptions) => {
     ctx.log.info("delivery");
 
     const activity = serializeCreateNoteActivity(
-      userId,
+      userIdUrl,
       "https://www.w3.org/ns/activitystreams#Public",
       note
     );
@@ -430,7 +432,7 @@ export const newRouter = (options?: IRouterOptions) => {
     ctx.log.info("delivery");
 
     const activity = serializeDeleteNoteActivity(
-      userId,
+      userIdUrl,
       ctx.params.id,
       `${userId}/s/${ctx.params.id}`
     );
@@ -464,6 +466,67 @@ export const newRouter = (options?: IRouterOptions) => {
       })
     );
   });
+  router.post("/api/note/:id/announce", async (ctx) => {
+    requireAuth(ctx);
+
+    if (ctx.state.auth.userId !== userId) {
+      ctx.throw(403, "Forbidden");
+      return;
+    }
+
+    const note = await ctx.state.app.noteRepository.findById(ctx.params.id);
+    if (!note) {
+      ctx.throw(404, "Not found");
+      return;
+    }
+
+    const shareId = ulid();
+
+    await ctx.state.app.shareRepository.create({
+      id: shareId,
+      noteId: note.id,
+      userId,
+      createdAt: dayjs().unix(),
+    });
+
+    await ctx.state.app.inboxItemRepository.create({
+      id: ulid(),
+      userId: userId,
+      type: "Share",
+      itemId: shareId,
+      createdAt: dayjs().unix(),
+    });
+
+    // FIXME: delivery SHOULD be performed asynchronously
+    ctx.log.info("delivery");
+
+    const activity = serializeAnnounceActivity(
+      userIdUrl,
+      shareId,
+      `${userIdUrl}/s/${note.id}`
+    );
+    const followers =
+      await ctx.state.app.followRelationRepository.findFollowers(userId);
+
+    await Promise.allSettled(
+      followers.map(async (follower) => {
+        const { data, error } = await deliveryActivity(
+          follower.userId,
+          activity
+        );
+        if (error) {
+          ctx.log.error(error);
+          return;
+        }
+        ctx.log.info(`deliveryActivity: ${data}`);
+      })
+    );
+
+    ctx.log.info("delivery end");
+
+    ctx.status = 204;
+  });
+
   router.get("/api/timeline/note", async (ctx) => {
     requireAuth(ctx);
 

@@ -1,12 +1,16 @@
-import { Column, Entity, PrimaryColumn, Repository } from "typeorm";
+import { Column, Entity, PrimaryColumn, Repository, Unique } from "typeorm";
 import { Share } from "../../../shared/model/share";
 
 @Entity()
+@Unique(["userId", "noteId"])
 export class ShareTable {
-  @PrimaryColumn({ length: 100 })
+  @PrimaryColumn()
+  id: string;
+
+  @Column({ length: 100 })
   userId: string;
 
-  @PrimaryColumn({ length: 100 })
+  @Column({ length: 100 })
   noteId: string;
 
   @Column()
@@ -14,6 +18,7 @@ export class ShareTable {
 
   static fromModel(share: Share): ShareTable {
     const shareTable = new ShareTable();
+    shareTable.id = share.id;
     shareTable.userId = share.userId;
     shareTable.noteId = share.noteId;
     shareTable.createdAt = share.createdAt;
@@ -22,6 +27,7 @@ export class ShareTable {
 
   toModel(): Share {
     return {
+      id: this.id,
       userId: this.userId,
       noteId: this.noteId,
       createdAt: this.createdAt,
