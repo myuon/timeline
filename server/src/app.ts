@@ -26,7 +26,7 @@ export const newApp = (
     mount(
       "/web",
       serveStaticProd({
-        path: path.resolve(__dirname, "..", "web"),
+        path: path.resolve(__dirname, "..", "..", "web"),
       })
     )
   );
