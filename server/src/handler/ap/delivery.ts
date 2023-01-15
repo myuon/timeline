@@ -1,16 +1,16 @@
 import { getInbox } from "./api";
 import fs from "fs";
 import path from "path";
-import { userId } from "../../config";
+import { userIdUrl } from "../../config";
 import { signedFetcher } from "./signedFetcher";
 
 const privateKeyPemString = fs.readFileSync(
   path.join(__dirname, "../../../../.secrets/private.pem"),
   "utf-8"
 );
-const signKey = {
+export const signKey = {
   privateKeyPemString,
-  keyId: `${userId}#main-key`,
+  keyId: `${userIdUrl}#main-key`,
 };
 
 export const deliveryActivity = async (to: string, activity: object) => {

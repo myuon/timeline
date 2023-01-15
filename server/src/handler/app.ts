@@ -1,5 +1,6 @@
 import { ParameterizedContext } from "koa";
 import { ActorRepository } from "../infra/actorRepository";
+import { DeliveryClient } from "../infra/delivery";
 import { FollowRelationRepository } from "../infra/followRelationRepository";
 import { InboxItemRepository } from "../infra/inboxRepository";
 import { NoteRepository } from "../infra/noteRepository";
@@ -11,6 +12,7 @@ export interface App {
   actorRepository: ActorRepository;
   inboxItemRepository: InboxItemRepository;
   shareRepository: ShareRepository;
+  deliveryClient: DeliveryClient;
 }
 
 export type Context = ParameterizedContext<{ app: App }>;

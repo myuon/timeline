@@ -21,6 +21,8 @@ import {
 import { newShareRepository, ShareTable } from "./infra/shareRepository";
 import { userActor } from "./config";
 import { App } from "./handler/app";
+import { newDeliveryClient } from "./infra/delivery";
+import { signKey } from "./handler/ap/delivery";
 
 export const newApp = (auth: Auth | undefined, dataSource: DataSource) => {
   const app = new Koa();
@@ -64,6 +66,7 @@ export const newApp = (auth: Auth | undefined, dataSource: DataSource) => {
         shareRepository: newShareRepository(
           dataSource.getRepository(ShareTable)
         ),
+        deliveryClient: newDeliveryClient(signKey),
       } as App;
 
       await (ctx.state.app as App).actorRepository.save(userActor);

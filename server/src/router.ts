@@ -35,6 +35,7 @@ import { ApiFollowRequest } from "../../shared/request/follow";
 import { fetcher } from "./helper/fetcher";
 import { syncActor } from "./handler/actor";
 import send from "koa-send";
+import { deliveryActivityToFollowers } from "./handler/delivery";
 
 const requireAuth = (ctx: Context) => {
   if (!ctx.state.auth) {
@@ -408,24 +409,7 @@ export const newRouter = (options?: IRouterOptions) => {
       "https://www.w3.org/ns/activitystreams#Public",
       note
     );
-    const followers =
-      await ctx.state.app.followRelationRepository.findFollowers(userId);
-
-    await Promise.allSettled(
-      followers.map(async (follower) => {
-        const { data, error } = await deliveryActivity(
-          follower.userId,
-          activity
-        );
-        if (error) {
-          ctx.log.error(error);
-          return;
-        }
-        ctx.log.info(`deliveryActivity: ${data}`);
-      })
-    );
-
-    ctx.log.info("delivery end");
+    await deliveryActivityToFollowers(ctx, activity, userId);
   });
   router.delete("/api/note/:id", async (ctx) => {
     requireAuth(ctx);
@@ -445,32 +429,13 @@ export const newRouter = (options?: IRouterOptions) => {
 
     ctx.status = 204;
 
-    // FIXME: delivery SHOULD be performed asynchronously
-    ctx.log.info("delivery");
-
     const activity = serializeDeleteNoteActivity(
       userIdUrl,
       ctx.params.id,
       `${userIdUrl}/s/${ctx.params.id}`
     );
-    const followers =
-      await ctx.state.app.followRelationRepository.findFollowers(userId);
 
-    await Promise.allSettled(
-      followers.map(async (follower) => {
-        const { data, error } = await deliveryActivity(
-          follower.userId,
-          activity
-        );
-        if (error) {
-          ctx.log.error(error);
-          return;
-        }
-        ctx.log.info(`deliveryActivity: ${data}`);
-      })
-    );
-
-    ctx.log.info("delivery end");
+    await deliveryActivityToFollowers(ctx, activity, userId);
 
     // remove from inboxes
     const items = await ctx.state.app.inboxItemRepository.findByItemId(
