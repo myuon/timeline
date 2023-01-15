@@ -14,16 +14,24 @@ export const syncActor = async (ctx: Context, url: string) => {
     ctx.throw(400, "No name for actor");
   }
 
+  if (!data.inbox) {
+    ctx.throw(400, "No inbox for actor");
+  }
+
+  if (!data.url) {
+    ctx.throw(400, "No url for actor");
+  }
+
   await ctx.state.app.actorRepository.save({
     userId: url.startsWith(`https://${domain}`)
       ? name
       : `${name}@${data.url ? new URL(data.url).hostname : ""}`,
     rawData: JSON.stringify(data),
-    inboxUrl: data?.inbox,
+    inboxUrl: data.inbox,
     name,
-    summary: data?.summary,
-    url: data?.url,
-    publicKeyPem: data?.publicKey?.publicKeyPem,
-    iconUrl: data?.icon?.url,
+    summary: data.summary ?? "",
+    url: data.url,
+    publicKeyPem: data.publicKey?.publicKeyPem,
+    iconUrl: data.icon?.url,
   });
 };

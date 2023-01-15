@@ -12,9 +12,19 @@ export const deliveryActivityToFollowers = async (
 
   await Promise.allSettled(
     followers.map(async (follower) => {
+      const actor = await ctx.state.app.actorRepository.findByUserId(
+        follower.userId
+      );
+      if (!actor) {
+        ctx.log.error(
+          `deliveryActivityToFollowers: actor not found: ${follower.userId}`
+        );
+        return;
+      }
+
       const { data, error } =
         await ctx.state.app.deliveryClient.deliveryActivity(
-          follower.userId,
+          actor.inboxUrl,
           activity
         );
       if (error) {

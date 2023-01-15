@@ -9,17 +9,17 @@ export class ActorTable {
   @Column({ nullable: true })
   rawData?: string;
 
-  @Column({ nullable: true })
-  inboxUrl?: string;
+  @Column()
+  inboxUrl: string;
 
-  @Column({ nullable: true })
-  name?: string;
+  @Column()
+  name: string;
 
-  @Column({ nullable: true })
-  summary?: string;
+  @Column()
+  summary: string;
 
-  @Column({ nullable: true })
-  url?: string;
+  @Column()
+  url: string;
 
   @Column({ nullable: true })
   publicKeyPem?: string;
@@ -56,12 +56,12 @@ export class ActorTable {
 
 export const newActorRepository = (repo: Repository<ActorTable>) => {
   return {
-    findByUserId: async (federatedId: string) => {
-      const actor = await repo.findOneBy({ userId: federatedId });
+    findByUserId: async (userId: string) => {
+      const actor = await repo.findOneBy({ userId });
       return actor?.toModel();
     },
-    findByUserIds: async (federatedIds: string[]) => {
-      const actors = await repo.findBy({ userId: In(federatedIds) });
+    findByUserIds: async (userIds: string[]) => {
+      const actors = await repo.findBy({ userId: In(userIds) });
       return actors.map((actor) => actor.toModel());
     },
     save: async (actor: Actor) => {

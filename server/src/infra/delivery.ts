@@ -1,5 +1,4 @@
 import { Activity } from "../../../shared/model/activity";
-import { getInbox } from "../handler/ap/api";
 import { signedFetcher } from "../handler/ap/signedFetcher";
 
 export const newDeliveryClient = (signKey: {
@@ -7,12 +6,7 @@ export const newDeliveryClient = (signKey: {
   keyId: string;
 }) => {
   return {
-    deliveryActivity: async (to: string, activity: Activity) => {
-      const { data: inbox, error: inboxError } = await getInbox(to);
-      if (!inbox) {
-        return { error: inboxError };
-      }
-
+    deliveryActivity: async (inbox: string, activity: Activity) => {
       return await signedFetcher(signKey, inbox, {
         method: "post",
         body: activity,

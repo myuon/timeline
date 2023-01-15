@@ -89,6 +89,13 @@ describe("api", () => {
 
   describe("deliver to followers", () => {
     before(async () => {
+      await appContext.actorRepository.save({
+        userId: "test@example.com",
+        name: "test",
+        inboxUrl: "https://example.com/inbox",
+        summary: "",
+        url: "https://example.com",
+      });
       await appContext.followRelationRepository.create({
         userId: "test@example.com",
         targetUserId: userId,
@@ -108,7 +115,7 @@ describe("api", () => {
         .expect(201);
 
       assert.equal(delivered.length, 1);
-      assert.equal(delivered[0].to, "test@example.com");
+      assert.equal(delivered[0].to, "https://example.com/inbox");
       assert.equal(delivered[0].activity.type, "Create");
       assert.match(
         (delivered[0].activity as any).id,
