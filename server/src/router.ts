@@ -346,7 +346,9 @@ export const newRouter = (options?: IRouterOptions) => {
       return;
     }
 
-    const actor = await ctx.state.app.actorRepository.findByUrl(activity.actor);
+    const actor = await ctx.state.app.actorRepository.findByFederatedId(
+      activity.actor
+    );
     if (!actor) {
       await syncActor(ctx, activity.actor);
     }

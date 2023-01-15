@@ -13,14 +13,14 @@ export const follow = async (app: App, ctx: Context, activity: Activity) => {
     ctx.throw(400, "Bad request");
   }
 
-  const objectActor = await app.actorRepository.findByUrl(
+  const objectActor = await app.actorRepository.findByFederatedId(
     activity.object as string
   );
   if (!objectActor) {
     ctx.throw(404, `Actor not found: ${activity.object}`);
   }
 
-  const actor = await app.actorRepository.findByUrl(activity.actor);
+  const actor = await app.actorRepository.findByFederatedId(activity.actor);
   if (!actor) {
     ctx.throw(404, `Actor not found: ${activity.actor}`);
   }
