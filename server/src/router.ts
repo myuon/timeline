@@ -50,6 +50,11 @@ export const newRouter = (options?: IRouterOptions) => {
       root: path.resolve(__dirname, "..", "..", "web"),
     });
   });
+  router.get("/manifest.json", async (ctx) => {
+    await send(ctx, "manifest.webmanifest", {
+      root: path.resolve(__dirname, "..", "..", "web"),
+    });
+  });
   router.get("/.well-known/host-meta", async (ctx) => {
     ctx.set("Content-Type", "application/xrd+xml");
     ctx.body = `<?xml version="1.0" encoding="UTF-8"?>
