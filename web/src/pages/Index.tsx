@@ -14,7 +14,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { ANote } from "./features/note/Note";
 import { useMe } from "../api/api";
-import timelineImage from "../assets/timeline.png";
+import timelineImage from "../../public/timeline.png";
 
 export const IndexPage = () => {
   useAuthGuard();

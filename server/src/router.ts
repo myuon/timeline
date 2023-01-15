@@ -45,14 +45,9 @@ const requireAuth = (ctx: Context) => {
 export const newRouter = (options?: IRouterOptions) => {
   const router = new Router<{ app: App; auth?: any }>(options);
 
-  router.get("/manifest.json", async (ctx) => {
-    await send(ctx, "manifest.json", {
-      root: path.resolve(__dirname, "..", "assets"),
-    });
-  });
-  router.get("/favicon.ico", async (ctx) => {
-    await send(ctx, "favicon.ico", {
-      root: path.resolve(__dirname, "..", "assets"),
+  router.get("/manifest.webmanifest", async (ctx) => {
+    await send(ctx, "manifest.webmanifest", {
+      root: path.resolve(__dirname, "..", "..", "web"),
     });
   });
   router.get("/.well-known/host-meta", async (ctx) => {

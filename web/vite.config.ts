@@ -13,9 +13,9 @@ export default defineConfig({
     pluginRewriteAll(),
     VitePWA({
       includeAssets: [
-        "favicon.svg",
-        "android-chrome-96x96.png",
-        "apple-touch-icon.png",
+        "/web/favicon.ico",
+        "/web/android-chrome-96x96.png",
+        "/web/apple-touch-icon.png",
       ],
       manifest: {
         name: "timeline",
@@ -25,12 +25,12 @@ export default defineConfig({
         background_color: "#242424",
         icons: [
           {
-            src: "/android-chrome-96x96.png",
+            src: "/web/android-chrome-96x96.png",
             sizes: "96x96",
             type: "image/png",
           },
           {
-            src: "/apple-touch-icon.png",
+            src: "/web/apple-touch-icon.png",
             sizes: "114x114",
             type: "image/png",
           },
