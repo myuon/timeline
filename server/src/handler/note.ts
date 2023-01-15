@@ -4,7 +4,7 @@ import { CreateNoteRequest } from "../../../shared/request/note";
 import { z } from "zod";
 import { App } from "./app";
 import { ulid } from "ulid";
-import { domain, userFirebaseId, userName } from "../config";
+import { userFirebaseId, userId } from "../config";
 import { Note } from "../../../shared/model/note";
 import dayjs from "dayjs";
 import { transformContent } from "../helper/transform";
@@ -26,7 +26,7 @@ export const createNote = async (app: App, ctx: Context) => {
 
   const note: Note = {
     id: ulid(),
-    userId: `https://${domain}/u/${userName}`,
+    userId,
     content: transformContent(result.data.content),
     rawContent: result.data.content,
     createdAt: dayjs().unix(),

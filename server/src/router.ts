@@ -394,7 +394,7 @@ export const newRouter = (options?: IRouterOptions) => {
     // = create an inbox item
     await ctx.state.app.inboxItemRepository.create({
       id: ulid(),
-      userId: userId,
+      userId,
       type: "Note",
       itemId: note.id,
       createdAt: dayjs().unix(),
@@ -451,7 +451,7 @@ export const newRouter = (options?: IRouterOptions) => {
     const activity = serializeDeleteNoteActivity(
       userIdUrl,
       ctx.params.id,
-      `${userId}/s/${ctx.params.id}`
+      `${userIdUrl}/s/${ctx.params.id}`
     );
     const followers =
       await ctx.state.app.followRelationRepository.findFollowers(userId);
