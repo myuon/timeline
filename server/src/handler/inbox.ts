@@ -13,16 +13,21 @@ export const follow = async (app: App, ctx: Context, activity: Activity) => {
     ctx.throw(400, "Bad request");
   }
 
-  const actor = await app.actorRepository.findByUserId(
+  const objectActor = await app.actorRepository.findByUrl(
     activity.object as string
   );
-  if (!actor) {
+  if (!objectActor) {
     ctx.throw(404, `Actor not found: ${activity.object}`);
   }
 
+  const actor = await app.actorRepository.findByUrl(activity.actor);
+  if (!actor) {
+    ctx.throw(404, `Actor not found: ${activity.actor}`);
+  }
+
   const followRelation = {
-    userId: activity.actor,
-    targetUserId: userId,
+    userId: actor.userId,
+    targetUserId: objectActor.userId,
     createdAt: dayjs().unix(),
   };
   await app.followRelationRepository.save(followRelation);
