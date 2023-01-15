@@ -24,7 +24,7 @@ import {
   newInboxItemRepository,
 } from "./src/infra/inboxRepository";
 import { userActor } from "./src/config";
-import { ShareTable } from "./src/infra/shareRepository";
+import { newShareRepository, ShareTable } from "./src/infra/shareRepository";
 
 const dataSource = new DataSource({
   type: "sqlite",
@@ -80,6 +80,7 @@ app.use(async (ctx, next) => {
       inboxItemRepository: newInboxItemRepository(
         dataSource.getRepository(InboxItemTable)
       ),
+      shareRepository: newShareRepository(dataSource.getRepository(ShareTable)),
     } as App;
 
     await (ctx.state.app as App).actorRepository.save(userActor);

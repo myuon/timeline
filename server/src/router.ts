@@ -7,7 +7,14 @@ import { App } from "./handler/app";
 import { z } from "zod";
 import { schemaForType } from "./helper/zod";
 import { create, follow } from "./handler/inbox";
-import { domain, userActor, userId, userIdUrl, userName } from "./config";
+import {
+  domain,
+  userActor,
+  userFirebaseId,
+  userId,
+  userIdUrl,
+  userName,
+} from "./config";
 import { parseBody } from "./middleware/parseBody";
 import {
   serializeAnnounceActivity,
@@ -469,7 +476,7 @@ export const newRouter = (options?: IRouterOptions) => {
   router.post("/api/note/:id/announce", async (ctx) => {
     requireAuth(ctx);
 
-    if (ctx.state.auth.userId !== userId) {
+    if (ctx.state.auth.sub !== userFirebaseId) {
       ctx.throw(403, "Forbidden");
       return;
     }

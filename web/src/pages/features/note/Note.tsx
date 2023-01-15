@@ -10,10 +10,12 @@ dayjs.extend(relativeTime);
 export const ANote = ({
   actor,
   note,
+  onAnnounce,
   onDelete,
 }: {
   actor?: Actor;
   note?: Note;
+  onAnnounce?: () => void;
   onDelete?: () => void;
 }) => (
   <div
@@ -80,9 +82,19 @@ export const ANote = ({
           justify-content: flex-end;
         `}
       >
-        <button onClick={onDelete}>
-          <i className="bi-trash" />
-        </button>
+        <div
+          css={css`
+            display: flex;
+            gap: 16px;
+          `}
+        >
+          <button onClick={onAnnounce}>
+            <i className="bi-megaphone" />
+          </button>
+          <button onClick={onDelete}>
+            <i className="bi-trash" />
+          </button>
+        </div>
       </div>
     </div>
   </div>

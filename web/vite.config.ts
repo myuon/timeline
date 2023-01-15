@@ -17,5 +17,8 @@ export default defineConfig({
   // adhoc configuration for integrated dev server
   server: {
     port: 5173,
+    hmr: {
+      port: 5173,
+    },
   },
 });

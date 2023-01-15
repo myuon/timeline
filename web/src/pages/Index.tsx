@@ -250,6 +250,15 @@ export const IndexPage = () => {
                 <ANote
                   actor={item.actor}
                   note={item.note}
+                  onAnnounce={async () => {
+                    await fetch(`/api/note/${item.note?.id}/announce`, {
+                      method: "POST",
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                      },
+                    });
+                  }}
                   onDelete={async () => {
                     const ok = window.confirm("本当に削除しますか？");
                     console.log(item.note);
