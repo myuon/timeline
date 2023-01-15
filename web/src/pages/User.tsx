@@ -50,7 +50,33 @@ export const UserPage = () => {
     >
       <Link to="/">INDEX</Link>
 
-      <h2>/u/{username}</h2>
+      <div
+        css={css`
+          display: flex;
+          gap: 8px;
+          align-items: center;
+        `}
+      >
+        <h2>/u/{username}</h2>
+        <button
+          onClick={async () => {
+            await fetch(`/api/user/${username}/sync`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/activity+json",
+                Authorization: `Bearer ${token}`,
+              },
+            });
+          }}
+        >
+          <i
+            className="bi-arrow-repeat"
+            css={css`
+              font-size: 24px;
+            `}
+          />
+        </button>
+      </div>
 
       <div
         css={css`

@@ -25,6 +25,7 @@ import { Activity } from "../../shared/model/activity";
 import { TimelineObject } from "../../shared/model/timeline";
 import { ApiFollowRequest } from "../../shared/request/follow";
 import { fetcher } from "./helper/fetcher";
+import { syncActor } from "./handler/actor";
 
 const requireAuth = (ctx: Context) => {
   if (!ctx.state.auth) {
@@ -323,23 +324,7 @@ export const newRouter = (options?: IRouterOptions) => {
 
     const actor = await ctx.state.app.actorRepository.findByUrl(activity.actor);
     if (!actor) {
-      const { data, error } = await getActor(activity.actor);
-      if (!data || error) {
-        ctx.log.warn(error);
-        ctx.throw(400, "Failed to get actor");
-        return;
-      }
-
-      await ctx.state.app.actorRepository.save({
-        userId: data?.id,
-        rawData: JSON.stringify(data),
-        inboxUrl: data?.inbox,
-        name: data?.name,
-        summary: data?.summary,
-        url: data?.url,
-        publicKeyPem: data?.publicKey?.publicKeyPem,
-        iconUrl: data?.icon?.url,
-      });
+      await syncActor(ctx, activity.actor);
     }
 
     if (activity.type === "Follow") {
@@ -595,6 +580,10 @@ export const newRouter = (options?: IRouterOptions) => {
     const href = resourceData.links.find(
       (link: any) => link.rel === "self"
     )?.href;
+
+    await syncActor(ctx, href);
+
+    ctx.status = 204;
   });
 
   router.post("/api/migrate", async (ctx) => {
