@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn, Repository, Unique } from "typeorm";
+import { Column, Entity, In, PrimaryColumn, Repository, Unique } from "typeorm";
 import { Share } from "../../../shared/model/share";
 
 @Entity()
@@ -45,9 +45,9 @@ export const newShareRepository = (repo: Repository<ShareTable>) => {
       const shares = await repo.findBy({ noteId });
       return shares.map((share) => share.toModel());
     },
-    findByUserIdAndNoteId: async (userId: string, noteId: string) => {
-      const share = await repo.findOneBy({ userId, noteId });
-      return share?.toModel();
+    findByIds: async (ids: string[]) => {
+      const shares = await repo.findBy({ id: In(ids) });
+      return shares.map((share) => share.toModel());
     },
     create: async (share: Share) => {
       const shareTable = ShareTable.fromModel(share);

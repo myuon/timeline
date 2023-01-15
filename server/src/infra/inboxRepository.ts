@@ -52,7 +52,7 @@ export const newInboxItemRepository = (repo: Repository<InboxItemTable>) => {
         page: number;
         size: number;
         since?: number;
-        type?: string;
+        types?: string[];
       }
     ) {
       const query = repo
@@ -64,8 +64,8 @@ export const newInboxItemRepository = (repo: Repository<InboxItemTable>) => {
       if (condition.since) {
         query.andWhere("inbox.createdAt > :since", { since: condition.since });
       }
-      if (condition.type) {
-        query.andWhere("inbox.type = :type", { type: condition.type });
+      if (condition.types) {
+        query.andWhere("inbox.type IN (:...types)", { types: condition.types });
       }
       const items = await query.getMany();
       return items.map((item) => item.toModel());

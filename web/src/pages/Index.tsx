@@ -25,7 +25,7 @@ export const IndexPage = () => {
       const params = new URLSearchParams({
         page: `0`,
         size: `10`,
-        type: "Note",
+        type: "Note,Share",
       });
 
       const resp = await fetch(`/api/timeline/note?${params}`, {
@@ -248,6 +248,7 @@ export const IndexPage = () => {
                 `}
               >
                 <ANote
+                  type={item.type}
                   actor={item.actor}
                   note={item.note}
                   onAnnounce={async () => {

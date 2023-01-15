@@ -543,25 +543,44 @@ export const newRouter = (options?: IRouterOptions) => {
         page: Number(ctx.query.page),
         size: Number(ctx.query.size),
         since: Number(ctx.query.since),
-        type: ctx.query.type as string,
+        types: (ctx.query.type as string).split(","),
       }
     );
-    const notes = await ctx.state.app.noteRepository.findByIds(
-      items.map((item) => item.itemId)
+    const shares = await ctx.state.app.shareRepository.findByIds(
+      items.filter((item) => item.type === "Share").map((item) => item.itemId)
     );
+    const notes = await ctx.state.app.noteRepository.findByIds([
+      ...items
+        .filter((item) => item.type === "Note")
+        .map((item) => item.itemId),
+      ...shares.map((share) => share.noteId),
+    ]);
     const actors = await ctx.state.app.actorRepository.findByUserIds(
       notes.map((note) => note.userId)
     );
 
     ctx.body = items.map((item) => {
-      const note = notes.find((note) => note.id === item.itemId);
-      const actor = actors.find((actor) => actor.userId === note?.userId);
+      if (item.type === "Note") {
+        const note = notes.find((note) => note.id === item.itemId);
+        const actor = actors.find((actor) => actor.userId === note?.userId);
 
-      return {
-        ...item,
-        note,
-        actor,
-      };
+        return {
+          ...item,
+          note,
+          actor,
+        };
+      } else if (item.type === "Share") {
+        const share = shares.find((share) => share.id === item.itemId);
+        const note = notes.find((note) => note.id === share?.noteId);
+        const actor = actors.find((actor) => actor.userId === share?.userId);
+
+        return {
+          ...item,
+          share,
+          note,
+          actor,
+        };
+      }
     }) as TimelineObject[];
   });
   router.post("/api/follow", koaBody(), async (ctx) => {
