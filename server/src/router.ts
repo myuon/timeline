@@ -127,11 +127,11 @@ export const newRouter = (options?: IRouterOptions) => {
         "https://w3id.org/security/v1",
       ],
       type: "Person",
-      id: userId,
-      following: `${userId}/following`,
-      followers: `${userId}/followers`,
-      inbox: `${userId}/inbox`,
-      outbox: `${userId}/outbox`,
+      id: userIdUrl,
+      following: `${userIdUrl}/following`,
+      followers: `${userIdUrl}/followers`,
+      inbox: `${userIdUrl}/inbox`,
+      outbox: `${userIdUrl}/outbox`,
       preferredUsername: userName,
       name: userName,
       summary: `@${userName} on ${domain}`,
@@ -140,11 +140,11 @@ export const newRouter = (options?: IRouterOptions) => {
         mediaType: "image/png",
         url: "https://pbs.twimg.com/profile_images/1398634166523097090/QhosMWKS_400x400.jpg",
       },
-      url: userId,
+      url: userIdUrl,
       publicKey: {
-        id: `${userId}#main-key`,
+        id: `${userIdUrl}#main-key`,
         type: "Key",
-        owner: userId,
+        owner: userIdUrl,
         publicKeyPem: fs.readFileSync(
           path.join(__dirname, "../../.secrets/public.pem"),
           "utf-8"
@@ -634,13 +634,15 @@ export const newRouter = (options?: IRouterOptions) => {
   router.post("/api/user/:userId/sync", async (ctx) => {
     requireAuth(ctx);
 
-    const userId = ctx.params.userId;
-    const domain = userId.split("@")[1];
+    const userId = ctx.params.userId.includes("@")
+      ? ctx.params.userId
+      : `${ctx.params.userId}@${domain}`;
+    const userDomain = userId.split("@")[1];
 
-    const { data } = await fetcher(
-      `https://${domain}/.well-known/webfinger?resource=acct:${userId}`
-    );
+    const webfingerUrl = `https://${userDomain}/.well-known/webfinger?resource=acct:${userId}`;
+    const { data, error } = await fetcher(webfingerUrl);
     if (!data) {
+      console.log(`url: ${webfingerUrl}, error: ${JSON.stringify(error)}`);
       ctx.throw(400, "Failed to fetch webfinger");
       return;
     }

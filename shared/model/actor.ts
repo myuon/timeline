@@ -7,4 +7,5 @@ export interface Actor {
   url: string;
   publicKeyPem?: string;
   iconUrl?: string;
+  federatedId?: string;
 }

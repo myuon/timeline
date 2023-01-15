@@ -1,4 +1,3 @@
-import { domain } from "../config";
 import { getActor } from "./ap/api";
 import { Context } from "./app";
 
@@ -23,9 +22,7 @@ export const syncActor = async (ctx: Context, url: string) => {
   }
 
   await ctx.state.app.actorRepository.save({
-    userId: url.startsWith(`https://${domain}`)
-      ? name
-      : `${name}@${data.url ? new URL(data.url).hostname : ""}`,
+    userId: `${name}@${new URL(data.id).hostname}`,
     rawData: JSON.stringify(data),
     inboxUrl: data.inbox,
     name,
@@ -33,5 +30,6 @@ export const syncActor = async (ctx: Context, url: string) => {
     url: data.url,
     publicKeyPem: data.publicKey?.publicKeyPem,
     iconUrl: data.icon?.url,
+    federatedId: data.id,
   });
 };

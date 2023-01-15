@@ -27,6 +27,9 @@ export class ActorTable {
   @Column({ nullable: true })
   iconUrl?: string;
 
+  @Column({ nullable: true })
+  federatedId?: string;
+
   static fromModel(actor: Actor): ActorTable {
     const actorTable = new ActorTable();
     actorTable.userId = actor.userId;
@@ -37,6 +40,7 @@ export class ActorTable {
     actorTable.url = actor.url;
     actorTable.publicKeyPem = actor.publicKeyPem;
     actorTable.iconUrl = actor.iconUrl;
+    actorTable.federatedId = actor.federatedId;
     return actorTable;
   }
 
@@ -50,6 +54,7 @@ export class ActorTable {
       url: this.url,
       publicKeyPem: this.publicKeyPem,
       iconUrl: this.iconUrl,
+      federatedId: this.federatedId,
     };
   }
 }
