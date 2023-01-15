@@ -8,12 +8,16 @@ import { deliveryActivity } from "./ap/delivery";
 import { Note } from "../../../shared/model/note";
 
 export const follow = async (app: App, ctx: Context, activity: Activity) => {
-  if (activity.object !== userId) {
+  if (!activity.object || !activity.actor) {
+    ctx.log.warn(`${JSON.stringify(activity)}`);
     ctx.throw(400, "Bad request");
   }
 
-  if (!activity.actor) {
-    ctx.throw(400, "Bad request");
+  const actor = await app.actorRepository.findByUserId(
+    activity.object as string
+  );
+  if (!actor) {
+    ctx.throw(404, `Actor not found: ${activity.object}`);
   }
 
   const followRelation = {
