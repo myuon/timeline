@@ -149,7 +149,26 @@ export const UserPage = () => {
                 <Interweave content={actor?.summary} />
               </div>
 
-              <div>{me?.name !== username && <Button>フォロー</Button>}</div>
+              <div>
+                {me?.name !== username && (
+                  <Button
+                    onClick={async () => {
+                      await fetch("/api/follow", {
+                        method: "POST",
+                        body: JSON.stringify({
+                          id: username,
+                        }),
+                        headers: {
+                          Authorization: `Bearer ${token}`,
+                          "Content-Type": "application/json",
+                        },
+                      });
+                    }}
+                  >
+                    フォロー
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </div>
