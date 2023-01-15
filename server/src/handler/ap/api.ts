@@ -34,15 +34,39 @@ interface ApActor {
   following?: string;
   icon?: {
     url?: string;
-  };
-  name?: string;
+  } | null;
+  name?: string | null;
   preferredUsername?: string;
   publicKey?: {
     publicKeyPem?: string;
   };
-  summary?: string;
+  summary?: string | null;
   url?: string;
 }
+
+export const schemaApActor = schemaForType<ApActor>()(
+  z.object({
+    id: z.string(),
+    inbox: z.string().optional(),
+    followers: z.string().optional(),
+    following: z.string().optional(),
+    icon: z
+      .object({
+        url: z.string().optional(),
+      })
+      .nullable()
+      .optional(),
+    name: z.string().optional().nullable(),
+    preferredUsername: z.string().optional(),
+    publicKey: z
+      .object({
+        publicKeyPem: z.string().optional(),
+      })
+      .optional(),
+    summary: z.string().nullable().optional(),
+    url: z.string().optional(),
+  })
+);
 
 export const getActor = async (
   actor: string
@@ -56,29 +80,7 @@ export const getActor = async (
     return { error };
   }
 
-  const schema = schemaForType<ApActor>()(
-    z.object({
-      id: z.string(),
-      inbox: z.string().optional(),
-      followers: z.string().optional(),
-      following: z.string().optional(),
-      icon: z
-        .object({
-          url: z.string().optional(),
-        })
-        .optional(),
-      name: z.string().optional(),
-      preferredUsername: z.string().optional(),
-      publicKey: z
-        .object({
-          publicKeyPem: z.string().optional(),
-        })
-        .optional(),
-      summary: z.string().optional(),
-      url: z.string().optional(),
-    })
-  );
-  const result = schema.safeParse(JSON.parse(data));
+  const result = schemaApActor.safeParse(JSON.parse(data));
   if (!result.success) {
     return { error: result.error };
   }
