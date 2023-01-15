@@ -1,30 +1,17 @@
-import Koa from "koa";
+import Koa, { Middleware } from "koa";
 import mount from "koa-mount";
 import logger from "koa-pino-logger";
-import { authJwt } from "./middleware/auth";
 import { serveStaticProd } from "./middleware/serve";
 import { newRouter } from "./router";
 import proxy from "koa-proxies";
-import { DataSource } from "typeorm";
-import { Auth } from "firebase-admin/lib/auth/auth";
 import path from "path";
-import { newNoteRepository, NoteTable } from "./infra/noteRepository";
-import {
-  FollowRelationTable,
-  newFollowRelationRepository,
-} from "./infra/followRelationRepository";
-import { ActorTable, newActorRepository } from "./infra/actorRepository";
-import {
-  InboxItemTable,
-  newInboxItemRepository,
-} from "./infra/inboxRepository";
-import { newShareRepository, ShareTable } from "./infra/shareRepository";
 import { userActor } from "./config";
 import { App } from "./handler/app";
-import { newDeliveryClient } from "./infra/delivery";
-import { signKey } from "./handler/ap/delivery";
 
-export const newApp = (auth: Auth | undefined, dataSource: DataSource) => {
+export const newApp = (
+  authMiddleware: Middleware | undefined,
+  appContext: App
+) => {
   const app = new Koa();
   app.use(logger());
 
@@ -32,8 +19,8 @@ export const newApp = (auth: Auth | undefined, dataSource: DataSource) => {
     prefix: "",
   });
 
-  if (auth) {
-    app.use(authJwt(auth));
+  if (authMiddleware) {
+    app.use(authMiddleware);
   }
   app.use(
     mount(
@@ -52,22 +39,7 @@ export const newApp = (auth: Auth | undefined, dataSource: DataSource) => {
         })(ctx, next);
       }
     } else {
-      ctx.state.app = {
-        noteRepository: newNoteRepository(dataSource.getRepository(NoteTable)),
-        followRelationRepository: newFollowRelationRepository(
-          dataSource.getRepository(FollowRelationTable)
-        ),
-        actorRepository: newActorRepository(
-          dataSource.getRepository(ActorTable)
-        ),
-        inboxItemRepository: newInboxItemRepository(
-          dataSource.getRepository(InboxItemTable)
-        ),
-        shareRepository: newShareRepository(
-          dataSource.getRepository(ShareTable)
-        ),
-        deliveryClient: newDeliveryClient(signKey),
-      } as App;
+      ctx.state.app = appContext;
 
       await (ctx.state.app as App).actorRepository.save(userActor);
 
