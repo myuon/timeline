@@ -271,7 +271,11 @@ export const newRouter = (options?: IRouterOptions) => {
     const { data, error: actorError } = await getActor(keyId);
     const publicKeyPem = data?.publicKey?.publicKeyPem;
     if (actorError || !publicKeyPem) {
-      ctx.log.info(`(getKeyId) data: ${data}, error: ${actorError}`);
+      ctx.log.info(
+        `(getKeyId) data: ${JSON.stringify(data)}, error: ${JSON.stringify(
+          actorError
+        )}`
+      );
       ctx.throw(400, "Invalid keyId");
       return;
     }
