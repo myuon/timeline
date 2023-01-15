@@ -24,11 +24,18 @@ import {
   newInboxItemRepository,
 } from "./src/infra/inboxRepository";
 import { userActor } from "./src/config";
+import { ShareTable } from "./src/infra/shareRepository";
 
 const dataSource = new DataSource({
   type: "sqlite",
   database: path.join(__dirname, "db.sqlite"),
-  entities: [NoteTable, FollowRelationTable, ActorTable, InboxItemTable],
+  entities: [
+    NoteTable,
+    FollowRelationTable,
+    ActorTable,
+    InboxItemTable,
+    ShareTable,
+  ],
   logging: true,
   synchronize: true,
 });
