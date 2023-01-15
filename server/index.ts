@@ -56,7 +56,7 @@ const router = newRouter({
 app.use(authJwt(auth));
 app.use(
   mount(
-    "/assets",
+    "/serverassets",
     serveStatic({
       path: path.resolve(__dirname, "assets"),
     })

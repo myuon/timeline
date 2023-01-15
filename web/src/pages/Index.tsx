@@ -229,7 +229,7 @@ export const IndexPage = () => {
             `}
           >
             <img
-              src="/assets/timeline.png"
+              src="/serverassets/timeline.png"
               alt=""
               css={css`
                 display: flex;
