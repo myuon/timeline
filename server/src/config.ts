@@ -15,4 +15,5 @@ export const userActor: Actor = {
   name: userName,
   summary: `${userName} @ ${domain}`,
   url: userIdUrl,
+  federatedId: userIdUrl,
 };
