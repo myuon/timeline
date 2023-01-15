@@ -14,6 +14,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { ANote } from "./features/note/Note";
 import { useMe } from "../api/api";
+import timelineImage from "../assets/timeline.png";
 
 export const IndexPage = () => {
   useAuthGuard();
@@ -229,7 +230,7 @@ export const IndexPage = () => {
             `}
           >
             <img
-              src="/serverassets/timeline.png"
+              src={timelineImage}
               alt=""
               css={css`
                 display: flex;

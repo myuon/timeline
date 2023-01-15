@@ -64,7 +64,7 @@ app.use(
 );
 app.use(
   mount(
-    "/web/assets",
+    "/web/serverassets",
     serveStatic({
       path: path.resolve(__dirname, "assets"),
     })
