@@ -1,7 +1,8 @@
-import { agent } from "supertest";
+import supertest from "supertest";
 import { newApp } from "../src/app";
 import { DataSource } from "typeorm";
 import { entities } from "../src/infra/db";
+import { domain } from "../src/config";
 
 const dataSource = new DataSource({
   type: "sqlite",
@@ -13,14 +14,30 @@ const dataSource = new DataSource({
 
 const app = newApp(undefined, dataSource);
 const server = app.listen(Math.floor(Math.random() * 10000));
-const request = agent(app);
+const request = supertest(server);
 
 describe("api", () => {
-  after(() => {
-    server.close();
+  before(async () => {
+    await dataSource.initialize();
+    await request.get("/manifest.json");
   });
 
-  it("/.well-known/nodeinfo", async (done) => {
-    await request.get("/.well-known/nodeinfo").expect(200).expect("{}", done);
+  after(async () => {
+    server.close();
+    await dataSource.destroy();
+  });
+
+  it("/.well-known/nodeinfo", async () => {
+    await request
+      .get("/.well-known/nodeinfo")
+      .timeout(10000)
+      .expect(200, {
+        links: [
+          {
+            rel: "http://nodeinfo.diaspora.software/ns/schema/2.1",
+            href: `https://${domain}/nodeinfo/2.1`,
+          },
+        ],
+      });
   });
 });
