@@ -4,7 +4,6 @@ import { Activity } from "../../../shared/model/activity";
 import { userId } from "../config";
 import dayjs from "dayjs";
 import { ulid } from "ulid";
-import { deliveryActivity } from "./ap/delivery";
 import { Note } from "../../../shared/model/note";
 
 export const follow = async (app: App, ctx: Context, activity: Activity) => {
@@ -38,9 +37,12 @@ export const follow = async (app: App, ctx: Context, activity: Activity) => {
     type: "Accept",
     actor: userId,
     object: activity,
-  };
+  } as Activity;
 
-  const { data, error } = await deliveryActivity(activity.actor, document);
+  const { data, error } = await app.deliveryClient.deliveryActivity(
+    activity.actor,
+    document
+  );
   if (error) {
     ctx.log.error(error);
     ctx.throw(500, "Internal server error");

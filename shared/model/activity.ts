@@ -1,5 +1,6 @@
 export interface Activity {
   type: string;
+  id?: string;
   published?: string;
   actor?: string;
   object?:

@@ -21,6 +21,7 @@ import {
 import { newShareRepository, ShareTable } from "./src/infra/shareRepository";
 import { newDeliveryClient } from "./src/infra/delivery";
 import { signKey } from "./src/handler/ap/delivery";
+import { newSigner } from "./src/infra/signer";
 
 const dataSource = new DataSource({
   type: "sqlite",
@@ -46,6 +47,7 @@ const app = newApp(authJwt(auth), {
   ),
   shareRepository: newShareRepository(dataSource.getRepository(ShareTable)),
   deliveryClient: newDeliveryClient(signKey),
+  signer: newSigner(),
 });
 
 const main = async () => {
