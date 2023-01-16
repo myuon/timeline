@@ -191,5 +191,39 @@ describe("api", () => {
       assert.equal(delivered[0].activity.type, "Accept");
       assert.equal(delivered[0].activity.actor, userIdUrl);
     });
+
+    it("GET /u/:userName", async () => {
+      const resp = await request.get(`/u/${userName}`).expect(200);
+      const body = resp.body;
+
+      assert.deepEqual(body, {
+        "@context": [
+          "https://www.w3.org/ns/activitystreams",
+          "https://w3id.org/security/v1",
+        ],
+        followers: "https://tl.ramda.io/u/myuon/followers",
+        following: "https://tl.ramda.io/u/myuon/following",
+        icon: {
+          mediaType: "image/png",
+          type: "Image",
+          url: "https://pbs.twimg.com/profile_images/1398634166523097090/QhosMWKS_400x400.jpg",
+        },
+        id: "https://tl.ramda.io/u/myuon",
+        inbox: "https://tl.ramda.io/u/myuon/inbox",
+        name: "myuon",
+        outbox: "https://tl.ramda.io/u/myuon/outbox",
+        preferredUsername: "myuon",
+        publicKey: {
+          id: "https://tl.ramda.io/u/myuon#main-key",
+          owner: "https://tl.ramda.io/u/myuon",
+          publicKeyPem:
+            "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAx8F5dC8js0yM3HlpQuan\n7j9bQAPaH39loiHLssRm5vvSZSVVNODi9ch3PrKlW44aXd6puQjT8cyAkuzigloK\nU+iI2cnd/nCIvXe3qONysIMbYwV1gtoccdBOZMQ8UDW3VtcT2oWdE8cGjAeAdoaN\nM7bx3gDq1Qw9X6nlzkhL9rvLp4yaVWNmsR0fpCkZw9l3wQA441UryKMo2eZ/5zUj\n185d4JWAMXjH7Xqw/ufJPly3wphJYvN3YQaw+Ryij7ruvnL1WWwUNxxb3hihmS7x\nuAeSZcVr5Xh1A/wjGU+3OU2kg20nrjkxqK6kpnhp7yrPUBMSjF9CeDKSgBRAcBZQ\nywIDAQAB\n-----END PUBLIC KEY-----\n",
+          type: "Key",
+        },
+        summary: "@myuon on tl.ramda.io",
+        type: "Person",
+        url: "https://tl.ramda.io/u/myuon",
+      });
+    });
   });
 });
