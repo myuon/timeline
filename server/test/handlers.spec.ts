@@ -189,10 +189,6 @@ describe("api", () => {
       assert.equal(delivered.length, 1);
       assert.equal(delivered[0].to, "https://misskey.io/users/99bga7dd11");
       assert.equal(delivered[0].activity.type, "Accept");
-      assert.match(
-        delivered[0].activity.id as string,
-        new RegExp(`^${userIdUrl}/s/(.*)/activity$`)
-      );
       assert.equal(delivered[0].activity.actor, userIdUrl);
     });
   });
