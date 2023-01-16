@@ -69,7 +69,7 @@ const appContext: App = {
         ctx.throw(400, "invalid signature");
       }
 
-      return;
+      return undefined;
     },
   },
 };

@@ -252,7 +252,10 @@ export const newRouter = (options?: IRouterOptions) => {
   router.post("/u/:userName/inbox", parseBody, async (ctx) => {
     ctx.log.info("inbox request: " + JSON.stringify(ctx.request.body));
 
-    await ctx.state.app.signer.verify(ctx);
+    const verified = await ctx.state.app.signer.verify(ctx);
+    if (verified === "actor_gone") {
+      ctx.throw(204, "Actor is gone");
+    }
 
     const schema = schemaForType<Activity>()(
       z.object({

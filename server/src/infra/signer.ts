@@ -21,6 +21,10 @@ export const newSigner = () => {
         ctx.throw(400, "Missing keyId");
       }
       const { data, error: actorError } = await getActor(keyId);
+      if (!data) {
+        return "actor_gone";
+      }
+
       const publicKeyPem = data?.publicKey?.publicKeyPem;
       if (actorError || !publicKeyPem) {
         ctx.log.info(

@@ -70,12 +70,17 @@ export const schemaApActor = schemaForType<ApActor>()(
 
 export const getActor = async (
   actor: string
-): Promise<FetcherResult<ApActor>> => {
-  const { data, error } = await fetcher(actor, {
+): Promise<FetcherResult<ApActor | undefined>> => {
+  const { data, error, status } = await fetcher(actor, {
     headers: {
       Accept: "application/activity+json",
     },
   });
+  if (status === 410) {
+    // If actor is Gone, this is a deleted user and cannot get any more data
+    return { data: undefined };
+  }
+
   if (error || !data) {
     return { error };
   }
