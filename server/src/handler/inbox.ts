@@ -1,7 +1,7 @@
 import { Context } from "koa";
 import { App } from "./app";
 import { Activity } from "../../../shared/model/activity";
-import { userId, userIdUrl } from "../config";
+import { userIdUrl } from "../config";
 import dayjs from "dayjs";
 import { ulid } from "ulid";
 import { Note } from "../../../shared/model/note";
