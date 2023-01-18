@@ -39,7 +39,7 @@ export const follow = async (app: App, ctx: Context, activity: Activity) => {
   } as Activity;
 
   const { data, error } = await app.deliveryClient.deliveryActivity(
-    activity.actor,
+    actor.inboxUrl,
     document
   );
   if (error) {
