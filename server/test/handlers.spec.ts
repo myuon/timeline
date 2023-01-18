@@ -225,5 +225,12 @@ describe("api", () => {
         url: "https://tl.ramda.io/u/myuon",
       });
     });
+
+    it("POST /api/follow", async () => {
+      delivered = [];
+
+      const resp = await request.post("/api/follow").send({});
+      console.log(resp);
+    });
   });
 });

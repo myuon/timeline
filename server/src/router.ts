@@ -254,7 +254,9 @@ export const newRouter = (options?: IRouterOptions) => {
 
     const verified = await ctx.state.app.signer.verify(ctx);
     if (verified === "actor_gone") {
-      ctx.throw(204, "Actor is gone");
+      ctx.status = 204;
+      ctx.body = "Actor is gone";
+      return;
     }
 
     const schema = schemaForType<Activity>()(
