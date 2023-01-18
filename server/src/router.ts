@@ -524,14 +524,21 @@ export const newRouter = (options?: IRouterOptions) => {
     }
 
     const { id } = result.data;
-    const { error: actorError } = await getActor(id);
-    if (actorError) {
-      ctx.log.error(actorError);
+    const actor = await ctx.state.app.actorRepository.findByUserId(id);
+    if (!actor || !actor.federatedId) {
       ctx.throw(400, "Failed to get actor");
+      return;
     }
 
-    const activity = serializeFollowActivity(userId, ulid(), id);
-    const { data, error } = await deliveryActivity(id, activity);
+    const activity = serializeFollowActivity(
+      userIdUrl,
+      ulid(),
+      actor.federatedId
+    );
+    const { data, error } = await ctx.state.app.deliveryClient.deliveryActivity(
+      actor.inboxUrl,
+      activity
+    );
     if (error) {
       ctx.log.error(error);
       ctx.throw(400, "Failed to delivery activity");

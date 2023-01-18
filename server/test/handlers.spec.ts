@@ -62,6 +62,38 @@ const appContext: App = {
 
       return { data: undefined };
     },
+    getActor: async (url: string) => {
+      return {
+        data: {
+          "@context": [
+            "https://www.w3.org/ns/activitystreams",
+            "https://w3id.org/security/v1",
+          ],
+          followers: "https://tl.ramda.io/u/myuon/followers",
+          following: "https://tl.ramda.io/u/myuon/following",
+          icon: {
+            mediaType: "image/png",
+            type: "Image",
+            url: "https://pbs.twimg.com/profile_images/1398634166523097090/QhosMWKS_400x400.jpg",
+          },
+          id: "https://tl.ramda.io/u/myuon",
+          inbox: "https://tl.ramda.io/u/myuon/inbox",
+          name: "myuon",
+          outbox: "https://tl.ramda.io/u/myuon/outbox",
+          preferredUsername: "myuon",
+          publicKey: {
+            id: "https://tl.ramda.io/u/myuon#main-key",
+            owner: "https://tl.ramda.io/u/myuon",
+            publicKeyPem:
+              "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAx8F5dC8js0yM3HlpQuan\n7j9bQAPaH39loiHLssRm5vvSZSVVNODi9ch3PrKlW44aXd6puQjT8cyAkuzigloK\nU+iI2cnd/nCIvXe3qONysIMbYwV1gtoccdBOZMQ8UDW3VtcT2oWdE8cGjAeAdoaN\nM7bx3gDq1Qw9X6nlzkhL9rvLp4yaVWNmsR0fpCkZw9l3wQA441UryKMo2eZ/5zUj\n185d4JWAMXjH7Xqw/ufJPly3wphJYvN3YQaw+Ryij7ruvnL1WWwUNxxb3hihmS7x\nuAeSZcVr5Xh1A/wjGU+3OU2kg20nrjkxqK6kpnhp7yrPUBMSjF9CeDKSgBRAcBZQ\nywIDAQAB\n-----END PUBLIC KEY-----\n",
+            type: "Key",
+          },
+          summary: "@myuon on tl.ramda.io",
+          type: "Person",
+          url: "https://tl.ramda.io/u/myuon",
+        },
+      };
+    },
   },
   signer: {
     verify: async (ctx) => {
@@ -187,7 +219,10 @@ describe("api", () => {
         .expect(200);
 
       assert.equal(delivered.length, 1);
-      assert.equal(delivered[0].to, "https://misskey.io/users/99bga7dd11");
+      assert.equal(
+        delivered[0].to,
+        "https://misskey.io/users/99bga7dd11/inbox"
+      );
       assert.equal(delivered[0].activity.type, "Accept");
       assert.equal(delivered[0].activity.actor, userIdUrl);
     });
@@ -229,8 +264,16 @@ describe("api", () => {
     it("POST /api/follow", async () => {
       delivered = [];
 
-      const resp = await request.post("/api/follow").send({});
-      console.log(resp);
+      await request
+        .post("/api/follow")
+        .set("Authorization", "Bearer test_token")
+        .send({ id: "myuon@tl.ramda.io" })
+        .expect(204);
+      assert.equal(delivered.length, 1);
+      assert.equal(delivered[0].to, "https://tl.ramda.io/u/myuon/inbox");
+      assert.equal(delivered[0].activity.type, "Follow");
+      assert.equal(delivered[0].activity.actor, "https://tl.ramda.io/u/myuon");
+      assert.equal(delivered[0].activity.object, "https://tl.ramda.io/u/myuon");
     });
   });
 });
