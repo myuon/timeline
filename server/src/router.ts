@@ -22,12 +22,9 @@ import {
   serializeDeleteNoteActivity,
   serializeFollowActivity,
 } from "./handler/ap/activity";
-import { deliveryActivity } from "./handler/ap/delivery";
 import { Context } from "koa";
-import { getActor } from "./handler/ap/api";
 import { ulid } from "ulid";
 import dayjs from "dayjs";
-import { importVerifyKey, verifyHttpHeaders } from "./helper/signature";
 import { Person } from "../../shared/model/person";
 import { Activity } from "../../shared/model/activity";
 import { TimelineObject } from "../../shared/model/timeline";
@@ -443,10 +440,18 @@ export const newRouter = (options?: IRouterOptions) => {
 
     await Promise.allSettled(
       followers.map(async (follower) => {
-        const { data, error } = await deliveryActivity(
-          follower.userId,
-          activity
+        const actor = await ctx.state.app.actorRepository.findByUserId(
+          follower.userId
         );
+        if (!actor) {
+          return;
+        }
+
+        const { data, error } =
+          await ctx.state.app.deliveryClient.deliveryActivity(
+            actor.inboxUrl,
+            activity
+          );
         if (error) {
           ctx.log.error(error);
           return;

@@ -7,7 +7,11 @@ import {
   serializeFollowActivity,
   serializeUndoActivity,
 } from "./src/handler/ap/activity";
-import { deliveryActivity } from "./src/handler/ap/delivery";
+import { signKey } from "./src/handler/ap/delivery";
+import { newDeliveryClient } from "./src/infra/delivery";
+
+const deliveryClient = newDeliveryClient(signKey);
+const deliveryActivity = deliveryClient.deliveryActivity;
 
 export const run = async () => {
   const command = process.argv[2];
