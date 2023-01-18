@@ -1,5 +1,5 @@
-import { fetcher } from "../../helper/fetcher";
-import { importSignKey, signHttpHeaders } from "../../helper/signature";
+import { fetcher } from "./fetcher";
+import { importSignKey, signHttpHeaders } from "./signature";
 
 export const signedFetcher = async (
   signKey: {
