@@ -3,6 +3,7 @@ import { ActorRepository } from "../infra/actorRepository";
 import { DeliveryClient } from "../infra/delivery";
 import { FollowRelationRepository } from "../infra/followRelationRepository";
 import { InboxItemRepository } from "../infra/inboxRepository";
+import { JobScheduleRepository } from "../infra/jobScheduleRepository";
 import { NoteRepository } from "../infra/noteRepository";
 import { ShareRepository } from "../infra/shareRepository";
 import { Signer } from "../infra/signer";
@@ -15,6 +16,7 @@ export interface App {
   shareRepository: ShareRepository;
   deliveryClient: DeliveryClient;
   signer: Signer;
+  jobScheduleRepository: JobScheduleRepository;
 }
 
 export type Context = ParameterizedContext<{ app: App }>;
