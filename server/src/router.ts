@@ -700,26 +700,27 @@ export const newRouter = (options?: IRouterOptions) => {
     ctx.status = 204;
   });
 
-  router.post("/api/schedule", async (ctx) => {
+  router.post("/api/schedule", koaBody(), async (ctx) => {
     requireAuth(ctx);
 
     const schema = schemaForType<{
-      scheduleName: string;
+      name: string;
     }>()(
       z.object({
-        scheduleName: z.string(),
+        name: z.string(),
       })
     );
 
     const result = schema.safeParse(ctx.request.body);
     if (!result.success) {
+      ctx.log.error(result.error);
       ctx.throw(400, "Invalid request");
       return;
     }
 
     await ctx.state.app.jobScheduleRepository.create({
       id: ulid(),
-      name: result.data.scheduleName,
+      name: result.data.name,
       lastExecutedAt: 0,
     });
 
