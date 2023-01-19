@@ -682,5 +682,49 @@ export const newRouter = (options?: IRouterOptions) => {
     ctx.status = 204;
   });
 
+  router.post("/schedule", async (ctx) => {
+    const schedules = await ctx.state.app.jobScheduleRepository.findAll();
+
+    await Promise.all(
+      schedules.map(async (schedule) => {
+        if (dayjs.unix(schedule.lastExecutedAt).add(30, "m") < dayjs()) {
+          // run schedule
+
+          schedule.lastExecutedAt = dayjs().unix();
+
+          await ctx.state.app.jobScheduleRepository.save(schedule);
+        }
+      })
+    );
+
+    ctx.status = 204;
+  });
+
+  router.post("/api/schedule", async (ctx) => {
+    requireAuth(ctx);
+
+    const schema = schemaForType<{
+      scheduleName: string;
+    }>()(
+      z.object({
+        scheduleName: z.string(),
+      })
+    );
+
+    const result = schema.safeParse(ctx.request.body);
+    if (!result.success) {
+      ctx.throw(400, "Invalid request");
+      return;
+    }
+
+    await ctx.state.app.jobScheduleRepository.create({
+      id: ulid(),
+      name: result.data.scheduleName,
+      lastExecutedAt: 0,
+    });
+
+    ctx.status = 201;
+  });
+
   return router;
 };

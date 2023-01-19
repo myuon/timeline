@@ -1,5 +1,5 @@
 export interface JobSchedule {
-  scheduleId: string;
-  scheduleName: string;
+  id: string;
+  name: string;
   lastExecutedAt: number;
 }

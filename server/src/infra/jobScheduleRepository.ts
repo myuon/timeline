@@ -4,26 +4,26 @@ import { JobSchedule } from "../../../shared/model/jobScheduler";
 @Entity()
 export class JobScheduleTable {
   @PrimaryColumn({ length: 100 })
-  scheduleId: string;
+  id: string;
 
   @Column({ length: 255 })
-  scheduleName: string;
+  name: string;
 
   @Column()
   lastExecutedAt: number;
 
   static fromModel(model: JobSchedule): JobScheduleTable {
     const table = new JobScheduleTable();
-    table.scheduleId = model.scheduleId;
-    table.scheduleName = model.scheduleName;
+    table.id = model.id;
+    table.name = model.name;
     table.lastExecutedAt = model.lastExecutedAt;
     return table;
   }
 
   toModel(): JobSchedule {
     return {
-      scheduleId: this.scheduleId,
-      scheduleName: this.scheduleName,
+      id: this.id,
+      name: this.name,
       lastExecutedAt: this.lastExecutedAt,
     };
   }
