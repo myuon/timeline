@@ -1,6 +1,6 @@
 import assert from "assert";
 import supertest from "supertest";
-import { newApp } from "../src/app";
+import { initializeApp, newApp } from "../src/app";
 import { DataSource } from "typeorm";
 import { entities } from "../src/infra/db";
 import {
@@ -24,6 +24,10 @@ import {
 import { newShareRepository, ShareTable } from "../src/infra/shareRepository";
 import { Activity } from "../../shared/model/activity";
 import { App } from "../src/handler/app";
+import {
+  JobScheduleTable,
+  newJobScheduleRepository,
+} from "../src/infra/jobScheduleRepository";
 
 const dataSource = new DataSource({
   type: "sqlite",
@@ -104,6 +108,10 @@ const appContext: App = {
       return undefined;
     },
   },
+  jobScheduleRepository: newJobScheduleRepository(
+    dataSource.getRepository(JobScheduleTable)
+  ),
+  plugins: {},
 };
 
 const app = newApp(authMiddleware, appContext);
@@ -113,6 +121,7 @@ const request = supertest(server);
 describe("api", () => {
   before(async () => {
     await dataSource.initialize();
+    await initializeApp(appContext);
     await request.get("/manifest.json");
   });
 
