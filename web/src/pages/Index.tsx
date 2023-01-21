@@ -1,5 +1,5 @@
 import { css } from "@emotion/react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuthGuard, useAuthToken } from "../api/auth";
 import { CreateNoteRequest } from "@/shared/request/note";
 import useSWR from "swr";

@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { IndexLayout } from "./layout/Index";
 import { IndexPage } from "./pages/Index";
 import { LoginPage } from "./pages/Login";
+import { RssFeedPlugin } from "./pages/RssFeedPlugin";
 import { UserPage } from "./pages/User";
 
 const router = createBrowserRouter(
@@ -20,7 +21,7 @@ const router = createBrowserRouter(
         },
         {
           path: "/plugin/rssfeed",
-          element: <div>PLUGIN: rssfeed</div>,
+          element: <RssFeedPlugin />,
         },
       ],
     },

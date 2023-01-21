@@ -23,21 +23,28 @@ export const styleInputBase = css`
 
 export const TextField = ({
   icon,
+  label,
   ...props
-}: { icon?: React.ReactNode } & React.ComponentPropsWithoutRef<"input">) => {
+}: {
+  icon?: React.ReactNode;
+  label?: string;
+} & React.ComponentPropsWithoutRef<"input">) => {
   return (
-    <div
-      css={[
-        css`
-          display: flex;
-          gap: 12px;
-          align-items: center;
-        `,
-        styleInputWrapper,
-      ]}
-    >
-      <input type="text" css={styleInputBase} {...props} />
-      {icon}
-    </div>
+    <label>
+      {label}
+      <div
+        css={[
+          css`
+            display: flex;
+            gap: 12px;
+            align-items: center;
+          `,
+          styleInputWrapper,
+        ]}
+      >
+        <input type="text" css={styleInputBase} {...props} />
+        {icon}
+      </div>
+    </label>
   );
 };
