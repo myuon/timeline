@@ -144,7 +144,24 @@ export const ANote = ({
               {dayjs.unix(note?.createdAt ?? 0).fromNow()}
             </small>
           </div>
-          <Interweave content={note?.content} />
+          <Interweave
+            content={note?.content}
+            css={css`
+              h1,
+              h2,
+              h3,
+              p {
+                margin: 4px 0;
+                line-height: 1.5;
+              }
+
+              ul {
+                display: grid;
+                gap: 4px;
+                margin-left: 16px;
+              }
+            `}
+          />
 
           <div
             css={css`
