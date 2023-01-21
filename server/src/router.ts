@@ -33,6 +33,7 @@ import { fetcher } from "./helper/fetcher";
 import { syncActor } from "./handler/actor";
 import send from "koa-send";
 import { deliveryActivityToFollowers } from "./handler/delivery";
+import { RssConfig } from "./plugin/rssfeed/model/rssConfig";
 
 const requireAuth = (ctx: Context) => {
   if (!ctx.state.auth) {
@@ -689,6 +690,15 @@ export const newRouter = (options?: IRouterOptions) => {
       schedules.map(async (schedule) => {
         if (dayjs.unix(schedule.lastExecutedAt).add(30, "m") < dayjs()) {
           // run schedule
+          await Promise.all(
+            Object.entries(ctx.state.app.plugins).map(
+              async ([name, plugin]) => {
+                ctx.log.info(`Running scheduled job: ${name}...`);
+
+                await plugin.onScheduledRun(ctx.state.app);
+              }
+            )
+          );
 
           schedule.lastExecutedAt = dayjs().unix();
 
@@ -722,6 +732,40 @@ export const newRouter = (options?: IRouterOptions) => {
       id: ulid(),
       name: result.data.name,
       lastExecutedAt: 0,
+    });
+
+    ctx.status = 201;
+  });
+
+  router.post("/api/plugin/rssfeed/config", koaBody(), async (ctx) => {
+    requireAuth(ctx);
+
+    const schema = schemaForType<{
+      title: string;
+      url: string;
+    }>()(
+      z.object({
+        title: z.string(),
+        url: z.string(),
+      })
+    );
+
+    const result = schema.safeParse(ctx.request.body);
+    if (!result.success) {
+      ctx.log.error(result.error);
+      ctx.throw(400, "Invalid request");
+      return;
+    }
+
+    await (
+      ctx.state.app.plugins.rssfeed as unknown as {
+        onCreateRssConfig: (config: RssConfig) => Promise<void>;
+      }
+    ).onCreateRssConfig({
+      id: ulid(),
+      title: result.data.title,
+      url: result.data.url,
+      createdAt: dayjs().unix(),
     });
 
     ctx.status = 201;

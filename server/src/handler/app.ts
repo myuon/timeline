@@ -17,6 +17,12 @@ export interface App {
   deliveryClient: DeliveryClient;
   signer: Signer;
   jobScheduleRepository: JobScheduleRepository;
+  plugins: Record<
+    string,
+    {
+      onScheduledRun: (app: App) => Promise<void>;
+    }
+  >;
 }
 
 export type Context = ParameterizedContext<{ app: App }>;

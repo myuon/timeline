@@ -1,9 +1,15 @@
 import { App } from "../../handler/app";
-import { RssConfigRepository } from "./infra/rssConfigRepository";
+import {
+  newRssConfigRepository,
+  RssConfigRepository,
+  RssConfigTable,
+} from "./infra/rssConfigRepository";
 import Parser from "rss-parser";
 import { ulid } from "ulid";
 import dayjs from "dayjs";
 import { userId } from "../../config";
+import { DataSource } from "typeorm";
+import { RssConfig } from "./model/rssConfig";
 
 export const onScheduledRun = async (app: App, repo: RssConfigRepository) => {
   const parser = new Parser();
@@ -39,4 +45,19 @@ ${feed.items.map((item) => `- ${item.title} (${item.link})\n`)}`,
   );
 
   return;
+};
+
+export const newRssFeedPlugin = (dataSource: DataSource) => {
+  const rssConfigRepository = newRssConfigRepository(
+    dataSource.getRepository(RssConfigTable)
+  );
+
+  return {
+    onScheduledRun: async (app: App) => {
+      return await onScheduledRun(app, rssConfigRepository);
+    },
+    onCreateRssConfig: async (config: RssConfig) => {
+      await rssConfigRepository.create(RssConfigTable.fromModel(config));
+    },
+  };
 };

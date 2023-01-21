@@ -26,11 +26,13 @@ import {
   JobScheduleTable,
   newJobScheduleRepository,
 } from "./src/infra/jobScheduleRepository";
+import { RssConfigTable } from "./src/plugin/rssfeed/infra/rssConfigRepository";
+import { newRssFeedPlugin } from "./src/plugin/rssfeed/plugin";
 
 const dataSource = new DataSource({
   type: "sqlite",
   database: path.join(__dirname, "db.sqlite"),
-  entities,
+  entities: [...entities, RssConfigTable],
   logging: true,
   synchronize: true,
 });
@@ -55,6 +57,9 @@ const app = newApp(authJwt(auth), {
   jobScheduleRepository: newJobScheduleRepository(
     dataSource.getRepository(JobScheduleTable)
   ),
+  plugins: {
+    rssfeed: newRssFeedPlugin(dataSource),
+  },
 });
 
 const main = async () => {
