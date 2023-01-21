@@ -59,5 +59,10 @@ export const newRssFeedPlugin = (dataSource: DataSource) => {
     onCreateRssConfig: async (config: RssConfig) => {
       await rssConfigRepository.create(RssConfigTable.fromModel(config));
     },
+    onFindAllRssConfig: async () => {
+      return await rssConfigRepository.findAll();
+    },
   };
 };
+
+export type RssFeedPlugin = ReturnType<typeof newRssFeedPlugin>;

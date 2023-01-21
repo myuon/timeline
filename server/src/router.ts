@@ -34,6 +34,7 @@ import { syncActor } from "./handler/actor";
 import send from "koa-send";
 import { deliveryActivityToFollowers } from "./handler/delivery";
 import { RssConfig } from "./plugin/rssfeed/model/rssConfig";
+import { RssFeedPlugin } from "./plugin/rssfeed/plugin";
 
 const requireAuth = (ctx: Context) => {
   if (!ctx.state.auth) {
@@ -757,11 +758,10 @@ export const newRouter = (options?: IRouterOptions) => {
       return;
     }
 
-    await (
-      ctx.state.app.plugins.rssfeed as unknown as {
-        onCreateRssConfig: (config: RssConfig) => Promise<void>;
-      }
-    ).onCreateRssConfig({
+    const rssfeedPlugin = ctx.state.app.plugins
+      .rssfeed as unknown as RssFeedPlugin;
+
+    await rssfeedPlugin.onCreateRssConfig({
       id: ulid(),
       title: result.data.title,
       url: result.data.url,
@@ -769,6 +769,16 @@ export const newRouter = (options?: IRouterOptions) => {
     });
 
     ctx.status = 201;
+  });
+  router.get("/api/plugin/rssfeed/config", async (ctx) => {
+    requireAuth(ctx);
+
+    const rssfeedPlugin = ctx.state.app.plugins
+      .rssfeed as unknown as RssFeedPlugin;
+
+    const configs = await rssfeedPlugin.onFindAllRssConfig();
+
+    ctx.body = configs;
   });
 
   return router;

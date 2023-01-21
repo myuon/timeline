@@ -63,7 +63,7 @@ export const IndexPage = () => {
       <div
         css={css`
           display: grid;
-          grid-template-columns: 320px 500px;
+          grid-template-columns: 320px 500px 320px;
           gap: 32px;
           align-items: flex-start;
         `}
@@ -297,6 +297,23 @@ export const IndexPage = () => {
               </motion.div>
             ))}
           </AnimatePresence>
+        </div>
+
+        <div>
+          <ul
+            css={css`
+              display: grid;
+              gap: 8px;
+              list-style-type: none;
+            `}
+          >
+            <li>
+              <Link to="/">INDEX</Link>
+            </li>
+            <li>
+              <Link to="/plugin/rssfeed">PLUGIN: rssfeed</Link>
+            </li>
+          </ul>
         </div>
       </div>
     </section>
