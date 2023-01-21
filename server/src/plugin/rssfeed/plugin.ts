@@ -28,7 +28,10 @@ export const onScheduledRun = async (app: App, repo: RssConfigRepository) => {
 
 <ul>${feed.items
           .slice(0, 5)
-          .map((item) => `<li><a href="${item.link}">${item.title}</a></li>`)
+          .map(
+            (item) =>
+              `<li><a href="${item.link}" target="_blank" rel="noopener noreferer">${item.title}</a></li>`
+          )
           .join("\n")}</ul>
 `,
         rawContent: `${feed.title}
