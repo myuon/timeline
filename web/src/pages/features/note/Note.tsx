@@ -25,10 +25,16 @@ export const ANote = ({
 
   return (
     <div
-      css={css`
-        display: grid;
-        gap: 8px;
-      `}
+      css={[
+        css`
+          display: grid;
+          gap: 8px;
+        `,
+        isPlugin &&
+          css`
+            background-color: #303055;
+          `,
+      ]}
     >
       {type === "Share" && (
         <p
@@ -39,6 +45,17 @@ export const ANote = ({
         >
           <i className="bi-megaphone" />
           Announceされました
+        </p>
+      )}
+      {isPlugin && (
+        <p
+          css={css`
+            display: flex;
+            gap: 8px;
+          `}
+        >
+          <i className="bi-gear" />
+          プラグインによる投稿
         </p>
       )}
 
