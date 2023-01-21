@@ -690,20 +690,22 @@ export const newRouter = (options?: IRouterOptions) => {
     await Promise.all(
       schedules.map(async (schedule) => {
         if (dayjs.unix(schedule.lastExecutedAt).add(30, "m") < dayjs()) {
-          // run schedule
-          await Promise.all(
-            Object.entries(ctx.state.app.plugins).map(
-              async ([name, plugin]) => {
-                ctx.log.info(`Running scheduled job: ${name}...`);
+          if (schedule.type === "plugin") {
+            const plugin = Object.entries(ctx.state.app.plugins).find(
+              ([name]) => name === schedule.name
+            );
+            if (!plugin) {
+              return;
+            }
 
-                await plugin.onScheduledRun(ctx.state.app);
-              }
-            )
-          );
+            ctx.log.info(`Running scheduled job: ${plugin[0]}...`);
 
-          schedule.lastExecutedAt = dayjs().unix();
+            await plugin[1].onScheduledRun(ctx.state.app);
 
-          await ctx.state.app.jobScheduleRepository.save(schedule);
+            schedule.lastExecutedAt = dayjs().unix();
+
+            await ctx.state.app.jobScheduleRepository.save(schedule);
+          }
         }
       })
     );
