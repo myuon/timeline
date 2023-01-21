@@ -26,9 +26,10 @@ export const onScheduledRun = async (app: App, repo: RssConfigRepository) => {
         createdAt: dayjs().unix(),
         content: `<h3>${feed.title}</h3>
 
-<ul>${feed.items.map(
-          (item) => `<li><a href="${item.link}">${item.title}</a></li>\n`
-        )}</ul>
+<ul>${feed.items
+          .slice(0, 5)
+          .map((item) => `<li><a href="${item.link}">${item.title}</a></li>`)
+          .join("\n")}</ul>
 `,
         rawContent: `${feed.title}
 

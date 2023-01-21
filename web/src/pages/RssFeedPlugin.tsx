@@ -33,7 +33,7 @@ export const RssFeedPlugin = () => {
       <h2>RssFeed Plugin</h2>
 
       <ul>
-        {configs.map((config: any) => (
+        {configs?.map((config: any) => (
           <li
             key={config.url}
             css={css`
