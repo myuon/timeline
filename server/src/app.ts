@@ -8,6 +8,18 @@ import path from "path";
 import { userActor } from "./config";
 import { App } from "./handler/app";
 
+export const initializeApp = async (app: App) => {
+  await app.actorRepository.save(userActor);
+
+  await Promise.all(
+    Object.entries(app.plugins).map(async ([name, plugin]) => {
+      console.log(`Registering plugin: ${name}`);
+
+      await plugin.onInitialize(app);
+    })
+  );
+};
+
 export const newApp = (
   authMiddleware: Middleware | undefined,
   appContext: App
@@ -40,8 +52,6 @@ export const newApp = (
       }
     } else {
       ctx.state.app = appContext;
-
-      await (ctx.state.app as App).actorRepository.save(userActor);
 
       return await next();
     }

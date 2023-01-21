@@ -12,11 +12,19 @@ export class JobScheduleTable {
   @Column()
   lastExecutedAt: number;
 
+  @Column({ nullable: true })
+  forceRunFlag: boolean;
+
+  @Column({ nullable: true })
+  type: string;
+
   static fromModel(model: JobSchedule): JobScheduleTable {
     const table = new JobScheduleTable();
     table.id = model.id;
     table.name = model.name;
     table.lastExecutedAt = model.lastExecutedAt;
+    table.forceRunFlag = model.forceRunFlag;
+    table.type = model.type;
     return table;
   }
 
@@ -25,6 +33,8 @@ export class JobScheduleTable {
       id: this.id,
       name: this.name,
       lastExecutedAt: this.lastExecutedAt,
+      forceRunFlag: this.forceRunFlag,
+      type: this.type,
     };
   }
 }
@@ -44,6 +54,14 @@ export const newJobScheduleRepository = (
     findAll: async () => {
       const tables = await repo.find();
       return tables.map((table) => table.toModel());
+    },
+    findById: async (id: string) => {
+      const table = await repo.findOneBy({ id });
+      return table?.toModel();
+    },
+    findByTypeAndName: async (type: string, name: string) => {
+      const table = await repo.findOneBy({ type, name });
+      return table?.toModel();
     },
   };
 };

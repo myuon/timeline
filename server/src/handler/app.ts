@@ -20,6 +20,7 @@ export interface App {
   plugins: Record<
     string,
     {
+      onInitialize: (app: App) => Promise<void>;
       onScheduledRun: (app: App) => Promise<void>;
     }
   >;

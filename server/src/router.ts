@@ -733,6 +733,8 @@ export const newRouter = (options?: IRouterOptions) => {
       id: ulid(),
       name: result.data.name,
       lastExecutedAt: 0,
+      forceRunFlag: false,
+      type: "plugin",
     });
 
     ctx.status = 201;

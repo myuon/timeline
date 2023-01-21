@@ -54,6 +54,21 @@ export const newRssFeedPlugin = (dataSource: DataSource) => {
   );
 
   return {
+    onInitialize: async (app: App) => {
+      const schedule = await app.jobScheduleRepository.findByTypeAndName(
+        "plugin",
+        "rssfeed"
+      );
+      if (!schedule) {
+        await app.jobScheduleRepository.save({
+          id: ulid(),
+          name: "rssfeed",
+          lastExecutedAt: 0,
+          forceRunFlag: false,
+          type: "plugin",
+        });
+      }
+    },
     onScheduledRun: async (app: App) => {
       return await onScheduledRun(app, rssConfigRepository);
     },

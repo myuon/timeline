@@ -5,7 +5,7 @@ import adminKey from "../.secrets/adminKey.json";
 import * as admin from "firebase-admin";
 import https from "https";
 import fs from "fs";
-import { newApp } from "./src/app";
+import { initializeApp, newApp } from "./src/app";
 import { entities } from "./src/infra/db";
 import { authJwt } from "./src/middleware/auth";
 import { newNoteRepository, NoteTable } from "./src/infra/noteRepository";
@@ -42,7 +42,7 @@ admin.initializeApp({
 });
 
 const auth = admin.auth();
-const app = newApp(authJwt(auth), {
+const appContext = {
   noteRepository: newNoteRepository(dataSource.getRepository(NoteTable)),
   followRelationRepository: newFollowRelationRepository(
     dataSource.getRepository(FollowRelationTable)
@@ -60,13 +60,15 @@ const app = newApp(authJwt(auth), {
   plugins: {
     rssfeed: newRssFeedPlugin(dataSource),
   },
-});
+};
+const app = newApp(authJwt(auth), appContext);
 
 const main = async () => {
   const port = process.env.PORT || 3000;
   const httpsPort = Number(port) + 1;
 
   await dataSource.initialize();
+  await initializeApp(appContext);
 
   app.listen(port);
   console.log(`Starting in ${process.env.NODE_ENV} mode`);
