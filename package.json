@@ -5,7 +5,8 @@
     "server"
   ],
   "devDependencies": {
-    "concurrently": "^7.5.0"
+    "concurrently": "^7.5.0",
+    "ts-node": "^10.9.1"
   },
   "scripts": {
     "dev": "concurrently \"yarn workspace web dev\" \"yarn workspace server dev\"",

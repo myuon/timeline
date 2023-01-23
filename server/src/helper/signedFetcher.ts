@@ -1,4 +1,4 @@
-import { fetcher } from "./fetcher";
+import { Fetcher } from "../infra/fetchClient";
 import { importSignKey, signHttpHeaders } from "./signature";
 
 export const signedFetcher = async (
@@ -6,6 +6,7 @@ export const signedFetcher = async (
     privateKeyPemString: string;
     keyId: string;
   },
+  fetcher: Fetcher,
   url: string,
   init: { method: string; body: object }
 ) => {

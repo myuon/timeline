@@ -112,6 +112,11 @@ const appContext: App = {
     dataSource.getRepository(JobScheduleTable)
   ),
   plugins: {},
+  fetchClient: {
+    fetcher: async () => {
+      return {};
+    },
+  },
 };
 
 const app = newApp(authMiddleware, appContext);

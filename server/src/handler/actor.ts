@@ -2,7 +2,10 @@ import { getActor } from "./ap/api";
 import { Context } from "./app";
 
 export const syncActor = async (ctx: Context, url: string) => {
-  const { data, error } = await getActor(url);
+  const { data, error } = await getActor(
+    ctx.state.app.fetchClient.fetcher,
+    url
+  );
   if (!data || error) {
     ctx.log.warn(error);
     ctx.throw(400, "Failed to get actor");

@@ -1,8 +1,9 @@
 import { getActor } from "../handler/ap/api";
 import { Context } from "../handler/app";
 import { importVerifyKey, verifyHttpHeaders } from "../helper/signature";
+import { FetchClient } from "./fetchClient";
 
-export const newSigner = () => {
+export const newSigner = (fetchClient: FetchClient) => {
   return {
     verify: async (ctx: Context) => {
       const signatureHeader = ctx.request.headers.signature as
@@ -20,7 +21,10 @@ export const newSigner = () => {
       if (!keyId) {
         ctx.throw(400, "Missing keyId");
       }
-      const { data, error: actorError } = await getActor(keyId);
+      const { data, error: actorError } = await getActor(
+        fetchClient.fetcher,
+        keyId
+      );
       if (!data) {
         return "actor_gone";
       }

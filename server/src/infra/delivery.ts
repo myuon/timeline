@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { Activity } from "../../../shared/model/activity";
 import { signedFetcher } from "../helper/signedFetcher";
-import { fetcher } from "../helper/fetcher";
 import { schemaForType } from "../helper/zod";
+import { Fetcher } from "./fetchClient";
 
 interface ApActor {
   id: string;
@@ -21,13 +21,16 @@ interface ApActor {
   url?: string;
 }
 
-export const newDeliveryClient = (signKey: {
-  privateKeyPemString: string;
-  keyId: string;
-}) => {
+export const newDeliveryClient = (
+  signKey: {
+    privateKeyPemString: string;
+    keyId: string;
+  },
+  fetcher: Fetcher
+) => {
   return {
     deliveryActivity: async (inbox: string, activity: Activity) => {
-      return await signedFetcher(signKey, inbox, {
+      return await signedFetcher(signKey, fetcher, inbox, {
         method: "post",
         body: activity,
       });

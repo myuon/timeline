@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { schemaForType } from "../../helper/zod";
-import { fetcher, FetcherResult } from "../../helper/fetcher";
+import { FetcherResult } from "../../helper/fetcher";
+import { Fetcher } from "../../infra/fetchClient";
 
 interface ApActor {
   id: string;
@@ -44,6 +45,7 @@ export const schemaApActor = schemaForType<ApActor>()(
 );
 
 export const getActor = async (
+  fetcher: Fetcher,
   actor: string
 ): Promise<FetcherResult<ApActor | undefined>> => {
   const { data, error, status } = await fetcher(actor, {

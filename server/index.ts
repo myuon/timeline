@@ -28,6 +28,7 @@ import {
 } from "./src/infra/jobScheduleRepository";
 import { RssConfigTable } from "./src/plugin/rssfeed/infra/rssConfigRepository";
 import { newRssFeedPlugin } from "./src/plugin/rssfeed/plugin";
+import { newFetchClient } from "./src/infra/fetchClient";
 
 const dataSource = new DataSource({
   type: "sqlite",
@@ -42,6 +43,7 @@ admin.initializeApp({
 });
 
 const auth = admin.auth();
+const fetchClient = newFetchClient();
 const appContext = {
   noteRepository: newNoteRepository(dataSource.getRepository(NoteTable)),
   followRelationRepository: newFollowRelationRepository(
@@ -52,14 +54,15 @@ const appContext = {
     dataSource.getRepository(InboxItemTable)
   ),
   shareRepository: newShareRepository(dataSource.getRepository(ShareTable)),
-  deliveryClient: newDeliveryClient(signKey),
-  signer: newSigner(),
+  deliveryClient: newDeliveryClient(signKey, fetchClient.fetcher),
+  signer: newSigner(fetchClient),
   jobScheduleRepository: newJobScheduleRepository(
     dataSource.getRepository(JobScheduleTable)
   ),
   plugins: {
     rssfeed: newRssFeedPlugin(dataSource),
   },
+  fetchClient,
 };
 const app = newApp(authJwt(auth), appContext);
 

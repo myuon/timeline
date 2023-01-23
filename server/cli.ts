@@ -9,8 +9,10 @@ import {
 } from "./src/handler/ap/activity";
 import { signKey } from "./src/handler/ap/delivery";
 import { newDeliveryClient } from "./src/infra/delivery";
+import { newFetchClient } from "./src/infra/fetchClient";
 
-const deliveryClient = newDeliveryClient(signKey);
+const fetchClient = newFetchClient();
+const deliveryClient = newDeliveryClient(signKey, fetchClient.fetcher);
 const deliveryActivity = deliveryClient.deliveryActivity;
 
 export const run = async () => {

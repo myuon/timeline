@@ -1,6 +1,7 @@
 import { ParameterizedContext } from "koa";
 import { ActorRepository } from "../infra/actorRepository";
 import { DeliveryClient } from "../infra/delivery";
+import { FetchClient } from "../infra/fetchClient";
 import { FollowRelationRepository } from "../infra/followRelationRepository";
 import { InboxItemRepository } from "../infra/inboxRepository";
 import { JobScheduleRepository } from "../infra/jobScheduleRepository";
@@ -24,6 +25,7 @@ export interface App {
       onScheduledRun: (app: App) => Promise<void>;
     }
   >;
+  fetchClient: FetchClient;
 }
 
 export type Context = ParameterizedContext<{ app: App }>;
