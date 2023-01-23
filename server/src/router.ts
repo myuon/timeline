@@ -29,11 +29,9 @@ import { Person } from "../../shared/model/person";
 import { Activity } from "../../shared/model/activity";
 import { TimelineObject } from "../../shared/model/timeline";
 import { ApiFollowRequest } from "../../shared/request/follow";
-import { fetcher } from "./helper/fetcher";
 import { syncActor } from "./handler/actor";
 import send from "koa-send";
 import { deliveryActivityToFollowers } from "./handler/delivery";
-import { RssConfig } from "./plugin/rssfeed/model/rssConfig";
 import { RssFeedPlugin } from "./plugin/rssfeed/plugin";
 
 const requireAuth = (ctx: Context) => {
@@ -301,6 +299,69 @@ export const newRouter = (options?: IRouterOptions) => {
       await follow(ctx.state.app, ctx, activity);
     } else if (activity.type === "Create") {
       const created = await create(ctx.state.app, ctx, activity);
+
+      // deliver to LOCAL followers
+      await Promise.all(
+        activity.cc?.map(async (cc) => {
+          if (cc.endsWith("/followers")) {
+            const userId = cc.replace("/followers", "");
+            const followers =
+              await ctx.state.app.followRelationRepository.findFollowers(
+                userId
+              );
+            await Promise.all(
+              followers.map(async (relation) => {
+                if (!relation.userId.startsWith(`https://${domain}`)) {
+                  return;
+                }
+
+                // = create an inbox item
+                await ctx.state.app.inboxItemRepository.create({
+                  id: ulid(),
+                  userId: relation.userId,
+                  type: "Note",
+                  itemId: created.id,
+                  createdAt: dayjs().unix(),
+                });
+              })
+            );
+          }
+        }) ?? []
+      );
+    } else if (activity.type === "Announce") {
+      const object = activity.object as string;
+      const { data, error } = await ctx.state.app.fetchClient.fetcher(object, {
+        headers: {
+          Accept: "application/activity+json",
+        },
+      });
+      if (error) {
+        ctx.throw(400, error);
+        return;
+      }
+
+      const noteResult = schema.safeParse(data);
+      if (!noteResult.success) {
+        ctx.throw(400, noteResult.error);
+        return;
+      }
+
+      const created = await create(ctx.state.app, ctx, noteResult.data);
+
+      const actor = await ctx.state.app.actorRepository.findByFederatedId(
+        activity.actor
+      );
+      if (!actor) {
+        ctx.throw(400, "Actor not found");
+        return;
+      }
+
+      await ctx.state.app.shareRepository.create({
+        id: ulid(),
+        userId: actor.userId,
+        noteId: created.id,
+        createdAt: dayjs().unix(),
+      });
 
       // deliver to LOCAL followers
       await Promise.all(

@@ -185,6 +185,178 @@ const appContext: App = {
           status: 200,
           error: undefined,
         };
+      } else if (
+        url === "https://unnerv.jp/users/Tokyo" &&
+        JSON.stringify(init) ===
+          JSON.stringify({
+            headers: {
+              Accept: "application/activity+json",
+            },
+          })
+      ) {
+        return {
+          data: JSON.stringify({
+            "@context": [
+              "https://www.w3.org/ns/activitystreams",
+              "https://w3id.org/security/v1",
+              {
+                Curve25519Key: "toot:Curve25519Key",
+                Device: "toot:Device",
+                Ed25519Key: "toot:Ed25519Key",
+                Ed25519Signature: "toot:Ed25519Signature",
+                EncryptedMessage: "toot:EncryptedMessage",
+                IdentityProof: "toot:IdentityProof",
+                PropertyValue: "schema:PropertyValue",
+                alsoKnownAs: {
+                  "@id": "as:alsoKnownAs",
+                  "@type": "@id",
+                },
+                cipherText: "toot:cipherText",
+                claim: {
+                  "@id": "toot:claim",
+                  "@type": "@id",
+                },
+                deviceId: "toot:deviceId",
+                devices: {
+                  "@id": "toot:devices",
+                  "@type": "@id",
+                },
+                discoverable: "toot:discoverable",
+                featured: {
+                  "@id": "toot:featured",
+                  "@type": "@id",
+                },
+                featuredTags: {
+                  "@id": "toot:featuredTags",
+                  "@type": "@id",
+                },
+                fingerprintKey: {
+                  "@id": "toot:fingerprintKey",
+                  "@type": "@id",
+                },
+                focalPoint: {
+                  "@container": "@list",
+                  "@id": "toot:focalPoint",
+                },
+                identityKey: {
+                  "@id": "toot:identityKey",
+                  "@type": "@id",
+                },
+                manuallyApprovesFollowers: "as:manuallyApprovesFollowers",
+                messageFranking: "toot:messageFranking",
+                messageType: "toot:messageType",
+                movedTo: {
+                  "@id": "as:movedTo",
+                  "@type": "@id",
+                },
+                publicKeyBase64: "toot:publicKeyBase64",
+                schema: "http://schema.org#",
+                suspended: "toot:suspended",
+                toot: "http://joinmastodon.org/ns#",
+                value: "schema:value",
+              },
+            ],
+            attachment: [],
+            devices: "https://unnerv.jp/users/Tokyo/collections/devices",
+            discoverable: false,
+            endpoints: {
+              sharedInbox: "https://unnerv.jp/inbox",
+            },
+            featured: "https://unnerv.jp/users/Tokyo/collections/featured",
+            featuredTags: "https://unnerv.jp/users/Tokyo/collections/tags",
+            followers: "https://unnerv.jp/users/Tokyo/followers",
+            following: "https://unnerv.jp/users/Tokyo/following",
+            icon: {
+              mediaType: "image/png",
+              type: "Image",
+              url: "https://media.unnerv.jp/accounts/avatars/000/000/060/original/9b07ce2b431e6639.png",
+            },
+            id: "https://unnerv.jp/users/Tokyo",
+            inbox: "https://unnerv.jp/users/Tokyo/inbox",
+            manuallyApprovesFollowers: false,
+            name: "東京都",
+            outbox: "https://unnerv.jp/users/Tokyo/outbox",
+            preferredUsername: "Tokyo",
+            publicKey: {
+              id: "https://unnerv.jp/users/Tokyo#main-key",
+              owner: "https://unnerv.jp/users/Tokyo",
+              publicKeyPem:
+                "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1MgXDu8aOORXJ3G8JZsZ\n+Cq4GBF9VeBWyNJ8JnxNW2xue/zFPkKjlb3Kzcb65W0wzJbB/fp2FGirDTHEaxZe\nRKZ6axxbaRL2pOyYnhY2t9I6akuD7xFIKpjUXrLI5PvR7ydXMEzBS1FYebE2LMra\nuXrmh/mcVn9mhcRzpc4Jpw2DAOEXb4yi2gKEcG3J2+EOHASjEDOdHPYuYWkuh8x4\n/WhqBTuH7lCsLirJvbiDFdi1NlRj69REuayCvTgXMCHXK7NM6qEJeXd65GWqU1oC\nnhny1/pGxhgKF/GEMr8CJGkqNwGEkdScr8SqtSHMcYEF02lV/0tcWFWbYCL7ZbYd\nGwIDAQAB\n-----END PUBLIC KEY-----\n",
+            },
+            published: "2017-04-16T00:00:00Z",
+            summary: "<p>東京都の情報を配信します。</p>",
+            tag: [],
+            type: "Person",
+            url: "https://unnerv.jp/@Tokyo",
+          }),
+          status: 200,
+        };
+      } else if (
+        url === "https://unnerv.jp/users/UN_NERV/statuses/109725674147055118" &&
+        JSON.stringify(init) ===
+          JSON.stringify({
+            headers: {
+              Accept: "application/activity+json",
+            },
+          })
+      ) {
+        return {
+          data: JSON.stringify({
+            "@context": [
+              "https://www.w3.org/ns/activitystreams",
+              {
+                Hashtag: "as:Hashtag",
+                atomUri: "ostatus:atomUri",
+                conversation: "ostatus:conversation",
+                inReplyToAtomUri: "ostatus:inReplyToAtomUri",
+                ostatus: "http://ostatus.org#",
+                sensitive: "as:sensitive",
+                toot: "http://joinmastodon.org/ns#",
+                votersCount: "toot:votersCount",
+              },
+            ],
+            atomUri:
+              "https://unnerv.jp/users/UN_NERV/statuses/109725674147055118",
+            attachment: [],
+            attributedTo: "https://unnerv.jp/users/UN_NERV",
+            cc: ["https://unnerv.jp/users/UN_NERV/followers"],
+            content:
+              '<p>【強い冬型の気圧配置に関する全般気象情報 2023年01月21日 15:01】<br />24日から26日頃にかけて、日本付近は強い冬型の気圧配置となるため、北日本から西日本にかけての日本海側を中心に大荒れや大しけ、大雪となる所があります。<br /><a href="https://unnerv.jp/tags/%E5%85%A8%E8%88%AC%E6%B0%97%E8%B1%A1%E6%83%85%E5%A0%B1" class="mention hashtag" rel="tag">#<span>全般気象情報</span></a></p>',
+            contentMap: {
+              ja: '<p>【強い冬型の気圧配置に関する全般気象情報 2023年01月21日 15:01】<br />24日から26日頃にかけて、日本付近は強い冬型の気圧配置となるため、北日本から西日本にかけての日本海側を中心に大荒れや大しけ、大雪となる所があります。<br /><a href="https://unnerv.jp/tags/%E5%85%A8%E8%88%AC%E6%B0%97%E8%B1%A1%E6%83%85%E5%A0%B1" class="mention hashtag" rel="tag">#<span>全般気象情報</span></a></p>',
+            },
+            conversation:
+              "tag:unnerv.jp,2023-01-21:objectId=1262670:objectType=Conversation",
+            id: "https://unnerv.jp/users/UN_NERV/statuses/109725674147055118",
+            inReplyTo: null,
+            inReplyToAtomUri: null,
+            published: "2023-01-21T06:01:56Z",
+            replies: {
+              first: {
+                items: [],
+                next: "https://unnerv.jp/users/UN_NERV/statuses/109725674147055118/replies?only_other_accounts=true&page=true",
+                partOf:
+                  "https://unnerv.jp/users/UN_NERV/statuses/109725674147055118/replies",
+                type: "CollectionPage",
+              },
+              id: "https://unnerv.jp/users/UN_NERV/statuses/109725674147055118/replies",
+              type: "Collection",
+            },
+            sensitive: false,
+            summary: null,
+            tag: [
+              {
+                href: "https://unnerv.jp/tags/%E5%85%A8%E8%88%AC%E6%B0%97%E8%B1%A1%E6%83%85%E5%A0%B1",
+                name: "#全般気象情報",
+                type: "Hashtag",
+              },
+            ],
+            to: ["https://www.w3.org/ns/activitystreams#Public"],
+            type: "Note",
+            url: "https://unnerv.jp/@UN_NERV/109725674147055118",
+          }),
+          status: 200,
+        };
       }
 
       return {
@@ -304,6 +476,36 @@ describe("api", () => {
           type: "Follow",
           actor: "https://misskey.io/users/99bga7dd11",
           object: userIdUrl,
+        })
+        .expect(200);
+
+      assert.equal(delivered.length, 1);
+      assert.equal(
+        delivered[0].to,
+        "https://misskey.io/users/99bga7dd11/inbox"
+      );
+      assert.equal(delivered[0].activity.type, "Accept");
+      assert.equal(delivered[0].activity.actor, userIdUrl);
+    });
+
+    it("POST announce /inbox", async () => {
+      delivered = [];
+
+      await request
+        .post(`/u/${userName}/inbox`)
+        .set("signature", "test_signature")
+        .send({
+          "@context": "https://www.w3.org/ns/activitystreams",
+          id: "https://unnerv.jp/users/Tokyo/statuses/109725674344355482/activity",
+          type: "Announce",
+          actor: "https://unnerv.jp/users/Tokyo",
+          published: "2023-01-21T06:01:59Z",
+          to: ["https://www.w3.org/ns/activitystreams#Public"],
+          cc: [
+            "https://unnerv.jp/users/UN_NERV",
+            "https://unnerv.jp/users/Tokyo/followers",
+          ],
+          object: "https://unnerv.jp/users/UN_NERV/statuses/109725674147055118",
         })
         .expect(200);
 
