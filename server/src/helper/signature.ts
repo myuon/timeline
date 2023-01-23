@@ -24,7 +24,7 @@ export const importVerifyKey = (pemString: string) =>
   );
 
 export const signHttpHeaders = async (
-  signKey: CryptoKey,
+  signKey: crypto.CryptoKey,
   request: {
     keyId: string;
     body: object;
@@ -63,7 +63,7 @@ export const signHttpHeaders = async (
 };
 
 export const verifyHttpHeaders = async (
-  verifyKey: CryptoKey,
+  verifyKey: crypto.CryptoKey,
   algorithm: string,
   headersString: string,
   signature: string,

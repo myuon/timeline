@@ -32,6 +32,7 @@
     "@types/koa-router": "^7.4.4",
     "@types/koa-static": "^4.0.2",
     "@types/mocha": "^10.0.1",
+    "@types/node": "^18.11.18",
     "@types/node-fetch": "^2.6.2",
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^5.40.1",
