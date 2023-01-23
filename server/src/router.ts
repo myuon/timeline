@@ -601,7 +601,9 @@ export const newRouter = (options?: IRouterOptions) => {
     const userDomain = userId.split("@")[1];
 
     const webfingerUrl = `https://${userDomain}/.well-known/webfinger?resource=acct:${userId}`;
-    const { data, error } = await fetcher(webfingerUrl);
+    const { data, error } = await ctx.state.app.fetchClient.fetcher(
+      webfingerUrl
+    );
     if (!data) {
       console.log(`url: ${webfingerUrl}, error: ${JSON.stringify(error)}`);
       ctx.throw(400, "Failed to fetch webfinger");
