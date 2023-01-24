@@ -118,6 +118,16 @@ export const newRouter = (options?: IRouterOptions) => {
       return;
     }
 
+    let publicKeyPem = "";
+    try {
+      publicKeyPem = fs.readFileSync(
+        path.join(__dirname, "../../.secrets/public.pem"),
+        "utf-8"
+      );
+    } catch (err) {
+      console.error(err);
+    }
+
     ctx.body = {
       "@context": [
         "https://www.w3.org/ns/activitystreams",
@@ -142,10 +152,7 @@ export const newRouter = (options?: IRouterOptions) => {
         id: `${userIdUrl}#main-key`,
         type: "Key",
         owner: userIdUrl,
-        publicKeyPem: fs.readFileSync(
-          path.join(__dirname, "../../.secrets/public.pem"),
-          "utf-8"
-        ),
+        publicKeyPem,
       },
     } as Person;
     ctx.set("Content-Type", "application/activity+json");

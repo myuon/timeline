@@ -367,7 +367,7 @@ const appContext: App = {
 };
 
 const app = newApp(authMiddleware, appContext);
-const server = app.listen(Math.floor(Math.random() * 10000));
+const server = app.listen(5987);
 const request = supertest(server);
 
 describe("api", () => {
