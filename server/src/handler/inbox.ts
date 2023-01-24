@@ -51,19 +51,20 @@ export const follow = async (app: App, ctx: Context, activity: Activity) => {
   ctx.status = 200;
 };
 
-export const create = async (app: App, ctx: Context, activity: Activity) => {
-  if (!activity.object) {
-    ctx.throw(400, "Bad request");
+export const create = async (
+  app: App,
+  ctx: Context,
+  activity: {
+    objectId: string;
+    actorId: string;
+    objectContent: string;
   }
-  if (typeof activity.object === "string") {
-    ctx.throw(400, "Bad request");
-  }
-
+) => {
   const note = {
     id: ulid(),
-    federatedId: activity.object.id,
-    userId: activity.actor,
-    content: activity.object.content,
+    federatedId: activity.objectId,
+    userId: activity.actorId,
+    content: activity.objectContent,
     createdAt: dayjs().unix(),
   } as Note;
 

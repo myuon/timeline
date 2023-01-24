@@ -288,17 +288,42 @@ export const newRouter = (options?: IRouterOptions) => {
       return;
     }
 
-    const actor = await ctx.state.app.actorRepository.findByFederatedId(
+    let actor = await ctx.state.app.actorRepository.findByFederatedId(
       activity.actor
     );
     if (!actor) {
       await syncActor(ctx, activity.actor);
+
+      actor = await ctx.state.app.actorRepository.findByFederatedId(
+        activity.actor
+      );
+    }
+
+    if (!actor) {
+      ctx.throw(404, "Actor not found");
+      return;
     }
 
     if (activity.type === "Follow") {
       await follow(ctx.state.app, ctx, activity);
     } else if (activity.type === "Create") {
-      const created = await create(ctx.state.app, ctx, activity);
+      const object = activity.object as
+        | {
+            id: string;
+            type: string;
+            content?: string;
+          }
+        | undefined;
+      if (!object) {
+        ctx.throw(400, "Missing object");
+        return;
+      }
+
+      const created = await create(ctx.state.app, ctx, {
+        objectId: object.id,
+        actorId: actor.userId,
+        objectContent: object.content ?? "",
+      });
 
       // deliver to LOCAL followers
       await Promise.all(
@@ -339,22 +364,29 @@ export const newRouter = (options?: IRouterOptions) => {
         ctx.throw(400, error);
         return;
       }
+      if (!data) {
+        ctx.throw(400, "No data");
+        return;
+      }
 
-      const noteResult = schema.safeParse(data);
+      const schema = schemaForType<{ id: string; content: string }>()(
+        z.object({
+          id: z.string(),
+          content: z.string(),
+        })
+      );
+
+      const noteResult = schema.safeParse(JSON.parse(data));
       if (!noteResult.success) {
         ctx.throw(400, noteResult.error);
         return;
       }
 
-      const created = await create(ctx.state.app, ctx, noteResult.data);
-
-      const actor = await ctx.state.app.actorRepository.findByFederatedId(
-        activity.actor
-      );
-      if (!actor) {
-        ctx.throw(400, "Actor not found");
-        return;
-      }
+      const created = await create(ctx.state.app, ctx, {
+        objectId: noteResult.data.id,
+        actorId: actor.userId,
+        objectContent: noteResult.data.content ?? "",
+      });
 
       await ctx.state.app.shareRepository.create({
         id: ulid(),
