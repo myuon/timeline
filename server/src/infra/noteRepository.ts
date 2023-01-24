@@ -80,6 +80,13 @@ export const newNoteRepository = (repo: Repository<NoteTable>) => {
       const records = await repo.findBy({ id: In(ids) });
       return records.map((record) => record.toModel());
     },
+    findByFederatedId: async (federatedId: string) => {
+      const record = await repo.findOneBy({ federatedId });
+      if (record === null) {
+        return undefined;
+      }
+      return record.toModel();
+    },
     save: async (note: Note) => {
       const noteTable = NoteTable.fromModel(note);
       await repo.save(noteTable);

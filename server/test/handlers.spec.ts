@@ -410,6 +410,11 @@ describe("api", () => {
         targetUserId: userId,
         createdAt: 0,
       });
+      await appContext.followRelationRepository.create({
+        userId,
+        targetUserId: "Tokyo@unnerv.jp",
+        createdAt: 0,
+      });
     });
 
     it("POST /api/note", async () => {
@@ -509,13 +514,17 @@ describe("api", () => {
         })
         .expect(200);
 
-      assert.equal(delivered.length, 1);
-      assert.equal(
-        delivered[0].to,
-        "https://misskey.io/users/99bga7dd11/inbox"
+      const note = await appContext.noteRepository.findByFederatedId(
+        "https://unnerv.jp/users/UN_NERV/statuses/109725674147055118"
       );
-      assert.equal(delivered[0].activity.type, "Accept");
-      assert.equal(delivered[0].activity.actor, userIdUrl);
+      assert.notEqual(note, undefined);
+
+      const items = await appContext.inboxItemRepository.findByItemId(
+        "Share",
+        note!.id
+      );
+      assert.equal(items.length, 1);
+      assert.equal(items[0].userId, userId);
     });
 
     it("GET /u/:userName", async () => {

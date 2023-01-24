@@ -399,22 +399,26 @@ export const newRouter = (options?: IRouterOptions) => {
       await Promise.all(
         activity.cc?.map(async (cc) => {
           if (cc.endsWith("/followers")) {
-            const userId = cc.replace("/followers", "");
+            const federatedId = cc.replace("/followers", "");
+            const federatedIdActor =
+              await ctx.state.app.actorRepository.findByFederatedId(
+                federatedId
+              );
+            if (!federatedIdActor) {
+              return;
+            }
+
             const followers =
               await ctx.state.app.followRelationRepository.findFollowers(
-                userId
+                federatedIdActor.userId
               );
             await Promise.all(
               followers.map(async (relation) => {
-                if (!relation.userId.startsWith(`https://${domain}`)) {
-                  return;
-                }
-
                 // = create an inbox item
                 await ctx.state.app.inboxItemRepository.create({
                   id: ulid(),
                   userId: relation.userId,
-                  type: "Note",
+                  type: "Share",
                   itemId: created.id,
                   createdAt: dayjs().unix(),
                 });
