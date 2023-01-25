@@ -1,4 +1,4 @@
-import { Activity } from "../../../shared/model/activity";
+import { Activity } from "../protocols/ap/activity";
 import { Context } from "./app";
 
 export const deliveryActivityToFollowers = async (

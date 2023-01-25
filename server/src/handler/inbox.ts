@@ -1,6 +1,6 @@
 import { Context } from "koa";
 import { App } from "./app";
-import { Activity } from "../../../shared/model/activity";
+import { Activity } from "../protocols/ap/activity";
 import { userIdUrl } from "../config";
 import dayjs from "dayjs";
 import { ulid } from "ulid";

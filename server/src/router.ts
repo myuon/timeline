@@ -26,7 +26,7 @@ import { Context } from "koa";
 import { ulid } from "ulid";
 import dayjs from "dayjs";
 import { Person } from "../../shared/model/person";
-import { Activity } from "../../shared/model/activity";
+import { Activity } from "./protocols/ap/activity";
 import { TimelineObject } from "../../shared/model/timeline";
 import { ApiFollowRequest } from "../../shared/request/follow";
 import { syncActor } from "./handler/actor";

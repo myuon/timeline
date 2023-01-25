@@ -22,7 +22,7 @@ import {
   newInboxItemRepository,
 } from "../src/infra/inboxRepository";
 import { newShareRepository, ShareTable } from "../src/infra/shareRepository";
-import { Activity } from "../../shared/model/activity";
+import { Activity } from "../src/protocols/ap/activity";
 import { App } from "../src/handler/app";
 import {
   JobScheduleTable,

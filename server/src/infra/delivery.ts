@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Activity } from "../../../shared/model/activity";
+import { Activity } from "../protocols/ap/activity";
 import { signedFetcher } from "../helper/signedFetcher";
 import { schemaForType } from "../helper/zod";
 import { Fetcher } from "./fetchClient";
