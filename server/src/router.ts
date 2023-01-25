@@ -395,8 +395,9 @@ export const newRouter = (options?: IRouterOptions) => {
         objectContent: noteResult.data.content ?? "",
       });
 
+      const shareId = ulid();
       await ctx.state.app.shareRepository.create({
-        id: ulid(),
+        id: shareId,
         userId: actor.userId,
         noteId: created.id,
         createdAt: dayjs().unix(),
@@ -426,7 +427,7 @@ export const newRouter = (options?: IRouterOptions) => {
                   id: ulid(),
                   userId: relation.userId,
                   type: "Share",
-                  itemId: created.id,
+                  itemId: shareId,
                   createdAt: dayjs().unix(),
                 });
               })
