@@ -1,7 +1,7 @@
 import { schemaForType } from "../../helper/zod";
 import z from "zod";
 
-export interface Activity {
+export interface ApActivity {
   type: string;
   id?: string;
   published?: string;
@@ -17,7 +17,7 @@ export interface Activity {
   cc?: string[];
 }
 
-export const schemaForActivity = schemaForType<Activity>()(
+export const schemaForActivity = schemaForType<ApActivity>()(
   z.object({
     type: z.string(),
     published: z.string().optional(),

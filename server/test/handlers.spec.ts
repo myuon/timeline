@@ -22,7 +22,7 @@ import {
   newInboxItemRepository,
 } from "../src/infra/inboxRepository";
 import { newShareRepository, ShareTable } from "../src/infra/shareRepository";
-import { Activity } from "../src/protocols/ap/activity";
+import { ApActivity } from "../src/protocols/ap/activity";
 import { App } from "../src/handler/app";
 import {
   JobScheduleTable,
@@ -48,7 +48,7 @@ const authMiddleware: Middleware = (ctx, next) => {
   return next();
 };
 
-let delivered: { to: string; activity: Activity }[] = [];
+let delivered: { to: string; activity: ApActivity }[] = [];
 
 const appContext: App = {
   noteRepository: newNoteRepository(dataSource.getRepository(NoteTable)),
@@ -61,7 +61,7 @@ const appContext: App = {
   ),
   shareRepository: newShareRepository(dataSource.getRepository(ShareTable)),
   deliveryClient: {
-    deliveryActivity: async (to: string, activity: Activity) => {
+    deliveryActivity: async (to: string, activity: ApActivity) => {
       delivered.push({ to, activity });
 
       return { data: undefined };

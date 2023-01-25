@@ -1,9 +1,9 @@
-import { Activity } from "../protocols/ap/activity";
+import { ApActivity } from "../protocols/ap/activity";
 import { Context } from "./app";
 
 export const deliveryActivityToFollowers = async (
   ctx: Context,
-  activity: Activity,
+  activity: ApActivity,
   userId: string
 ) => {
   const followers = await ctx.state.app.followRelationRepository.findFollowers(

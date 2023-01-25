@@ -1,12 +1,12 @@
 import { Context } from "koa";
 import { App } from "./app";
-import { Activity } from "../protocols/ap/activity";
+import { ApActivity } from "../protocols/ap/activity";
 import { userIdUrl } from "../config";
 import dayjs from "dayjs";
 import { ulid } from "ulid";
 import { Note } from "../../../shared/model/note";
 
-export const follow = async (app: App, ctx: Context, activity: Activity) => {
+export const follow = async (app: App, ctx: Context, activity: ApActivity) => {
   if (!activity.object || !activity.actor) {
     ctx.log.warn(`${JSON.stringify(activity)}`);
     ctx.throw(400, "Bad request");
@@ -36,7 +36,7 @@ export const follow = async (app: App, ctx: Context, activity: Activity) => {
     type: "Accept",
     actor: userIdUrl,
     object: activity,
-  } as Activity;
+  } as ApActivity;
 
   const { data, error } = await app.deliveryClient.deliveryActivity(
     actor.inboxUrl,

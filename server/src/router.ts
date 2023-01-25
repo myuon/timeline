@@ -33,6 +33,7 @@ import { syncActor } from "./handler/actor";
 import send from "koa-send";
 import { deliveryActivityToFollowers } from "./handler/delivery";
 import { RssFeedPlugin } from "./plugin/rssfeed/plugin";
+import { schemaForObject } from "./protocols/ap/object";
 
 const requireAuth = (ctx: Context) => {
   if (!ctx.state.auth) {
@@ -357,14 +358,7 @@ export const newRouter = (options?: IRouterOptions) => {
         return;
       }
 
-      const schema = schemaForType<{ id: string; content: string }>()(
-        z.object({
-          id: z.string(),
-          content: z.string(),
-        })
-      );
-
-      const noteResult = schema.safeParse(JSON.parse(data));
+      const noteResult = schemaForObject.safeParse(JSON.parse(data));
       if (!noteResult.success) {
         ctx.throw(400, noteResult.error);
         return;
