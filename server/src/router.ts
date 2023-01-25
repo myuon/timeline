@@ -26,7 +26,7 @@ import { Context } from "koa";
 import { ulid } from "ulid";
 import dayjs from "dayjs";
 import { Person } from "../../shared/model/person";
-import { Activity } from "./protocols/ap/activity";
+import { schemaForActivity } from "./protocols/ap/activity";
 import { TimelineObject } from "../../shared/model/timeline";
 import { ApiFollowRequest } from "../../shared/request/follow";
 import { syncActor } from "./handler/actor";
@@ -263,26 +263,7 @@ export const newRouter = (options?: IRouterOptions) => {
       return;
     }
 
-    const schema = schemaForType<Activity>()(
-      z.object({
-        type: z.string(),
-        published: z.string().optional(),
-        actor: z.string().optional(),
-        object: z
-          .string()
-          .or(
-            z.object({
-              id: z.string(),
-              type: z.string(),
-              content: z.string().optional(),
-            })
-          )
-          .optional(),
-        target: z.string().optional(),
-        cc: z.array(z.string()).optional(),
-      })
-    );
-    const result = schema.safeParse(ctx.request.body);
+    const result = schemaForActivity.safeParse(ctx.request.body);
     if (!result.success) {
       ctx.throw(400, result.error);
       return;
