@@ -519,9 +519,12 @@ describe("api", () => {
       );
       assert.notEqual(note, undefined);
 
+      const shares = await appContext.shareRepository.findByNoteId(note!.id);
+      assert.equal(shares.length, 1);
+
       const items = await appContext.inboxItemRepository.findByItemId(
         "Share",
-        note!.id
+        shares[0].id
       );
       assert.equal(items.length, 1);
       assert.equal(items[0].userId, userId);
