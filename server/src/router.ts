@@ -26,14 +26,14 @@ import { Context } from "koa";
 import { ulid } from "ulid";
 import dayjs from "dayjs";
 import { Person } from "../../shared/model/person";
-import { schemaForActivity } from "./protocols/ap/activity";
+import { newApCreate, schemaForActivity } from "./protocols/ap/activity";
 import { TimelineObject } from "../../shared/model/timeline";
 import { ApiFollowRequest } from "../../shared/request/follow";
 import { syncActor } from "./handler/actor";
 import send from "koa-send";
 import { deliveryActivityToFollowers } from "./handler/delivery";
 import { RssFeedPlugin } from "./plugin/rssfeed/plugin";
-import { schemaForObject } from "./protocols/ap/object";
+import { newApNote, schemaForObject } from "./protocols/ap/object";
 
 const requireAuth = (ctx: Context) => {
   if (!ctx.state.auth) {
@@ -181,14 +181,22 @@ export const newRouter = (options?: IRouterOptions) => {
       ctx.body = {
         "@context": "https://www.w3.org/ns/activitystreams",
         type: "OrderedCollectionPage",
-        id: `${userId}/outbox?page=true`,
-        partOf: `${userId}/outbox`,
+        id: `${userIdUrl}/outbox?page=true`,
+        partOf: `${userIdUrl}/outbox`,
         orderedItems: notes.map((note) =>
-          serializeCreateNoteActivity(
-            userIdUrl,
-            "https://www.w3.org/ns/activitystreams#Public",
-            note
-          )
+          newApCreate({
+            activityId: `${userIdUrl}/s/${note.id}`,
+            actor: userIdUrl,
+            to: ["https://www.w3.org/ns/activitystreams#Public"],
+            object: newApNote({
+              id: `${userIdUrl}/s/${note.id}`,
+              attributedTo: userIdUrl,
+              content: note.content,
+              to: ["https://www.w3.org/ns/activitystreams#Public"],
+              url: `${userIdUrl}/s/${note.id}`,
+            }),
+            published: dayjs.unix(note.createdAt).toDate().toUTCString(),
+          })
         ),
       };
     } else {

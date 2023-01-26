@@ -580,5 +580,31 @@ describe("api", () => {
       assert.equal(delivered[0].activity.actor, "https://tl.ramda.io/u/myuon");
       assert.equal(delivered[0].activity.object, "https://tl.ramda.io/u/myuon");
     });
+
+    it("GET /u/myuon/outbox", async () => {
+      const resp = await request.get("/u/myuon/outbox").expect(200);
+      const body = resp.body;
+
+      assert.deepEqual(body, {
+        "@context": "https://www.w3.org/ns/activitystreams",
+        id: "https://tl.ramda.io/u/myuon/outbox",
+        type: "OrderedCollection",
+        totalItems: 0,
+        last: "https://tl.ramda.io/u/myuon/outbox?page=true",
+      });
+    });
+
+    it("GET /u/myuon/outbox?page=true", async () => {
+      const resp = await request.get("/u/myuon/outbox?page=true").expect(200);
+      const body = resp.body;
+
+      assert.deepEqual(body, {
+        "@context": "https://www.w3.org/ns/activitystreams",
+        id: "https://tl.ramda.io/u/myuon/outbox?page=true",
+        type: "OrderedCollectionPage",
+        partOf: "https://tl.ramda.io/u/myuon/outbox",
+        orderedItems: [],
+      });
+    });
   });
 });
