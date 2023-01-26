@@ -1,10 +1,10 @@
 import { Context } from "koa";
 import { App } from "./app";
-import { ApActivity } from "../protocols/ap/activity";
 import { userIdUrl } from "../config";
 import dayjs from "dayjs";
 import { ulid } from "ulid";
 import { Note } from "../../../shared/model/note";
+import { ApActivity } from "../protocols/ap/activity";
 
 export const follow = async (app: App, ctx: Context, activity: ApActivity) => {
   if (!activity.object || !activity.actor) {
